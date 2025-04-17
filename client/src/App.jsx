@@ -4,14 +4,16 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "./App.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 // import Login from "./components/login/Login";
-import Faculties from "./components/Tables/Faculties";
+// import Faculties from "./components/Tables/Faculties";
+import Admins from "./components/Tables/Admins";
 
 
 const App = () => {
     return (
         <>
         {/* <Login/> */}
-        <Faculties/>
+        {/* <Faculties/> */}
+        <Admins/>
         </>
     );
 };
