@@ -1,0 +1,11 @@
+.border-dashed {
+  border-style: dashed !important;
+}
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.backBTN:hover{
+    background-color: #19355a !important;
+    color: white !important;
+}

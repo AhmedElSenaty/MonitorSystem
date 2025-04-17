@@ -18,6 +18,14 @@
         "password": "doctor2025",
         "role": "doctor"
       }
+    ],
+    "register": [
+      {
+        "id": 1,
+        "email": "student@helwan.edu.eg",
+        "password": "123456",
+        "role": "student"
+      }
     ]
   }
   
