@@ -507,7 +507,7 @@ const RegisterForm = () => {
                   <div className="d-flex justify-content-center align-item-center row mt-4">
                     <button
                       type="button"
-                      className="btn btn-outline-primary col-8 col-md-5 mx-2 mb-1 backBTN"
+                      className="btn btn-outline-primary col-8 col-md-5 mx-2 my-1 backBTN"
                       onClick={() => stepper.previous()}
                       style={{ color: PRIMARY, textAlign: "center" }}
                     >
@@ -515,7 +515,7 @@ const RegisterForm = () => {
                     </button>
                     <button
                       type="button"
-                      className="btn btn-primary col-8 col-md-5 mx-2 mt-1"
+                      className="btn btn-primary col-8 col-md-5 mx-2 my-1"
                       onClick={handleSubmit}
                       style={{ color: "white", backgroundColor: PRIMARY }}
                     >

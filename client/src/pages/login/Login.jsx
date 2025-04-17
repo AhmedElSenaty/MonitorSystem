@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -7,7 +7,9 @@ import { useNavigate } from "react-router-dom";
 import "./Login.css"; // for custom styles
 
 const Login = () => {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
+    
+        const [loader, setLoader] = useState(false);
   const {
     register,
     handleSubmit,
@@ -15,7 +17,8 @@ const Login = () => {
   } = useForm();
 
   //TODO: post method
-  const onSubmit = async (data) => {
+    const onSubmit = async (data) => {
+      setLoader(true);
     try {
       //change url
       const res = await axios.get(`http://localhost:3000/users`, {
@@ -34,6 +37,8 @@ const Login = () => {
     } catch (error) {
       toast.error("حدث خطأ أثناء محاولة الدخول");
       console.error(error);
+    }finally{
+        setLoader(false);
     }
   };
 
@@ -76,9 +81,17 @@ const Login = () => {
               )}
             </div>
 
-            <button type="submit" className="btn btn-primary w-100 mb-4 mt-3">
-              تسجيل الدخول
-            </button>
+            {loader ? (
+              <div className="d-flex justify-content-center align-item-center row mt-4">
+                <div class="spinner-border" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            ) : (
+              <button type="submit" className="btn btn-primary w-100 mb-4 mt-3">
+                تسجيل الدخول
+              </button>
+            )}
 
             <div className="text-center mt-3">
               {/* navigate to register  onClick={() => navigate("/register")} */}
