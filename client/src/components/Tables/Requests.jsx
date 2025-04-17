@@ -11,6 +11,10 @@ const Requests = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const requestsPerPage = 10;
 
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
+
+
 
 
     useEffect(() => {
@@ -26,21 +30,92 @@ const Requests = () => {
         }
     };
 
-
-
+    const statusCounts = {
+        "تحت المراجعة": requests.filter(r => r.status === "تحت المراجعة").length,
+        "تم القبول": requests.filter(r => r.status === "تم القبول").length,
+        "تم الرفض": requests.filter(r => r.status === "تم الرفض").length,
+    };
+    
 
 
 
     // Pagination logic
     const indexOfLastRequest= currentPage * requestsPerPage;
     const indexOfFirstRequest = indexOfLastRequest - requestsPerPage;
-    const currentRequests = requests.slice(indexOfFirstRequest, indexOfLastRequest);
-    const totalPages = Math.ceil(requests.length / requestsPerPage);
+
+    const filteredRequests = requests.filter(r =>
+        r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (r.ssn && r.ssn.includes(searchTerm))
+    );
+    
+    const totalPages = Math.ceil(filteredRequests.length / requestsPerPage);
+    const currentRequests = filteredRequests.slice(indexOfFirstRequest, indexOfLastRequest);
+    
 
     return (
         <div dir='rtl' className='p-4 bg-light min-vh-100'>
 
-            
+            <div className="summary">
+                <div className="row mb-4 justify-content-end">
+                    <div className="col-md-2 mb-2">
+                        <div className="card border-warning text-end">
+                            <div className="card-body">
+                                <h6 className="card-title text-warning">تحت المراجعة</h6>
+                                <h4 className="card-text">{statusCounts["تحت المراجعة"]}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-md-2 mb-2">
+                        <div className="card border-success text-end">
+                            <div className="card-body">
+                                <h6 className="card-title text-success">تم القبول</h6>
+                                <h4 className="card-text">{statusCounts["تم القبول"]}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-md-2 mb-2">
+                        <div className="card border-danger text-end">
+                            <div className="card-body">
+                                <h6 className="card-title text-danger">تم الرفض</h6>
+                                <h4 className="card-text">{statusCounts["تم الرفض"]}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="search">
+            <div className="mb-4 row">
+                <div className="col-md-3 mb-2">
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="بحث بالاسم أو الرقم القومي..."
+                        value={searchTerm}
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value);
+                            setCurrentPage(1);
+                        }}
+                    />
+                </div>
+                <div className="col-md-3">
+                    <select
+                        className="form-select"
+                        value={statusFilter}
+                        onChange={(e) => {
+                            setStatusFilter(e.target.value);
+                            setCurrentPage(1);
+                        }}
+                    >
+                        <option value="">كل الحالات</option>
+                        <option value="تحت المراجعة">تحت المراجعة</option>
+                        <option value="تم القبول">تم القبول</option>
+                        <option value="تم الرفض">تم الرفض</option>
+                    </select>
+                </div>
+            </div>
+
+            </div>
 
             <div >
                 <table className="table table-hover text-end">
