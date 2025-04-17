@@ -390,7 +390,8 @@ const RegisterForm = () => {
                           name="gender"
                           className="form-select"
                           value={form.gender}
-                          onChange={handleChange}
+                        onChange={handleChange}
+                        disabled
                         >
                           <option value="">الجنس</option>
                           <option value="ذكر">ذكر</option>
@@ -404,7 +405,8 @@ const RegisterForm = () => {
                           className="form-control"
                           placeholder="العمر"
                           value={form.age}
-                          readOnly
+                                                readOnly
+                                                disabled
                         />
                       </div>
                       <div className="col-md-4 my-1 my-sm-2">
@@ -414,7 +416,8 @@ const RegisterForm = () => {
                           className="form-control"
                           placeholder="تاريخ الميلاد"
                           value={birthDate}
-                          readOnly
+                                                readOnly
+                                                disabled
                         />
                       </div>
                     </div>
