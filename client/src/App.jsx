@@ -3,9 +3,11 @@ import '../node_modules/bs-stepper/dist/css/bs-stepper.min.css';
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./App.css";
 
+
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import Navbar from "./components/Navbar";
+import Footer from "./components/footer";
 import RegisterForm from './pages/register/Register';
 import Login from "./pages/login/Login";
 
@@ -17,11 +19,10 @@ const App = () => {
             <Routes>
                 <Route path="/" element={<UnderDevelopment />} />
                 <Route path="/register" element={<RegisterForm />} />
-                <Route path="/login" element={<Login/>} />
+                <Route path="/login" element={<Login />} />
             </Routes>
+            <Footer />
         </BrowserRouter>
-
-        
     );
 };
 
