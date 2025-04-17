@@ -10,19 +10,20 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/footer";   
 import RegisterForm from './pages/register/Register';
 import Login from "./pages/login/Login";
-
+import PersonalInfoPortal from "./pages/profile/Profile";
 
 const App = () => {
     return (
-        <BrowserRouter>
-            <Navbar />
-            <Routes>
-                <Route path="/" element={<UnderDevelopment />} />
-                <Route path="/register" element={<RegisterForm />} />
-                <Route path="/login" element={<Login />} />
-            </Routes>
-            <Footer />
-        </BrowserRouter>
+      <BrowserRouter>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<UnderDevelopment />} />
+          <Route path="/register" element={<RegisterForm />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/profile" element={<PersonalInfoPortal />} />
+        </Routes>
+        <Footer />
+      </BrowserRouter>
     );
 };
 
