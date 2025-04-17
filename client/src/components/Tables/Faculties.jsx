@@ -5,6 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashCan, faChevronRight, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faSquare as faSquareRegular, faSquareCheck as faSquareCheckRegular } from '@fortawesome/free-regular-svg-icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './Tables.css';
 
 const Faculties = () => {
@@ -37,7 +39,7 @@ const Faculties = () => {
             setCheckedFaculties(checkedFaculties.filter(id => id !== facultyId));
         } else {
             if (checkedFaculties.length >= 4) {
-                alert("لا يمكنك اختيار أكثر من ٤ كليات");
+                toast.error("لا يمكنك اختيار أكثر من ٤ كليات");
                 return;
             }
             setCheckedFaculties([...checkedFaculties, facultyId]);
@@ -60,8 +62,9 @@ const Faculties = () => {
             );
             await Promise.all(postReqs);
 
-            alert("تم الحفظ بنجاح");
+            toast.success("تم الحفظ بنجاح");
         } catch (error) {
+            toast.error(" حدث خطأ أثناء الحفظ");
             console.error("Error saving:", error);
         }
     };
@@ -70,7 +73,9 @@ const Faculties = () => {
         try {
             await axios.delete(`http://localhost:3000/faculties/${facultyId}`);
             fetchData();
+            toast.success(" تم حذف بنجاح");
         } catch (error) {
+            toast.error(" حدث خطأ أثناء الحذف");
             console.error("Error deleting:", error);
         }
     };
@@ -84,7 +89,9 @@ const Faculties = () => {
             setShowModal(false);
             setNewFacultyName('');
             fetchData();
+            toast.success(" تمت إضافة الكلية");
         } catch (error) {
+            toast.error(" حدث خطأ أثناء الإضافة");
             console.error("Error adding faculty:", error);
         }
     };
@@ -112,7 +119,7 @@ const Faculties = () => {
                     <thead className="table-secondary">
                         <tr>
                             <th>رقم مسلسل</th>
-                            <th>الكلية</th>
+                            <th className='w-25 text-wrap'>الكلية</th>
                             <th className="text-center">تحكم</th>
                         </tr>
                     </thead>
@@ -120,7 +127,7 @@ const Faculties = () => {
                         {faculties.map(faculty => (
                             <tr key={faculty.id}>
                                 <td>{faculty.id}</td>
-                                <td>{faculty.name}</td>
+                                <td >{faculty.name}</td>
                                 <td className="text-center">
                                     <FontAwesomeIcon
                                         icon={checkedFaculties.includes(faculty.id) ? faSquareCheckRegular : faSquareRegular}
@@ -145,8 +152,8 @@ const Faculties = () => {
                     <div className="modal-dialog modal-dialog-centered">
                         <div className="modal-content">
                             <div className="modal-header">
+                                <button type="button" className="btn-close ms-0" onClick={() => setShowModal(false)}></button>
                                 <h5 className="modal-title">إضافة كلية جديدة</h5>
-                                <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
                             </div>
                             <div className="modal-body">
                                 <input
@@ -165,6 +172,8 @@ const Faculties = () => {
                     </div>
                 </div>
             )}
+            <ToastContainer position="top-center" />
+
         </div>
     );
 };
