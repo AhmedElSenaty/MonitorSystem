@@ -119,7 +119,7 @@ const Faculties = () => {
                     <thead className="table-secondary">
                         <tr>
                             <th>رقم مسلسل</th>
-                            <th className='w-25 text-wrap'>الكلية</th>
+                            <th className='w-25 text-break'>الكلية</th>
                             <th className="text-center">تحكم</th>
                         </tr>
                     </thead>
@@ -127,12 +127,12 @@ const Faculties = () => {
                         {faculties.map(faculty => (
                             <tr key={faculty.id}>
                                 <td>{faculty.id}</td>
-                                <td >{faculty.name}</td>
-                                <td className="text-center">
+                                <td  className="text-break">{faculty.name}</td>
+                                <td className="text-center fs-5" style={{alignContent:"center"}}>
                                     <FontAwesomeIcon
                                         icon={checkedFaculties.includes(faculty.id) ? faSquareCheckRegular : faSquareRegular}
                                         onClick={() => toggleCheck(faculty.id)}
-                                        style={{ cursor: 'pointer', marginLeft: '10px' }}
+                                        style={{ cursor: 'pointer', marginLeft: '25px' }}
                                     />
                                     <FontAwesomeIcon
                                         icon={faTrashCan}

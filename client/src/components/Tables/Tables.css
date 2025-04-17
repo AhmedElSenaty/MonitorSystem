@@ -48,3 +48,8 @@
     --bs-btn-disabled-bg: #1F2D5C;
     --bs-btn-disabled-border-color: #1F2D5C;
 }
+
+table td, table th {
+    word-break: break-word;
+    white-space: normal;
+}
