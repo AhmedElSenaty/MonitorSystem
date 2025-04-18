@@ -1,16 +1,14 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashCan, faChevronRight, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faSquare as faSquareRegular, faSquareCheck as faSquareCheckRegular } from '@fortawesome/free-regular-svg-icons';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import {  toast } from 'react-toastify';
 import './Tables.css';
 
 const Faculties = () => {
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
     const [faculties, setFaculties] = useState([]);
     const [checkedFaculties, setCheckedFaculties] = useState([]);
     const [showModal, setShowModal] = useState(false);
@@ -99,7 +97,7 @@ const Faculties = () => {
     return (
         <div dir='rtl' className='p-5 bg-light vh-100'>
             {/* TODO: onClick={() => navigate(-1)} */}
-            <button type="button" className="btn btn-outline-primary mb-3" >
+            <button type="button" className="btn btn-outline-primary mb-3" onClick={() => navigate(-1)} >
                 <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
                 رجوع
             </button>
@@ -172,7 +170,6 @@ const Faculties = () => {
                     </div>
                 </div>
             )}
-            <ToastContainer position="top-center" />
 
         </div>
     );

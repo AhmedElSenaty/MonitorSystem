@@ -1,9 +1,12 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useRef } from "react";
 import { Modal, Button } from 'react-bootstrap';
-
+import axios from "axios";
+import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
 
 const PersonalInfoPortal = () => {
+    const navigate = useNavigate();
     const originalData = {
         name: "احمد محمد عمر",
         address: "القاهرة الجديدة",
@@ -16,6 +19,7 @@ const PersonalInfoPortal = () => {
         DOB: "01/01/2000",
     };
     const [isEditing, setIsEditing] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [data, setData] = useState({ ...originalData });
 
     const fileInputs = {
@@ -37,13 +41,12 @@ const PersonalInfoPortal = () => {
         setFiles((prev) => ({ ...prev, [type]: file }));
 
     const startEdit = () => setIsEditing(true);
-    const saveEdit = () => setIsEditing(false);
     const cancelEdit = () => {
         setData({ ...originalData });
         setIsEditing(false);
     };
-    // const role = "Employee";
-    const role = "Admin";
+    const role = "Employee";
+    // const role = "Admin";
     const isAdmin = role === "Admin";
     const isEmployee = role === "Employee";
 
@@ -54,7 +57,7 @@ const PersonalInfoPortal = () => {
         { status: "تحت المراجعة", notes: "لا يوجد ملاحظات" },
     ];
 
-    const [request, setRequest] = useState(requests[2]);
+    const [request, setRequest] = useState(requests[0]);
     const statusClass = (s) =>
         s === "تم القبول"
             ? "text-success"
@@ -85,6 +88,48 @@ const PersonalInfoPortal = () => {
         closeModal();
     };
 
+    const validateData = () => {
+        const errors = {};
+        if (!data.name.trim()) errors.name = "الاسم مطلوب";
+        if (!data.address.trim()) errors.address = "العنوان مطلوب";
+        if (!data.degree.trim()) errors.degree = "الدرجة مطلوبة";
+        if (!data.job.trim()) errors.job = "الوظيفة مطلوبة";
+        return errors;
+    };
+
+    const saveEdit = async () => {
+        setLoading(true);
+        const errors = validateData();
+        if (Object.keys(errors).length > 0) {
+            toast.error("تحقق من الحقول:\n" + Object.values(errors).join("\n"));
+            return;
+        }
+
+        const formData = new FormData();
+        Object.entries(data).forEach(([key, value]) => formData.append(key, value));
+        Object.entries(files).forEach(([key, file]) => {
+            if (file) formData.append(key, file);
+        });
+
+        try {
+            const response = await axios.get("http://localhost:3000/users?_delay=10000").then((res) => res.data);
+            console.log(response);
+            // TODO: change url
+            // const response = await axios.post("http://localhost:3000/users?_delay=1000s", formData, {
+            //     headers: {
+            //         'Content-Type': 'multipart/form-data'
+            //     }
+            // });
+            toast.success("تم تحديث البيانات بنجاح");
+            setIsEditing(false);
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            toast.error("حدث خطأ أثناء تحديث البيانات.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div
             dir="rtl"
@@ -104,19 +149,28 @@ const PersonalInfoPortal = () => {
                                 </button>
                             ) : (
                                 isEmployee && (
-                                    <div className="d-flex">
-                                        <button
-                                            className="btn btn-success me-1 mx-2 px-3"
-                                            onClick={saveEdit}
-                                        >
-                                            حفظ
-                                        </button>
-                                        <button
-                                            className="btn btn-danger mx-2 px-3"
-                                            onClick={cancelEdit}
-                                        >
-                                            إلغاء
-                                        </button>
+                                        <div className="d-flex">
+                                            {!loading && (
+                                                <>
+                                                    <button
+                                                        className="btn btn-success me-1 mx-2 px-3"
+                                                        onClick={saveEdit}
+                                                    >
+                                                        حفظ
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-danger mx-2 px-3"
+                                                        onClick={cancelEdit}
+                                                    >
+                                                        إلغاء
+                                                        </button>
+                                                </>
+                                            )}
+                                            {loading && (
+                                                <div className="spinner-border text-primary" role="status">
+                                                    <span className="visually-hidden">Loading...</span>
+                                                </div>
+                                            )}
                                     </div>
                                 )
                             )}
@@ -418,7 +472,10 @@ const PersonalInfoPortal = () => {
                                     <td>
                                         {/* TODO: add events to redirect use to the tables page */}
                                         {isEmployee && (
-                                            <button style={{ backgroundColor: '#19355A' }} className="btn btn-outline-primary btn-main btn-sm">
+                                            <button style={{ backgroundColor: '#19355A' }}
+                                                className="btn btn-outline-primary btn-main btn-sm"
+                                                onClick={() => navigate('/faculties')}
+                                            >
                                                 عرض الكليات
                                             </button>
                                         )}
@@ -441,7 +498,7 @@ const PersonalInfoPortal = () => {
                                                     </>
                                                 )}
                                                 {request.status === "تم القبول" && (
-                                                    <button className="btn btn-outline-primary btn-sm">
+                                                    <button className="btn btn-outline-primary btn-sm" onClick={() => navigate("/faculties")}>
                                                         اضف كليات
                                                     </button>
                                                 )}

@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
 // import { useNavigate } from 'react-router-dom';
-import 'react-toastify/dist/ReactToastify.css';
 import './Tables.css';
 
 const Requests = () => {
