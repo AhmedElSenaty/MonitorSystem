@@ -103,8 +103,13 @@ const RegisterForm = () => {
     };
     const validate = (fields) => {
         const newErrors = {};
-        if (fields.includes("name") && !form.name.trim())
-            newErrors.name = "الاسم مطلوب";
+        if (fields.includes("name")) {
+            if (!form.name.trim()) {
+                newErrors.name = "الاسم مطلوب";
+            } else if ((form.name.trim().match(/ /g) || []).length < 3) {
+                newErrors.name = "الاسم يجب أن يحتوي على أربع كلمات على الأقل";
+            }
+        }
         if (fields.includes("email") && !form.email.includes("@"))
             newErrors.email = "بريد إلكتروني غير صالح";
         if (fields.includes("address") && !form.address.trim())
@@ -195,7 +200,6 @@ const RegisterForm = () => {
 
     return (
       <>
-        <ToastContainer position="top-right" />
         <div className="container mt-5">
           <div className="card shadow p-4">
             <h2 className="text-center text-primary mb-3">تقديم طلب</h2>
@@ -536,7 +540,7 @@ const RegisterForm = () => {
           </div>
           <div className="col-12 col-md-12 w-100 d-flex align-item-center justify-content-center">
             <button
-              style={{ backgroundColor: SECONDARY_HOVER }}
+              style={{ backgroundColor: SECONDARY_HOVER , borderColor: SECONDARY_HOVER }}
               className="col-5 btn btn-primary my-3"
               dir="rtl"
               onClick={() => navigate("/login")}
