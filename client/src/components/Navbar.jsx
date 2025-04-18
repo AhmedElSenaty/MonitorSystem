@@ -32,7 +32,7 @@ const Navbar = () => {
                             </ul>
                         )}
                         <div className={role === "superadmin" ? "d-flex" : "d-flex me-auto my-2 my-lg-0"} role="logout">
-                            <button className="btn btn-outline-success me-5" type="button" onClick={onLogout}>تسجيل خروج</button>
+                            <button className="btn btn-outline-info me-5" type="button" onClick={onLogout}>تسجيل خروج</button>
                         </div>
                     </div>
                 </div>

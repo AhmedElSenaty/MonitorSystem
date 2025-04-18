@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashCan, faChevronRight, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faTrashCan, faChevronRight, faPlus, faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import { faSquare as faSquareRegular, faSquareCheck as faSquareCheckRegular } from '@fortawesome/free-regular-svg-icons';
 import {  toast } from 'react-toastify';
 import './Tables.css';
@@ -18,6 +18,21 @@ const Faculties = () => {
     useEffect(() => {
         fetchData();
     }, []);
+    const downloadFile = async (url, fileName) => {
+        try {
+            const response = await axios.get(url, {
+                responseType: 'blob',
+            });
+            const blob = new Blob([response.data], { type: response.headers['content-type'] });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = fileName;
+            link.click();
+        } catch (error) {
+            toast.error("حدث خطأ أثناء تحميل الملف");
+            console.error("Download error:", error);
+        }
+    };
 
     const fetchData = async () => {
         try {
@@ -110,6 +125,13 @@ const Faculties = () => {
                     <FontAwesomeIcon icon={faPlus} className='ms-2' />
                     اضف كلية
                 </button>
+                <button
+                    className="btn btn-outline-success rounded-0"
+                    onClick={() => downloadFile("http://localhost:3000/faculties/export", "كل_الكليات.xlsx")}
+                >
+                    <FontAwesomeIcon icon={faFileExcel} className="ms-2" />
+                    تصدير الكل
+                </button>
             </div>
 
             <div className="table-responsive">
@@ -126,18 +148,29 @@ const Faculties = () => {
                             <tr key={faculty.id}>
                                 <td>{faculty.id}</td>
                                 <td  className="text-break">{faculty.name}</td>
-                                <td className="text-center fs-5" style={{alignContent:"center"}}>
+                                <td className="text-center fs-5" style={{ alignContent: "center" }}>
+                                    {/* <button
+                                        > */}
+                                    <FontAwesomeIcon icon={faFileExcel}
+                                            title="تصدير الكلية"
+                                            className="btn btn-outline-success  mx-1"
+                                            onClick={() => downloadFile(`http://localhost:3000/faculties/${faculty.id}/export`, `الكلية_${faculty.name}.xlsx`)}
+                                            />
+                                    {/* </button> */}
                                     <FontAwesomeIcon
+                                        className="btn btn-outline-primary  mx-1"
                                         icon={checkedFaculties.includes(faculty.id) ? faSquareCheckRegular : faSquareRegular}
                                         onClick={() => toggleCheck(faculty.id)}
-                                        style={{ cursor: 'pointer', marginLeft: '25px' }}
-                                    />
+                                        style={{ cursor: 'pointer', marginLeft: '20px' }}
+                                        />
                                     <FontAwesomeIcon
                                         icon={faTrashCan}
+                                        className="btn btn-outline-danger  mx-1"
                                         onClick={() => handleDelete(faculty.id)}
-                                        style={{ cursor: 'pointer', color: 'red' }}
+                                        style={{ cursor: 'pointer', marginLeft: '10px' }}
                                     />
                                 </td>
+
                             </tr>
                         ))}
                     </tbody>

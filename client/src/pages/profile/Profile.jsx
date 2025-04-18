@@ -3,8 +3,7 @@ import React, { useState, useRef } from "react";
 import { Modal, Button } from 'react-bootstrap';
 import axios from "axios";
 import { useNavigate } from "react-router";
-import { toast } from "react-toastify";
-import { set } from "react-hook-form";
+import { toast } from "react-toastify"
 
 const PersonalInfoPortal = () => {
     const navigate = useNavigate();
@@ -44,10 +43,11 @@ const PersonalInfoPortal = () => {
         setData({ ...originalData });
         setIsEditing(false);
     };
-    const role = "Employee";
-    // const role = "Admin";
-    const isAdmin = role === "Admin";
-    const isEmployee = role === "Employee";
+    const role = "employee";
+    // const role = "admin";
+
+    const isAdmin = role === "admin";
+    const isEmployee = role === "employee";
 
     const requests = [
         { status: "تم القبول", notes: "لا يوجد ملاحظات" },
@@ -501,9 +501,11 @@ const PersonalInfoPortal = () => {
                                     <td>
                                         {/* TODO: add events to redirect use to the tables page */}
                                         {isEmployee && (
-                                            <button style={{ backgroundColor: '#19355A' }}
+                                            <button
                                                 className="btn btn-outline-primary btn-main btn-sm"
                                                 onClick={() => navigate('/faculties')}
+                                                disabled={request.status === "تحت المراجعة" || request.status === "تم الرفض"}
+                                                style={{ backgroundColor: '#19355A', cursor: request.status === "تحت المراجعة" || request.status === "تم الرفض" ? "not-allowed" : "pointer" }}
                                             >
                                                 عرض الكليات
                                             </button>
@@ -556,8 +558,8 @@ const PersonalInfoPortal = () => {
                         />
                     </Modal.Body>
                     <Modal.Footer className="flex-row-reverse">
-                        <Button variant="secondary" onClick={closeModal}>إلغاء</Button>
-                        <Button variant="primary" onClick={saveNote}>حفظ التغييرات</Button>
+                        <Button variant="danger" onClick={closeModal}>إلغاء</Button>
+                        <Button variant="success" onClick={saveNote}>حفظ التغييرات</Button>
                     </Modal.Footer>
                 </Modal>
 
