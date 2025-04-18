@@ -61,3 +61,11 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 input[type="time"]::-moz-calendar-picker-indicator {
   display: none;
 }
+.btn-main:hover {
+    background-color: #19355a !important;
+    color: white !important;
+}
+.btn-main{
+    background-color: transparent !important;
+    color: #19355a !important;
+}

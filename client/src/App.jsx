@@ -2,19 +2,28 @@ import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../node_modules/bs-stepper/dist/css/bs-stepper.min.css';
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./App.css";
-import 'bootstrap/dist/css/bootstrap.min.css';
-// import Login from "./components/login/Login";
-// import Faculties from "./components/Tables/Faculties";
-import Admins from "./components/Tables/Admins";
 
+
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+
+import Navbar from "./components/Navbar";
+import Footer from "./components/footer";   
+import RegisterForm from './pages/register/Register';
+import Login from "./pages/login/Login";
+import PersonalInfoPortal from "./pages/profile/Profile";
 
 const App = () => {
     return (
-        <>
-        {/* <Login/> */}
-        {/* <Faculties/> */}
-        <Admins/>
-        </>
+      <BrowserRouter>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<UnderDevelopment />} />
+          <Route path="/register" element={<RegisterForm />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/profile" element={<PersonalInfoPortal />} />
+        </Routes>
+        <Footer />
+      </BrowserRouter>
     );
 };
 

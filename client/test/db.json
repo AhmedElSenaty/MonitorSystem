@@ -1,143 +1,31 @@
 {
-  "users": [
-    {
-      "id": "1",
-      "email": "student@helwan.edu.eg",
-      "password": "123456",
-      "role": "student"
-    },
-    {
-      "id": "2",
-      "email": "admin@helwan.edu.eg",
-      "password": "admin123",
-      "role": "admin"
-    },
-    {
-      "id": "3",
-      "email": "doctor@helwan.edu.eg",
-      "password": "doctor2025",
-      "role": "doctor"
-    }
-  ],
-  "faculties": [
-    {
-      "id": "1",
-      "name": "طب"
-    },
-    {
-      "id": "2",
-      "name": "تجارة"
-    },
-    {
-      "id": "3",
-      "name": "هندسة"
-    },
-    {
-      "id": "4",
-      "name": "تقنية المعلومات"
-    },
-    {
-      "id": "5",
-      "name": "تربية"
-    },
-    {
-      "id": "6",
-      "name": "علوم"
-    },
-    {
-      "id": "d9ba",
-      "name": "afdaf"
-    }
-  ],
-  "userFaculties": [
-    {
-      "id": "fdcf",
-      "userId": 1,
-      "facultyId": "1"
-    },
-    {
-      "id": "f141",
-      "userId": 1,
-      "facultyId": "3"
-    },
-    {
-      "id": "f374",
-      "userId": 1,
-      "facultyId": "4"
-    }
-  ],
-  "admins": [
-    {
-      "id": "1",
-      "name": "أحمد",
-      "mail": "admin@helwan.edu.eg",
-      "pass": "admin123"
-    },
-    {
-      "id": "2",
-      "name": "سارة",
-      "mail": "doctor@helwan.edu.eg",
-      "pass": "doctor2025"
-    },
-    {
-      "name": "محمد",
-      "mail": "student@helwan.edu.eg",
-      "pass": "2222",
-      "id": "3"
-    },
-    {
-      "name": "ماهر",
-      "mail": "student@helwan.edu.eg",
-      "pass": "1111",
-      "id": "4"
-    },
-    {
-      "id": "5",
-      "name": "محمد",
-      "mail": "student@helwan.edu.eg",
-      "pass": "123456"
-    },
-    {
-      "id": "6",
-      "name": "محمد",
-      "mail": "student@helwan.edu.eg",
-      "pass": "123456"
-    },
-    {
-      "id": "7",
-      "name": "محمد",
-      "mail": "student@helwan.edu.eg",
-      "pass": "123456"
-    },
-    {
-      "id": "8",
-      "name": "محمد",
-      "mail": "student@helwan.edu.eg",
-      "pass": "123456"
-    },
-    {
-      "id": "9",
-      "name": "محمد",
-      "mail": "student@helwan.edu.eg",
-      "pass": "123456"
-    },
-    {
-      "id": "10",
-      "name": "حبيبة",
-      "mail": "student@helwan.edu.eg",
-      "pass": "123456"
-    },
-    {
-      "id": "12",
-      "name": "محمود",
-      "mail": "student@helwan.edu.eg",
-      "pass": "123456"
-    },
-    {
-      "id": "923e",
-      "name": "منير",
-      "mail": "student@helwan.edu.eg",
-      "pass": "123456"
-    }
-  ]
-}
+    "users": [
+      {
+        "id": 1,
+        "email": "student@helwan.edu.eg",
+        "password": "123456",
+        "role": "student"
+      },
+      {
+        "id": 2,
+        "email": "admin@helwan.edu.eg",
+        "password": "admin123",
+        "role": "admin"
+      },
+      {
+        "id": 3,
+        "email": "doctor@helwan.edu.eg",
+        "password": "doctor2025",
+        "role": "doctor"
+      }
+    ],
+    "register": [
+      {
+        "id": 1,
+        "email": "student@helwan.edu.eg",
+        "password": "123456",
+        "role": "student"
+      }
+    ]
+  }
+  
