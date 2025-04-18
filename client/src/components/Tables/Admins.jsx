@@ -117,12 +117,14 @@ const Admins = () => {
                                     <FontAwesomeIcon
                                         icon={faPenRegular}
                                         onClick={() => handleEdit(admin)}
-                                        style={{ cursor: 'pointer', marginLeft: '25px' }}
+                                        style={{ cursor: 'pointer' }}
+                                        className='btn btn-outline-primary mx-1'
                                     />
                                     <FontAwesomeIcon
                                         icon={faTrashCan}
                                         onClick={() => handleDelete(admin.id)}
-                                        style={{ cursor: 'pointer', color: 'red' }}
+                                        style={{ cursor: 'pointer' }}
+                                        className='btn btn-outline-danger mx-1'
                                     />
                                 </td>
                             </tr>
