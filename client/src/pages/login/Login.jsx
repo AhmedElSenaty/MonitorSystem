@@ -38,7 +38,7 @@ const Login = () => {
           const userData = {
               id: token.Id,
               role: token.role.toLowerCase(),
-              token: token,
+              token: res.data.data.token,
               isLoggedIn: true
           }
           setUser(userData);

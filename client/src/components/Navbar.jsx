@@ -17,7 +17,7 @@ const Navbar = () => {
     useEffect(() => {
         setRole(user.role);
         setIsLoggedIn(user.isLoggedIn);
-    })
+    },[user]);
 
     const onLogout = () => {
         console.log("Logout clicked");
@@ -32,9 +32,12 @@ const Navbar = () => {
                     <a className="navbar-brand" >
                         <img src="/assets/helwan-logo.png" alt="Logo" width="50" height="50" className="d-inline-block align-text-top" />
                     </a>
+                    {isLoggedIn && (
+                        
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                     </button>
+                    )}
                     <div className="collapse navbar-collapse" id="navbarScroll">
                         {role === "superadmin" && (
                             <ul className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll gap-2" style={{ "--bs-scroll-height": "100px" }}>

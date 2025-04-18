@@ -1,36 +1,33 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from "react";
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Toast } from 'react-bootstrap';
 import axios from "axios";
 import { useNavigate, useParams } from "react-router";
-import { toast } from "react-toastify"
+import { ToastContainer,toast } from "react-toastify"
+import { useAuth } from "../../Context/AuthContext";
 
 const PersonalInfoPortal = () => {
+    const { user, setUser } = useAuth();
     const navigate = useNavigate();
     const { id } = useParams();
-
-    // useEffect(() => {
-    //     if (!id) {
-    //         toast.error("يرجى تسجيل الدخول",{rtl: true});
-    //         navigate("/login");
-    //     }
-    // }, [id]);
-
-    const originalData = {
-        name: "احمد محمد عمر",
-        address: "القاهرة الجديدة",
-        degree: "خريج",
-        job: "معيد",
-        ssn: "123456789",
-        phone: "0100100100",
-        email: "7x8e9@example.com",
-        gender: "ذكر",
-        DOB: "01/01/2000",
+    
+    let originalData = {
+        name: "",
+        address: "",
+        degree: "",
+        job: "",
+        ssn: "",
+        phone: "",
+        email: "",
+        gender: "",
+        DOB: "",
+        age: "",
     };
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState({ ...originalData });
-
+    const [orgdata, setOrgData] = useState({ ...originalData });
+    
     const fileInputs = {
         personal: useRef(),
         degree: useRef(),
@@ -43,35 +40,85 @@ const PersonalInfoPortal = () => {
         idFront: null,
         idBack: null,
     });
-
-    const handleChange = (field, value) =>
-        setData((prev) => ({ ...prev, [field]: value }));
-
-    const startEdit = () => setIsEditing(true);
-    const cancelEdit = () => {
-        setData({ ...originalData });
-        setIsEditing(false);
-    };
-    const role = "employee";
-    // const role = "admin";
-
-    const isAdmin = role === "admin";
-    const isEmployee = role === "employee";
-
-    const requests = [
+    
+    
+    
+    let requests = [
         { status: "تم القبول", notes: "لا يوجد ملاحظات" },
         { status: "تحت المراجعة", notes: "لا يوجد ملاحظات" },
         { status: "تم الرفض", notes: "الصورة غير واضحة" },
         { status: "تحت المراجعة", notes: "لا يوجد ملاحظات" },
     ];
-
-    const [request, setRequest] = useState(requests[0]);
+    
+    const [role, setRole] = useState('');
+    const isAdmin = role === "admin";
+    const isEmployee = role === "employee";
+    const [request, setRequest] = useState(requests[1]);
     const statusClass = (s) =>
         s === "تم القبول"
             ? "text-success"
             : s === "تحت المراجعة"
                 ? "text-warning"
                 : "text-danger";
+    
+    
+        useEffect(() => {
+            if (!id && !user) {
+                toast.error("يرجى تسجيل الدخول",{rtl: true});
+                navigate("/login");
+                return;
+            }
+            setRole(user.role);
+            const fetchData = async () => {
+                try {
+                    const response = await axios.get(`https://localhost:7057/api/Request/${id}`, {
+                        headers: {
+                            'Authorization': `Bearer ${user.token}`
+                        }
+                    });
+                    setData({
+                        name: response.data.data.employeeInformation.name,
+                        address: response.data.data.employeeInformation.address,
+                        degree: response.data.data.employeeInformation.degree,
+                        job: response.data.data.employeeInformation.job,
+                        ssn: response.data.data.employeeInformation.ssn,
+                        phone: response.data.data.employeeInformation.phone,
+                        email: response.data.data.employeeInformation.email,
+                        gender: response.data.data.employeeInformation.gender,
+                        DOB: response.data.data.employeeInformation.dob,
+                        age: response.data.data.employeeInformation.age
+                    });
+                    setOrgData({ ...data });
+
+                    setFiles({
+                        personal: response.data.data.employeeImagesDto.personalImage,
+                        degree: response.data.data.employeeImagesDto.degreeImage,
+                        idFront: response.data.data.employeeImagesDto.ssnFrontImage,
+                        idBack: response.data.data.employeeImagesDto.ssnBackImage
+                    })
+                    setRequest(response.data.data.requestStatus);
+                    console.log(response.data.data.requestStatus);
+                } catch (error) {
+                    console.error("Error fetching data:", error);
+                }
+            };
+            fetchData();
+            
+    
+        }, [id, user.token, navigate]);
+    
+    const handleChange = (field, value) =>
+        setData((prev) => ({ ...prev, [field]: value }));
+
+    const startEdit = () => setIsEditing(true);
+    const cancelEdit = () => {
+        console.log(orgdata);
+        setData(orgdata);
+        setIsEditing(false);
+    };
+    // const role = "employee";
+    // const role = "admin";
+
 
 
     // Modal state for adding notes
@@ -109,11 +156,13 @@ const PersonalInfoPortal = () => {
         if (!data.degree.trim()) errors.degree = 'المؤهل مطلوب';
         if (!data.job.trim()) errors.job = 'الوظيفة مطلوبة';
         if (!data.gender.trim()) errors.gender = 'النوع مطلوب';
-        if (!/^\d{2}\/\d{2}\/\d{4}$/.test(data.DOB)) errors.DOB = 'تاريخ الميلاد بصيغة DD/MM/YYYY';
+        console.log(errors);
         return errors;
     };
     // Improved file handler with immediate validation
     const handleFile = (type, file) => {
+        console.log(file);
+        console.log(type);
         const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
         const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/jpg'];
 
@@ -125,14 +174,61 @@ const PersonalInfoPortal = () => {
             toast.error(`${label}: نوع الملف غير مدعوم \n(jpg, jpeg فقط)`, { rtl: true,autoClose: 5000 });
             return;
         }
+        console.log(file.size > MAX_FILE_SIZE);
         if (file.size > MAX_FILE_SIZE) {
             toast.error(`${label}: حجم الملف كبير جدًا \n( 1MB أقصى حجم)`, { rtl: true,autoClose: 5000 });
             return;
         }
-        setFiles(prev => ({ ...prev, [type]: file }));
+        console.log('send...');
+        const updateProfile = async () => {
+            
+            let formData = new FormData();
+            formData.append(type, file);
+            try {
+                /*
+                degreeImage
+                personalImage
+                ssnBackImage
+                ssnFrontImage
+                */
+                const getIdentifier = (type)=>{
+                    switch(type){
+                        case "degree":
+                            return "DegreeImage";
+                        case "personal":
+                            return "PersonalImage";
+                        case "idFront":
+                            return "SSNFrontImage";
+                        case "idBack":
+                            return "SSNBackImage";
+                    }
+                };
+                const response = await axios.put("https://localhost:7057/api/Request/UpdateRequestAssets", formData, {
+                    params: {
+                        "Identifier": getIdentifier(type)
+                    }
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${user.token}`,
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                console.log(response.data);
+                toast.success("تم تحديث البيانات بنجاح", { rtl: true });
+
+                setFiles(prev => ({ ...prev, [type]: file }));
+            } catch (error) {
+                console.error("Error updating profile:", error);
+                toast.error("حدث خطأ أثناء تحديث البيانات.", { rtl: true });
+            }
+        }
+        updateProfile();
     };
+      
 
     const saveEdit = async () => {
+        console.log("saving...");
+        console.log(data);
         setLoading(true);
         const errors = validateData();
         if (Object.keys(errors).length > 0) {
@@ -142,20 +238,20 @@ const PersonalInfoPortal = () => {
         }
 
         const formData = new FormData();
-        Object.entries(data).forEach(([key, value]) => formData.append(key, value));
-        Object.entries(files).forEach(([key, file]) => {
-            if (file) formData.append(key, file);
-        });
-
+        Object.entries(data).forEach(([key, value]) => formData.append(key.toLowerCase(), value));
+    
         try {
-            const response = await axios.get("http://localhost:3000/users?_delay=10000").then((res) => res.data);
-            console.log(response);
+            
             // TODO: change url
-            // const response = await axios.post("http://localhost:3000/users?_delay=1000s", formData, {
-            //     headers: {
-            //         'Content-Type': 'multipart/form-data'
-            //     }
-            // });
+            const response = await axios.put("https://localhost:7057/api/Request/UpdateRequestData", {
+                ...data,
+                gender: data.gender === 'ذكر' ? 1 : 0
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                }
+            });
+            console.log(response.data);
             toast.success("تم تحديث البيانات بنجاح", { rtl: true });
             setIsEditing(false);
         } catch (error) {
@@ -174,6 +270,7 @@ const PersonalInfoPortal = () => {
             className="container-fluid p-0"
             style={{ backgroundColor: "#EBEFF5" }}
         >
+            <ToastContainer position={"top-center"}/>
             <div className="container py-4 w-100">
                 {/* Personal Data Table */}
                 <div className="row justify-content-center mb-5">
@@ -417,7 +514,11 @@ const PersonalInfoPortal = () => {
                                     >
                                         {files[type] ? (
                                             <img
-                                                src={URL.createObjectURL(files[type])}
+                                                src={
+                                                    typeof files[type] === 'string'
+                                                        ? `${files[type]}`
+                                                        : URL.createObjectURL(files[type])
+                                                }
                                                 alt={label}
                                                 className="img-fluid"
                                                 style={{ maxHeight: "100%", maxWidth: "100%" }}
@@ -449,7 +550,11 @@ const PersonalInfoPortal = () => {
                                         >
                                             {files[type] ? (
                                                 <img
-                                                    src={URL.createObjectURL(files[type])}
+                                                    src={
+                                                        typeof files[type] === 'string'
+                                                            ? `${files[type]}`
+                                                            : URL.createObjectURL(files[type])
+                                                    }
                                                     alt={label}
                                                     className="img-fluid"
                                                     style={{ maxHeight: "100%", maxWidth: "100%" }}
