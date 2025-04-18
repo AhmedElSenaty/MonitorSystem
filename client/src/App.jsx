@@ -7,23 +7,28 @@ import "./App.css";
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import Navbar from "./components/Navbar";
-import Footer from "./components/footer";   
+import Footer from "./components/footer";
 import RegisterForm from './pages/register/Register';
 import Login from "./pages/login/Login";
 import PersonalInfoPortal from "./pages/profile/Profile";
+import Requests from "./components/Tables/Requests";
+// import Faculties from "./components/Tables/Faculties";
+
 
 const App = () => {
     return (
-      <BrowserRouter>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<UnderDevelopment />} />
-          <Route path="/register" element={<RegisterForm />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/profile" element={<PersonalInfoPortal />} />
-        </Routes>
-        <Footer />
-      </BrowserRouter>
+        <BrowserRouter>
+            <Navbar />
+            <Routes>
+                <Route path="/" element={<UnderDevelopment />} />
+                <Route path="/register" element={<RegisterForm />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/profile" element={<PersonalInfoPortal />} />
+                <Route path="/requests" element={<Requests />} />
+                <Route path="/faculties" element={<Faculties />} />
+            </Routes>
+            <Footer />
+        </BrowserRouter>
     );
 };
 

@@ -1,31 +1,264 @@
 {
-    "users": [
+  "users": [
+    {
+      "id": "1",
+      "email": "student@helwan.edu.eg",
+      "password": "123456",
+      "role": "student"
+    },
+    {
+      "id": "2",
+      "email": "admin@helwan.edu.eg",
+      "password": "admin123",
+      "role": "admin"
+    },
+    {
+      "id": "3",
+      "email": "doctor@helwan.edu.eg",
+      "password": "doctor2025",
+      "role": "doctor"
+    }
+  ],
+  "faculties": [
+    {
+      "id": "1",
+      "name": "طب"
+    },
+    {
+      "id": "2",
+      "name": "تجارة"
+    },
+    {
+      "id": "3",
+      "name": "هندسة"
+    },
+    {
+      "id": "4",
+      "name": "تقنية المعلومات"
+    },
+    {
+      "id": "5",
+      "name": "تربية"
+    },
+    {
+      "id": "6",
+      "name": "علوم"
+    }
+  ],
+  "userFaculties": [
+    {
+      "id": "75b5",
+      "userId": 1,
+      "facultyId": "1"
+    },
+    {
+      "id": "4cd6",
+      "userId": 1,
+      "facultyId": "3"
+    },
+    {
+      "id": "e820",
+      "userId": 1,
+      "facultyId": "4"
+    }
+  ],
+  "admins": [
+    {
+      "id": "1",
+      "name": "أحمد",
+      "mail": "admin@helwan.edu.eg",
+      "pass": "admin123"
+    },
+    {
+      "id": "2",
+      "name": "سارة",
+      "mail": "doctor@helwan.edu.eg",
+      "pass": "doctor2025"
+    },
+    {
+      "name": "محمد",
+      "mail": "student@helwan.edu.eg",
+      "pass": "2222",
+      "id": "3"
+    },
+    {
+      "name": "ماهر",
+      "mail": "student@helwan.edu.eg",
+      "pass": "1111",
+      "id": "4"
+    },
+    {
+      "id": "5",
+      "name": "محمد",
+      "mail": "student@helwan.edu.eg",
+      "pass": "123456"
+    },
+    {
+      "id": "6",
+      "name": "محمد",
+      "mail": "student@helwan.edu.eg",
+      "pass": "123456"
+    },
+    {
+      "id": "7",
+      "name": "محمد",
+      "mail": "student@helwan.edu.eg",
+      "pass": "123456"
+    },
+    {
+      "id": "8",
+      "name": "محمد",
+      "mail": "student@helwan.edu.eg",
+      "pass": "123456"
+    },
+    {
+      "id": "9",
+      "name": "محمد",
+      "mail": "student@helwan.edu.eg",
+      "pass": "123456"
+    },
+    {
+      "id": "10",
+      "name": "حبيبة",
+      "mail": "student@helwan.edu.eg",
+      "pass": "123456"
+    },
+    {
+      "id": "12",
+      "name": "محمود",
+      "mail": "student@helwan.edu.eg",
+      "pass": "123456"
+    },
+    {
+      "id": "923e",
+      "name": "منير",
+      "mail": "student@helwan.edu.eg",
+      "pass": "123456"
+    }
+  ],
+  "requests":
+    [
       {
-        "id": 1,
-        "email": "student@helwan.edu.eg",
-        "password": "123456",
-        "role": "student"
+        "id": "1",
+        "ssn" : "56789",
+        "name": "أحمد علي",
+        "gender": "ذكر",
+        "degree": "بكالوريوس",
+        "status": "تحت المراجعة"
       },
       {
-        "id": 2,
-        "email": "admin@helwan.edu.eg",
-        "password": "admin123",
-        "role": "admin"
+        "id": "2",
+        "ssn" : "123456",
+        "name": "فاطمة الزهراء",
+        "gender": "أنثى",
+        "degree": "ماجستير",
+        "status": "تم القبول"
       },
       {
-        "id": 3,
-        "email": "doctor@helwan.edu.eg",
-        "password": "doctor2025",
-        "role": "doctor"
-      }
-    ],
-    "register": [
+        "id": "3",
+        "ssn" : "123456",
+        "name": "خالد محمود",
+        "gender": "ذكر",
+        "degree": "دكتوراه",
+        "status": "تم الرفض"
+      },
       {
-        "id": 1,
-        "email": "student@helwan.edu.eg",
-        "password": "123456",
-        "role": "student"
+        "id": "4",
+        "ssn" : "123456",
+        "name": "ليلى حسن",
+        "gender": "أنثى",
+        "degree": "بكالوريوس",
+        "status": "تحت المراجعة"
+      },
+      {
+        "id": "5",
+        "ssn" : "123456",
+        "name": "يوسف إبراهيم",
+        "gender": "ذكر",
+        "degree": "ماجستير",
+        "status": "تم القبول"
+      },
+      {
+        "id": "6",
+        "ssn" : "123456",
+        "name": "سارة ناصر",
+        "gender": "أنثى",
+        "degree": "دكتوراه",
+        "status": "تم الرفض"
+      },
+      {
+        "id": "7",
+        "ssn" : "123456",
+        "name": "مروان عادل",
+        "gender": "ذكر",
+        "degree": "بكالوريوس",
+        "status": "تم القبول"
+      },
+      {
+        "id": "8",
+        "ssn" : "123456",
+        "name": "جميلة عبد الله",
+        "gender": "أنثى",
+        "degree": "ماجستير",
+        "status": "تحت المراجعة"
+      },
+      {
+        "id": "9",
+        "ssn" : "123456",
+        "name": "زياد أحمد",
+        "gender": "ذكر",
+        "degree": "دكتوراه",
+        "status": "تم الرفض"
+      },
+      {
+        "id": "10",
+        "ssn" : "123456",
+        "name": "هدى مصطفى",
+        "gender": "أنثى",
+        "degree": "بكالوريوس",
+        "status": "تم القبول"
+      },
+      {
+        "id": "11",
+        "ssn" : "123456",
+        "name": "علي محمد",
+        "gender": "ذكر",
+        "degree": "ماجستير",
+        "status": "تم القبول"
+      },
+      {
+        "id": "12",
+        "ssn" : "123456",
+        "name": "نورة حسن",
+        "gender": "أنثى",
+        "degree": "دكتوراه",
+        "status": "تم الرفض"
+      },
+      {
+        "id": "13",
+        "ssn" : "123456",
+        "name": "بدر خالد",
+        "gender": "ذكر",
+        "degree": "بكالوريوس",
+        "status": "تحت المراجعة"
+      },
+      {
+        "id": "14",
+        "ssn" : "123456",
+        "name": "مي عبد الرحمن",
+        "gender": "أنثى",
+        "degree": "ماجستير",
+        "status": "تم القبول"
+      },
+      {
+        "id": "15",
+        "ssn" : "123456",
+        "name": "عمر سعيد",
+        "gender": "ذكر",
+        "degree": "دكتوراه",
+        "status": "تحت المراجعة"
       }
-    ]
-  }
-  
+    
+    
+  ]
+}
