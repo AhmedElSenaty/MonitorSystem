@@ -39,15 +39,6 @@ const PersonalInfoPortal = () => {
     const handleChange = (field, value) =>
         setData((prev) => ({ ...prev, [field]: value }));
 
-    // const handleFile = (type, file) => {
-    //     setFiles((prev) => ({ ...prev, [type]: file }));
-    //     const errors = validateImages();
-    //     if (errors[type]) {
-    //         toast.error(errors[type], { autoClose: 8000 });
-    //         setFiles((prev) => ({ ...prev, [type]: null }));
-    //     }
-    // }
-
     const startEdit = () => setIsEditing(true);
     const cancelEdit = () => {
         setData({ ...originalData });
@@ -72,8 +63,8 @@ const PersonalInfoPortal = () => {
             : s === "تحت المراجعة"
                 ? "text-warning"
                 : "text-danger";
-    
-    
+
+
     // Modal state for adding notes
     const [showModal, setShowModal] = useState(false);
     const [currentRequest, setCurrentRequest] = useState(null);
@@ -114,16 +105,19 @@ const PersonalInfoPortal = () => {
     };
     // Improved file handler with immediate validation
     const handleFile = (type, file) => {
+        const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
+        const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/jpg'];
+
         if (!file) return;
         const label = type === 'personal' ? 'الصورة الشخصية' :
             type === 'degree' ? 'صورة المؤهل' :
                 type === 'idFront' ? 'صورة البطاقة (وجه)' : 'صورة البطاقة (ظهر)';
         if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-            toast.error(`${label}: نوع الملف غير مدعوم`, { autoClose: 5000 });
+            toast.error(`${label}: نوع الملف غير مدعوم \n(jpg, jpeg فقط)`, { autoClose: 5000 });
             return;
         }
         if (file.size > MAX_FILE_SIZE) {
-            toast.error(`${label}: حجم الملف كبير جدًا (أقصى 5MB)`, { autoClose: 5000 });
+            toast.error(`${label}: حجم الملف كبير جدًا \n( 1MB أقصى حجم)`, { autoClose: 5000 });
             return;
         }
         setFiles(prev => ({ ...prev, [type]: file }));
@@ -164,8 +158,6 @@ const PersonalInfoPortal = () => {
     };
 
 
-    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-    const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/jpg'];
 
     return (
         <div
@@ -186,28 +178,28 @@ const PersonalInfoPortal = () => {
                                 </button>
                             ) : (
                                 isEmployee && (
-                                        <div className="d-flex">
-                                            {!loading && (
-                                                <>
-                                                    <button
-                                                        className="btn btn-success me-1 mx-2 px-3"
-                                                        onClick={saveEdit}
-                                                    >
-                                                        حفظ
-                                                    </button>
-                                                    <button
-                                                        className="btn btn-danger mx-2 px-3"
-                                                        onClick={cancelEdit}
-                                                    >
-                                                        إلغاء
-                                                        </button>
-                                                </>
-                                            )}
-                                            {loading && (
-                                                <div className="spinner-border text-primary" role="status">
-                                                    <span className="visually-hidden">Loading...</span>
-                                                </div>
-                                            )}
+                                    <div className="d-flex">
+                                        {!loading && (
+                                            <>
+                                                <button
+                                                    className="btn btn-success me-1 mx-2 px-3"
+                                                    onClick={saveEdit}
+                                                >
+                                                    حفظ
+                                                </button>
+                                                <button
+                                                    className="btn btn-danger mx-2 px-3"
+                                                    onClick={cancelEdit}
+                                                >
+                                                    إلغاء
+                                                </button>
+                                            </>
+                                        )}
+                                        {loading && (
+                                            <div className="spinner-border text-primary" role="status">
+                                                <span className="visually-hidden">Loading...</span>
+                                            </div>
+                                        )}
                                     </div>
                                 )
                             )}
@@ -552,7 +544,7 @@ const PersonalInfoPortal = () => {
                 <Modal show={showModal} onHide={closeModal} dialogClassName="modal-lg text-end" dir="rtl">
                     <Modal.Header className="flex-row-reverse " >
                         <button type="button" className="btn-close" aria-label="إغلاق" onClick={closeModal}></button>
-                        <Modal.Title style={{marginLeft: '68%'}}>إضافة / تعديل ملاحظة</Modal.Title>
+                        <Modal.Title style={{ marginLeft: '68%' }}>إضافة / تعديل ملاحظة</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <textarea

@@ -55,25 +55,25 @@ const Requests = () => {
 
             <div className="summary">
                 <div className="row mb-4 justify-content-end">
-                    <div className="col-md-2 mb-2">
-                        <div className="card border-warning text-end">
-                            <div className="card-body">
+                    <div className="col-md-2 mb-2 ">
+                        <div className="card border-warning text-end ">
+                            <div className="card-body shadow-sm">
                                 <h6 className="card-title text-warning">تحت المراجعة</h6>
                                 <h4 className="card-text">{statusCounts["تحت المراجعة"]}</h4>
                             </div>
                         </div>
                     </div>
-                    <div className="col-md-2 mb-2">
-                        <div className="card border-success text-end">
-                            <div className="card-body">
+                    <div className="col-md-2 mb-2 ">
+                        <div className="card border-success text-end ">
+                            <div className="card-body shadow-sm">
                                 <h6 className="card-title text-success">تم القبول</h6>
                                 <h4 className="card-text">{statusCounts["تم القبول"]}</h4>
                             </div>
                         </div>
                     </div>
-                    <div className="col-md-2 mb-2">
-                        <div className="card border-danger text-end">
-                            <div className="card-body">
+                    <div className="col-md-2 mb-2 ">
+                        <div className="card border-danger text-end ">
+                            <div className="card-body shadow-sm">
                                 <h6 className="card-title text-danger">تم الرفض</h6>
                                 <h4 className="card-text">{statusCounts["تم الرفض"]}</h4>
                             </div>
