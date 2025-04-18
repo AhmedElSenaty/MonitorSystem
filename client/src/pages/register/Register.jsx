@@ -172,18 +172,40 @@ const RegisterForm = () => {
         Object.entries(files).forEach(([k, f]) => f && data.append(k, f));
 
         try {
+            const formData = new FormData();
+
+            formData.append('SSNFrontImage', files.frontId);
+            formData.append('SSNBackImage', files.backId);
+            formData.append('PersonalImage', files.personal);
+            formData.append('DegreeImage', files.degree);
             const res = await axios.post(
-              "http://localhost:3000/register",
-              data,
+                "https://localhost:7057/api/Account/RegisterEmployee",
+                formData
+                , {
+                    params: {
+                        Email: form.email,
+                        Password: form.password,
+                        Name: form.name,
+                        Age: form.age,
+                        SSN: form.ssn,
+                        Phone: form.phone,
+                        Address: form.address,
+                        Degree: form.degree,
+                        Job: form.job,
+                        Gender: form.gender == "ذكر" ? 1 : 0,
+                    },
+                },
               {
                 headers: { "Content-Type": "multipart/form-data" },
               }
             );
-            console.log(res);
+            console.warn(res);
             toast.success("تم تقديم الطلب بنجاح 🎉");
+            navigate("/login");
         } catch (err) {
-            console.error(err);
-            toast.error("حدث خطأ أثناء الإرسال.");
+            console.warn(err.response.data.errors);
+             Object.values(err.response.data.errors).forEach(msg => toast.error(msg, { rtl: true }));
+            toast.error("حدث خطأ أثناء الإرسال.", { rtl: true });
         } finally {
             setLoader(false);
         }
