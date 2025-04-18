@@ -3,9 +3,7 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashCan, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faPenToSquare as faPenRegular } from '@fortawesome/free-regular-svg-icons';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 import './Tables.css';
 
 const Admins = () => {
@@ -190,7 +188,6 @@ const Admins = () => {
                 </div>
             )}
 
-            <ToastContainer position="top-center" />
         </div>
     );
 };
