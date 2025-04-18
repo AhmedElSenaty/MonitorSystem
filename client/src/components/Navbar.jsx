@@ -2,7 +2,8 @@ import React from "react";
 import "./Navbar.css";
 
 const Navbar = () => {
-  const role = "superAdmin";
+//   const role = "superadmin";
+  const role = "admin";
 
   const onLogout = () => {
     console.log("Logout clicked");
@@ -19,7 +20,7 @@ const Navbar = () => {
             <span className="navbar-toggler-icon"></span>
           </button>
           <div className="collapse navbar-collapse" id="navbarScroll">
-            {role === "superAdmin" && (
+            {role === "superadmin" && (
               <ul className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll gap-2" style={{ "--bs-scroll-height": "100px" }}>
                 <li className="nav-item">
                   <a className="nav-link" href="#" style={{color: "white"}}>قائمة الموظفين</a>
@@ -29,7 +30,7 @@ const Navbar = () => {
                 </li>
               </ul>
             )}
-            <div className="d-flex" role="logout">
+                      <div className={role === "superadmin" ? "d-flex" : "d-flex me-auto my-2 my-lg-0"} role="logout">
               <button className="btn btn-outline-success me-5" type="button" onClick={onLogout}>تسجيل خروج</button>
             </div>
           </div>
