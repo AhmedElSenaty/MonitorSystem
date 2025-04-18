@@ -7,17 +7,15 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState({
         id: '',
         token: null,
-        name: '',
-        email: '',
         isLoggedIn: false,
         role: null,
     });
 
 
     const logout = () => {
-        setUser({ isLoggedIn: false, role: null, token: null });
+        setUser({ isLoggedIn: false, role: null, token: null, id: null });
         //to-do
-        //localStorage.removeItem("user");
+        localStorage.removeItem("user");
     };
 
     return (

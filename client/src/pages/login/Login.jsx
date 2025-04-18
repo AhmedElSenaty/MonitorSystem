@@ -5,10 +5,11 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Login.css"; // for custom styles
-
+import { decodeJWT } from "../../utils/decodeJWT";
+import {useAuth} from '../../Context/AuthContext'
 const Login = () => {
     const navigate = useNavigate();
-    
+    const {setUser} = useAuth();
         const [loader, setLoader] = useState(false);
   const {
     register,
@@ -21,22 +22,45 @@ const Login = () => {
       setLoader(true);
     try {
       //change url
-      const res = await axios.get(`http://localhost:3000/users`, {
-        params: {
-          email: data.email,
-          password: data.password
-        }
+        const res = await axios.post(`https://localhost:7057/api/Account/Login`, {
+        
+          "email": data.email,
+          "password": data.password
+        
       });
 
-      if (res.data.length > 0) {
-        toast.success("تم تسجيل الدخول بنجاح");
-        // Proceed with navigation or state update
+      if (res.data  ) {
+        toast.success("تم تسجيل الدخول بنجاح", { rtl: true });
+          // Proceed with navigation or state update
+          console.log(res.data);
+          console.log(decodeJWT(res.data.data.token));
+          const token = decodeJWT(res.data.data.token);
+          const userData = {
+              id: token.Id,
+              role: token.role.toLowerCase(),
+              token: token,
+              isLoggedIn: true
+          }
+          setUser(userData);
+          localStorage.setItem("user", JSON.stringify(userData));
+          switch (token.role.toLowerCase()) {
+              case "admin":
+                  navigate("/requests");
+                  break;
+              case "superadmin":
+                  navigate("/admins");
+                  break;
+              case "employee":
+                  navigate(`/profile/${token.Id}`);
+                  break;
+          }
       } else {
-        toast.error("بيانات الدخول غير صحيحة");
+        toast.error("بيانات الدخول غير صحيحة", { rtl: true });
       }
     } catch (error) {
-      toast.error("حدث خطأ أثناء محاولة الدخول");
-      console.error(error);
+        // toast.error("حدث خطأ أثناء محاولة الدخول", { rtl: true });
+        Object.values(error.response.data.data.errors).forEach(msg => toast.error(msg, { rtl: true }));
+        console.warn(error.response.data.data.errors);
     }finally{
         setLoader(false);
     }

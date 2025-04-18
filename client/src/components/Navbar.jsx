@@ -1,16 +1,28 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./Navbar.css";
+import { useAuth } from "../Context/AuthContext";
+import { useNavigate } from "react-router";
 
 const Navbar = () => {
+    const navigate = useNavigate();
+    const {logout, user} = useAuth();
+    const [role, setRole] = useState("");
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     // TODO: get Role from Auth Context use useState
     //   const role = "superadmin";
     // const role = "admin";
-    const role = "employee";
+    // const role = "employee";
     // const isLoggedIn = true;
-    const isLoggedIn = false;
+    // const isLoggedIn = false;
+    useEffect(() => {
+        setRole(user.role);
+        setIsLoggedIn(user.isLoggedIn);
+    })
 
     const onLogout = () => {
         console.log("Logout clicked");
+        logout();
+        navigate("/login");
     };
 
     return (
