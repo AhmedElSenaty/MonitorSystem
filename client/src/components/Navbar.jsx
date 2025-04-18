@@ -1,39 +1,42 @@
 import React from "react";
-import logo from "/assets/helwan-logo.png"; // Replace with your actual path
+import "./Navbar.css";
 
 const Navbar = () => {
+//   const role = "superadmin";
+  const role = "admin";
 
-    const role = "superAdmin";
-
-
-//TODO: Replace with your actual logout function
-    const onLogout = () => {
+  const onLogout = () => {
     console.log("Logout clicked");
-  }
+  };
+
   return (
-    <nav className="navbar navbar-expand p-3 shadow" style={{ backgroundColor: "#19355A" }} dir="ltr">
-      <div className="container-fluid d-flex align-items-center justify-content-between text-white">
-
-        {/* Logo */}
-        <div className="d-flex align-items-center">
-          <img src={logo} alt="Helwan Logo" style={{ height: 60 }} className="me-3" />
-          
+    <div>
+      <nav className="navbar navbar-expand-lg shadow" style={{ backgroundColor: "#19355A"}} dir="rtl">
+        <div className="container-fluid">
+          <a className="navbar-brand" href="#">
+            <img src="/assets/helwan-logo.png" alt="Logo" width="50" height="50" className="d-inline-block align-text-top" />
+          </a>
+          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          <div className="collapse navbar-collapse" id="navbarScroll">
+            {role === "superadmin" && (
+              <ul className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll gap-2" style={{ "--bs-scroll-height": "100px" }}>
+                <li className="nav-item">
+                  <a className="nav-link" href="#" style={{color: "white"}}>قائمة الموظفين</a>
+                </li>
+                <li className="nav-item " >
+                  <a className="nav-link" href="#" style={{color: "white"}}>قائمة الكليات</a>
+                </li>
+              </ul>
+            )}
+                      <div className={role === "superadmin" ? "d-flex" : "d-flex me-auto my-2 my-lg-0"} role="logout">
+              <button className="btn btn-outline-success me-5" type="button" onClick={onLogout}>تسجيل خروج</button>
+            </div>
+          </div>
         </div>
-
-        {/* Role-specific Links */}
-        <div className="d-flex gap-4 align-items-center">
-          {role === "superAdmin" && (
-            <>
-            {/* TODO: Super Admin Links */}
-              <span className="nav-link text-white">قائمة الموظفين</span>
-              <span className="nav-link text-white">قائمة الكليات</span>
-            </>
-          )}
-          <button className="btn btn-outline-light ms-5" onClick={onLogout}>تسجيل خروج</button>
-        </div>
-
-      </div>
-    </nav>
+      </nav>
+    </div>
   );
 };
 
