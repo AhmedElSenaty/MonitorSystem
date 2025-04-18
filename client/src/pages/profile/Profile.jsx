@@ -6,10 +6,13 @@ import { useNavigate, useParams } from "react-router";
 import { ToastContainer,toast } from "react-toastify"
 import { useAuth } from "../../Context/AuthContext";
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
+
 const PersonalInfoPortal = () => {
     const { user, setUser } = useAuth();
     const navigate = useNavigate();
-    const { id } = useParams();
+    const { id , reqID} = useParams();
     
     let originalData = {
         name: "",
@@ -27,6 +30,7 @@ const PersonalInfoPortal = () => {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState({ ...originalData });
     const [orgdata, setOrgData] = useState({ ...originalData });
+    const [zoomedImage, setZoomedImage] = useState({ ...originalData });
     
     const fileInputs = {
         personal: useRef(),
@@ -41,7 +45,37 @@ const PersonalInfoPortal = () => {
         idBack: null,
     });
     
-    
+    const approve = async () => {
+        try {
+            const res = await axios.put(`https://localhost:7057/api/Request/ChangeStatus`, {
+                requestId: reqID*1,
+                status: 2
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`
+                }
+            });
+            toast.success(res.data.message, { rtl: true, autoClose: 5000 });
+            navigate(`/faculties/${id}`);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    const reject = async () => {
+        try {
+            const res = await axios.put(`https://localhost:7057/api/Request/ChangeStatus`, {
+                requestId: reqID,
+                status: 3
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`
+                }
+            });
+            toast.success(res.data.message, { rtl: true, autoClose: 5000 });
+        } catch (error) {
+            console.log(error);
+        }
+    }
     
     let requests = [
         { status: "تم القبول", notes: "لا يوجد ملاحظات" },
@@ -123,6 +157,7 @@ const PersonalInfoPortal = () => {
 
     // Modal state for adding notes
     const [showModal, setShowModal] = useState(false);
+    const [showImgModal, setShowImgModal] = useState(false);
     const [currentRequest, setCurrentRequest] = useState(null);
     const [noteText, setNoteText] = useState('');
 
@@ -136,6 +171,7 @@ const PersonalInfoPortal = () => {
         setCurrentRequest(null);
         setNoteText('');
     };
+    const closeImgModal = () => setShowImgModal(false);
     const saveNote = () => {
         if (currentRequest) {
             currentRequest.notes = noteText;
@@ -161,6 +197,8 @@ const PersonalInfoPortal = () => {
     };
     // Improved file handler with immediate validation
     const handleFile = (type, file) => {
+        setZoomedImage(null);
+        setShowImgModal(false);
         console.log(file);
         console.log(type);
         const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
@@ -179,11 +217,11 @@ const PersonalInfoPortal = () => {
             toast.error(`${label}: حجم الملف كبير جدًا \n( 1MB أقصى حجم)`, { rtl: true,autoClose: 5000 });
             return;
         }
-        console.log('send...');
+        // console.log('send...');
         const updateProfile = async () => {
             
             let formData = new FormData();
-            formData.append(type, file);
+            formData.append('Image', file);
             try {
                 /*
                 degreeImage
@@ -194,23 +232,25 @@ const PersonalInfoPortal = () => {
                 const getIdentifier = (type)=>{
                     switch(type){
                         case "degree":
-                            return "DegreeImage";
+                            return "Degree";
                         case "personal":
-                            return "PersonalImage";
+                            return "Personal";
                         case "idFront":
-                            return "SSNFrontImage";
+                            return "SSNFront";
                         case "idBack":
-                            return "SSNBackImage";
+                            return "SSNBack";
                     }
                 };
-                const response = await axios.put("https://localhost:7057/api/Request/UpdateRequestAssets", formData, {
+                // console.log(user.token);
+                // console.log(formData);
+                const response = await axios.put("https://localhost:7057/api/Request/UpdateRequestAssets", formData,
+                {
                     params: {
                         "Identifier": getIdentifier(type)
-                    }
-                }, {
+                    },
                     headers: {
                         'Authorization': `Bearer ${user.token}`,
-                        'Content-Type': 'multipart/form-data'
+                        // 'Content-Type': 'multipart/form-data'
                     }
                 });
                 console.log(response.data);
@@ -272,6 +312,13 @@ const PersonalInfoPortal = () => {
         >
             <ToastContainer position={"top-center"}/>
             <div className="container py-4 w-100">
+                {isAdmin && (
+                    
+                <button type="button" className="btn btn-outline-primary mb-3" onClick={() => navigate(-1)} >
+                                <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
+                                رجوع
+                            </button>
+                )}
                 {/* Personal Data Table */}
                 <div className="row justify-content-center mb-5">
                     <div className="col-12 col-lg-12">
@@ -543,10 +590,14 @@ const PersonalInfoPortal = () => {
                                                     : "#EFF1F5",
                                                 border: "1px dashed #CFB53B",
                                                 borderRadius: "8px",
-                                                cursor: "pointer",
+                                                cursor: "zoom-in",
                                                 position: "relative",
                                             }}
-                                            onClick={() => fileInputs[type].current.click()}
+                                            // onClick={() => fileInputs[type].current.click()}
+                                            onClick={() => {
+                                                setZoomedImage(files[type])
+                                                setShowImgModal(true);
+                                            }}
                                         >
                                             {files[type] ? (
                                                 <img
@@ -574,10 +625,8 @@ const PersonalInfoPortal = () => {
                                             />
                                         </div>
                                         <button
-                                            className="btn"
+                                            className="btn btn-outline-warning"
                                             style={{
-                                                border: "1px solid #CFB53B",
-                                                color: "#CFB53B",
                                                 borderRadius: "5px",
                                                 width: "100%",
                                             }}
@@ -634,10 +683,12 @@ const PersonalInfoPortal = () => {
                                                 {request.status === "تحت المراجعة" && (
                                                     <>
                                                         {/* TODO: add events to add requests to the database */}
-                                                        <button className="btn btn-outline-success btn-sm mx-2">
+                                                        <button className="btn btn-outline-success btn-sm mx-2"
+                                                            onClick={approve}>
                                                             قبول
                                                         </button>
-                                                        <button className="btn btn-outline-danger btn-sm mx-2">
+                                                        <button className="btn btn-outline-danger btn-sm mx-2"
+                                                            onClick={reject}>
                                                             رفض
                                                         </button>
                                                     </>
@@ -675,6 +726,22 @@ const PersonalInfoPortal = () => {
                         <Button variant="danger" onClick={closeModal}>إلغاء</Button>
                         <Button variant="success" onClick={saveNote}>حفظ التغييرات</Button>
                     </Modal.Footer>
+                </Modal>
+                {/* zoomed image Modal */}
+                <Modal show={showImgModal} onHide={closeImgModal} dialogClassName="modal-lg text-end" >
+                    <Modal.Header closeButton className="flex-row-reverse " >
+                    </Modal.Header>
+                    <Modal.Body className="d-flex justify-content-center align-items-center">
+                        <img
+                        src={
+                            zoomedImage
+                        }
+                        alt="zoomed Image"
+                        className="img-fluid"
+                        style={{ maxHeight: "100%", maxWidth: "100%" }}
+                                                />
+                    </Modal.Body>
+                    
                 </Modal>
 
             </div>

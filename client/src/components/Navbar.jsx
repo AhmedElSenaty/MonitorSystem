@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 
 const Navbar = () => {
     const navigate = useNavigate();
-    const {logout, user} = useAuth();
+    const {logout, user, setUser} = useAuth();
     const [role, setRole] = useState("");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     // TODO: get Role from Auth Context use useState
@@ -15,9 +15,19 @@ const Navbar = () => {
     // const isLoggedIn = true;
     // const isLoggedIn = false;
     useEffect(() => {
-        setRole(user.role);
-        setIsLoggedIn(user.isLoggedIn);
-    },[user]);
+        // const userStored = JSON.parse(localStorage.getItem("user"));
+        const userStored = user;
+        
+        if (userStored) {
+            setUser(userStored);
+            console.log('user');
+            setRole(userStored.role);
+            setIsLoggedIn(userStored.isLoggedIn);
+            console.log(userStored.token);
+        }
+        
+    }, []);
+    
 
     const onLogout = () => {
         console.log("Logout clicked");
@@ -49,7 +59,7 @@ const Navbar = () => {
                                 </li>
                             </ul>
                         )}
-                        {isLoggedIn && (
+                        {user.isLoggedIn && (
                         <div className={role === "superadmin" ? "d-flex" : "d-flex me-auto my-2 my-lg-0"} role="logout">
                             <button className="btn btn-outline-info me-5" type="button" onClick={onLogout}>تسجيل خروج</button>
                         </div>

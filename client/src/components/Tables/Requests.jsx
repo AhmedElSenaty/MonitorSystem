@@ -2,32 +2,93 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './Tables.css';
+import { useAuth } from '../../Context/AuthContext';
+import { toast } from 'react-toastify';
 
 const Requests = () => {
+    const { user } = useAuth();
     const navigate = useNavigate();
     const [requests, setRequests] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const requestsPerPage = 10;
+    const requestsPerPage = 2;
 
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
+
+    // Pagination logic
+    const indexOfLastRequest = currentPage * requestsPerPage;
+    const indexOfFirstRequest = indexOfLastRequest - requestsPerPage;
+
+    const filteredRequests = requests.filter(r =>
+        r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (r.ssn && r.ssn.includes(searchTerm))
+    );
+
+    const [totalPages, setTotalPages] = useState(1);
+    const currentRequests = filteredRequests.slice(indexOfFirstRequest, indexOfLastRequest);
 
 
 
 
     useEffect(() => {
+        const fetchData = async () => {
+            const getStatus = (stateus) => {
+                switch (stateus) {
+                    case 'تحت المراجعة': return 1;
+                    case 'تم القبول': return 2;
+                    case 'تم الرفض': return 3;
+                    default: return null;
+                }
+            };
+
+            try {
+                const res = await axios.get('https://localhost:7057/api/Request', {
+                    params: {
+                        PageIndex: currentPage,
+                        PageSize: requestsPerPage,
+                        SearchByEmployeeName: isNaN(searchTerm) ? searchTerm : '',
+                        SearchByEmployeeSSN: isNaN(searchTerm) ? '' : searchTerm,
+                        Status: statusFilter === '' ? null : getStatus(statusFilter)
+                    },
+                    headers: {
+                        Authorization: `Bearer ${user.token}`
+                    }
+                });
+
+                // API responds { status, message, data: { requests: [...] }, errors }
+                const apiData = res.data?.data;
+                if (!apiData || !Array.isArray(apiData.requests)) {
+                    toast.error('لا توجد بيانات للطلبات', { rtl: true });
+                    setRequests([]);
+                    return;
+                }
+                console.log(apiData);
+                setCurrentPage(apiData.metadata.pagination.pageIndex);
+                setTotalPages(apiData.metadata.pagination.totalPages);
+                const formatted = apiData.requests.map(r => ({
+                    id: r.requestId,
+                    name: r.employeeName,
+                    ssn: r.employeeId,
+                    degree: r.degree,
+                    gender: r.employeeGender,
+                    status: r.status   
+                }));
+
+                setRequests(formatted);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                if (error.response?.data?.message) {
+                    toast.error(error.response.data.message, { rtl: true });
+                } else {
+                    toast.error('حدث خطأ أثناء جلب البيانات', { rtl: true });
+                }
+            }
+        };
+
         fetchData();
-    }, []);
+    }, [currentPage, searchTerm, statusFilter, user.token, requestsPerPage]);
 
-    const fetchData = async () => {
-        try {
-            const res = await axios.get(`http://localhost:3000/requests`);
-            setRequests(res.data);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        }
-    };
-
+    
     const statusCounts = {
         "تحت المراجعة": requests.filter(r => r.status === "تحت المراجعة").length,
         "تم القبول": requests.filter(r => r.status === "تم القبول").length,
@@ -37,19 +98,7 @@ const Requests = () => {
 
 
 
-    // Pagination logic
-    const indexOfLastRequest= currentPage * requestsPerPage;
-    const indexOfFirstRequest = indexOfLastRequest - requestsPerPage;
-
-    const filteredRequests = requests.filter(r =>
-        r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (r.ssn && r.ssn.includes(searchTerm))
-    );
-    
-    const totalPages = Math.ceil(filteredRequests.length / requestsPerPage);
-    const currentRequests = filteredRequests.slice(indexOfFirstRequest, indexOfLastRequest);
-    
-
+   
     return (
         <div dir='rtl' className='p-4 bg-light min-vh-100'>
 
@@ -135,7 +184,7 @@ const Requests = () => {
                                 <td className="text-break" style={{ color: request.status === 'تحت المراجعة' ? '#AD8700' : request.status === 'تم القبول' ? 'green' : 'red'}}>{request.status}</td>
                                 <td className="text-center" style={{alignContent:"center"}}>
                                     {/* TODO: onClick={() => navigate(`/staff/${request.id}`)} */}
-                                    <button className="btn btn-primary" onClick={() => navigate(`/profile/${request.id}`)}>عرض</button>
+                                    <button className="btn btn-primary" onClick={() => navigate(`/profile/${request.ssn}/${request.id}`)}>عرض</button>
                                 </td>
                             </tr>
                         ))}

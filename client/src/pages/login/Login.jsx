@@ -59,8 +59,29 @@ const Login = () => {
       }
     } catch (error) {
         // toast.error("حدث خطأ أثناء محاولة الدخول", { rtl: true });
-        Object.values(error.response.data.data.errors).forEach(msg => toast.error(msg, { rtl: true }));
-        console.warn(error.response.data.data.errors);
+        // Object.values(error.response.data.data.errors).forEach(msg => toast.error(msg, { rtl: true }));
+        // console.warn(error.response.data.data.errors);
+        setLoader(false);
+
+        // If axios got a response from the server with an error status:
+        if (error.response && error.response.data) {
+            const errs = error.response.data.data?.errors;
+            if (errs) {
+                // iterate over API validation errors
+                Object.values(errs).forEach(msg => toast.error(msg, { rtl: true }));
+            } else if (error.response.data.message) {
+                // or a single error message
+                toast.error(error.response.data.message, { rtl: true });
+            } else {
+                toast.error('حدث خطأ في الاستجابة من الخادم', { rtl: true });
+            }
+        }
+        // If no response at all (network error, CORS, timeout, etc.)
+        else {
+            toast.error('تعذر الاتصال بالخادم. الرجاء التحقق من الإنترنت.', { rtl: true });
+        }
+
+        console.error('Login error:', error);
     }finally{
         setLoader(false);
     }
