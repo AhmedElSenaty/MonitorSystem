@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./Login.css"; // for custom styles
 
 const Login = () => {
-  // const navigate = useNavigate();
+    const navigate = useNavigate();
+    
+        const [loader, setLoader] = useState(false);
   const {
     register,
     handleSubmit,
@@ -15,10 +17,11 @@ const Login = () => {
   } = useForm();
 
   //TODO: post method
-  const onSubmit = async (data) => {
+    const onSubmit = async (data) => {
+      setLoader(true);
     try {
       //change url
-      const res = await axios.get(`http://localhost:3001/users`, {
+      const res = await axios.get(`http://localhost:3000/users`, {
         params: {
           email: data.email,
           password: data.password
@@ -34,14 +37,22 @@ const Login = () => {
     } catch (error) {
       toast.error("حدث خطأ أثناء محاولة الدخول");
       console.error(error);
+    }finally{
+        setLoader(false);
     }
   };
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div className="d-flex shadow rounded overflow-hidden login-container" style={{ maxWidth: 900, width: "100%", height: "70%" }}>
+      <div
+        className="d-flex shadow rounded overflow-hidden login-container"
+        style={{ maxWidth: 900, width: "100%", height: "70%" }}
+      >
         {/* Left Side: Image */}
-        <div className="login-left d-none d-md-block" style={{ maxWidth: 500, width: "100%" }} />
+        <div
+          className="login-left d-none d-md-block"
+          style={{ maxWidth: 500, width: "100%" }}
+        />
 
         {/* Right Side: Form */}
         <div className="bg-white p-5 w-100" dir="rtl">
@@ -53,7 +64,9 @@ const Login = () => {
                 placeholder="البريد الإلكتروني"
                 {...register("email", { required: "هذا الحقل مطلوب" })}
               />
-              {errors.email && <small className="text-danger">{errors.email.message}</small>}
+              {errors.email && (
+                <small className="text-danger">{errors.email.message}</small>
+              )}
             </div>
 
             <div className="mb-3">
@@ -63,22 +76,39 @@ const Login = () => {
                 placeholder="كلمة مرور"
                 {...register("password", { required: "كلمة المرور مطلوبة" })}
               />
-              {errors.password && <small className="text-danger">{errors.password.message}</small>}
+              {errors.password && (
+                <small className="text-danger">{errors.password.message}</small>
+              )}
             </div>
 
-            <button type="submit" className="btn btn-primary w-100 mb-4 mt-3">تسجيل الدخول</button>
+            {loader ? (
+              <div className="d-flex justify-content-center align-item-center row mt-4">
+                <div class="spinner-border" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            ) : (
+              <button type="submit" className="btn btn-primary w-100 mb-4 mt-3">
+                تسجيل الدخول
+              </button>
+            )}
 
             <div className="text-center mt-3">
               {/* navigate to register  onClick={() => navigate("/register")} */}
               <p>في حالة عدم التسجيل من قبل</p>
-              <button type="button" className="btn btn-warning w-100">اضغط هنا</button>
+              <button
+                type="button"
+                className="btn btn-warning w-100"
+                onClick={() => navigate("/register")}
+              >
+                اضغط هنا
+              </button>
             </div>
           </form>
         </div>
       </div>
       <ToastContainer position="top-center" rtl autoClose={3000} />
     </div>
-    
   );
 };
 
