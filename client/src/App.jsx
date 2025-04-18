@@ -16,14 +16,13 @@ import Requests from "./components/Tables/Requests";
 import Faculties from "./components/Tables/Faculties";
 import Admins from './components/Tables/Admins';
 
-
 const App = () => {
     return (
         <BrowserRouter>
             <Navbar />
             <ToastContainer position="top-center" />
             <Routes>
-                <Route path="/" element={<UnderDevelopment />} />
+                <Route index element={<Login />} />
                 <Route path="/register" element={<RegisterForm />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/profile" element={<PersonalInfoPortal />} />

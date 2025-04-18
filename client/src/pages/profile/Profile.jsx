@@ -4,6 +4,7 @@ import { Modal, Button } from 'react-bootstrap';
 import axios from "axios";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
+import { set } from "react-hook-form";
 
 const PersonalInfoPortal = () => {
     const navigate = useNavigate();
@@ -37,8 +38,15 @@ const PersonalInfoPortal = () => {
 
     const handleChange = (field, value) =>
         setData((prev) => ({ ...prev, [field]: value }));
-    const handleFile = (type, file) =>
-        setFiles((prev) => ({ ...prev, [type]: file }));
+
+    // const handleFile = (type, file) => {
+    //     setFiles((prev) => ({ ...prev, [type]: file }));
+    //     const errors = validateImages();
+    //     if (errors[type]) {
+    //         toast.error(errors[type], { autoClose: 8000 });
+    //         setFiles((prev) => ({ ...prev, [type]: null }));
+    //     }
+    // }
 
     const startEdit = () => setIsEditing(true);
     const cancelEdit = () => {
@@ -88,20 +96,45 @@ const PersonalInfoPortal = () => {
         closeModal();
     };
 
+    // Validation logic matching RegisterForm
     const validateData = () => {
         const errors = {};
-        if (!data.name.trim()) errors.name = "الاسم مطلوب";
-        if (!data.address.trim()) errors.address = "العنوان مطلوب";
-        if (!data.degree.trim()) errors.degree = "الدرجة مطلوبة";
-        if (!data.job.trim()) errors.job = "الوظيفة مطلوبة";
+        if (!data.name.trim()) errors.name = 'الاسم مطلوب';
+        if ((data.name.trim().match(/ /g) || []).length < 3) errors.name = 'الاسم يجب ان يحتوي على اربع كلمات على الاقل';
+        if (!data.ssn.trim()) errors.ssn = 'الرقم القومي مطلوب';
+        if (!/^\d{14}$/.test(data.ssn)) errors.ssn = 'الرقم القومي يجب أن يكون 14 رقمًا';
+        if (!/^01[0-9]{9}$/.test(data.phone)) errors.phone = 'رقم الهاتف غير صالح';
+        if (!/\S+@\S+\.\S+/.test(data.email)) errors.email = 'البريد الإلكتروني غير صالح';
+        if (!data.address.trim()) errors.address = 'العنوان مطلوب';
+        if (!data.degree.trim()) errors.degree = 'المؤهل مطلوب';
+        if (!data.job.trim()) errors.job = 'الوظيفة مطلوبة';
+        if (!data.gender.trim()) errors.gender = 'النوع مطلوب';
+        if (!/^\d{2}\/\d{2}\/\d{4}$/.test(data.DOB)) errors.DOB = 'تاريخ الميلاد بصيغة DD/MM/YYYY';
         return errors;
+    };
+    // Improved file handler with immediate validation
+    const handleFile = (type, file) => {
+        if (!file) return;
+        const label = type === 'personal' ? 'الصورة الشخصية' :
+            type === 'degree' ? 'صورة المؤهل' :
+                type === 'idFront' ? 'صورة البطاقة (وجه)' : 'صورة البطاقة (ظهر)';
+        if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+            toast.error(`${label}: نوع الملف غير مدعوم`, { autoClose: 5000 });
+            return;
+        }
+        if (file.size > MAX_FILE_SIZE) {
+            toast.error(`${label}: حجم الملف كبير جدًا (أقصى 5MB)`, { autoClose: 5000 });
+            return;
+        }
+        setFiles(prev => ({ ...prev, [type]: file }));
     };
 
     const saveEdit = async () => {
         setLoading(true);
         const errors = validateData();
         if (Object.keys(errors).length > 0) {
-            toast.error("تحقق من الحقول:\n" + Object.values(errors).join("\n"));
+            Object.values(errors).forEach(msg => toast.error(msg));
+            setLoading(false);
             return;
         }
 
@@ -129,6 +162,10 @@ const PersonalInfoPortal = () => {
             setLoading(false);
         }
     };
+
+
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/jpg'];
 
     return (
         <div
@@ -424,7 +461,7 @@ const PersonalInfoPortal = () => {
                                             )}
                                             <input
                                                 type="file"
-                                                accept="image/*"
+                                                accept="image/jpeg, image/jpg"
                                                 ref={fileInputs[type]}
                                                 style={{ display: "none" }}
                                                 onChange={(e) => handleFile(type, e.target.files[0])}
