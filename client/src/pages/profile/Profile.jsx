@@ -1,12 +1,21 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Modal, Button } from 'react-bootstrap';
 import axios from "axios";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify"
 
 const PersonalInfoPortal = () => {
     const navigate = useNavigate();
+    const { id } = useParams();
+
+    // useEffect(() => {
+    //     if (!id) {
+    //         toast.error("يرجى تسجيل الدخول",{rtl: true});
+    //         navigate("/login");
+    //     }
+    // }, [id]);
+
     const originalData = {
         name: "احمد محمد عمر",
         address: "القاهرة الجديدة",
@@ -113,11 +122,11 @@ const PersonalInfoPortal = () => {
             type === 'degree' ? 'صورة المؤهل' :
                 type === 'idFront' ? 'صورة البطاقة (وجه)' : 'صورة البطاقة (ظهر)';
         if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-            toast.error(`${label}: نوع الملف غير مدعوم \n(jpg, jpeg فقط)`, { autoClose: 5000 });
+            toast.error(`${label}: نوع الملف غير مدعوم \n(jpg, jpeg فقط)`, { rtl: true,autoClose: 5000 });
             return;
         }
         if (file.size > MAX_FILE_SIZE) {
-            toast.error(`${label}: حجم الملف كبير جدًا \n( 1MB أقصى حجم)`, { autoClose: 5000 });
+            toast.error(`${label}: حجم الملف كبير جدًا \n( 1MB أقصى حجم)`, { rtl: true,autoClose: 5000 });
             return;
         }
         setFiles(prev => ({ ...prev, [type]: file }));
@@ -127,7 +136,7 @@ const PersonalInfoPortal = () => {
         setLoading(true);
         const errors = validateData();
         if (Object.keys(errors).length > 0) {
-            Object.values(errors).forEach(msg => toast.error(msg));
+            Object.values(errors).forEach(msg => toast.error(msg, { rtl: true }));
             setLoading(false);
             return;
         }
@@ -147,11 +156,11 @@ const PersonalInfoPortal = () => {
             //         'Content-Type': 'multipart/form-data'
             //     }
             // });
-            toast.success("تم تحديث البيانات بنجاح");
+            toast.success("تم تحديث البيانات بنجاح", { rtl: true });
             setIsEditing(false);
         } catch (error) {
             console.error("Error updating profile:", error);
-            toast.error("حدث خطأ أثناء تحديث البيانات.");
+            toast.error("حدث خطأ أثناء تحديث البيانات.", { rtl: true });
         } finally {
             setLoading(false);
         }

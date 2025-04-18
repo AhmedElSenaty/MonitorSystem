@@ -2,70 +2,78 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
 :root {
-  --font-cario: "Cairo", serif;
-  --font-noto: "Noto Sans", serif;
-  --color-primary: #19355a;  
-  --color-primary-hover: #27285d;  
-  --color-secondary: #b38e19; 
-  --color-secondary-hover: #ad8700; 
+    --font-cario: "Cairo", serif;
+    --font-noto: "Noto Sans", serif;
+    --color-primary: #19355a;
+    --color-primary-hover: #27285d;
+    --color-secondary: #b38e19;
+    --color-secondary-hover: #ad8700;
 }
+
 /* Force scrollbar to overlay instead of taking space */
 html {
-  overflow-y: overlay;
-  overflow-x: hidden;
+    font-family: var(--font-cario), var(--font-noto);
+    overflow-y: overlay;
+    overflow-x: hidden;
 }
 
 /* WebKit Browsers (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
-  width: 5px; /* Reduce width */
+    width: 5px;
+    /* Reduce width */
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #b38e19; /* Scrollbar color */
-  border-radius: 3px; /* Rounded edges */
+    background: #b38e19;
+    /* Scrollbar color */
+    border-radius: 3px;
+    /* Rounded edges */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #ad8700; /* Darker on hover */
+    background: #ad8700;
+    /* Darker on hover */
 }
 
 .active {
-  color: #ad8700;
+    color: #ad8700;
 }
 
 /* Remove default calendar icon (Chrome, Safari, Edge, Opera) */
 input[type="date"]::-webkit-calendar-picker-indicator {
-  display: none;
-  -webkit-appearance: none;
+    display: none;
+    -webkit-appearance: none;
 }
 
 /* Remove default calendar icon (Firefox) */
 input[type="date"]::-moz-calendar-picker-indicator {
-  display: none;
+    display: none;
 }
 
 /* Remove default password visibility toggle (Chrome, Edge) */
 input[type="password"]::-ms-reveal,
 input[type="password"]::-webkit-textfield-decoration-container {
-  display: none;
+    display: none;
 }
 
 
 /* Remove default clock icon (Chrome, Safari, Edge, Opera) */
 input[type="time"]::-webkit-calendar-picker-indicator {
-  display: none;
-  -webkit-appearance: none;
+    display: none;
+    -webkit-appearance: none;
 }
 
 /* Remove default clock icon (Firefox) */
 input[type="time"]::-moz-calendar-picker-indicator {
-  display: none;
+    display: none;
 }
+
 .btn-main:hover {
     background-color: #19355a !important;
     color: white !important;
 }
-.btn-main{
+
+.btn-main {
     background-color: transparent !important;
     color: #19355a !important;
 }

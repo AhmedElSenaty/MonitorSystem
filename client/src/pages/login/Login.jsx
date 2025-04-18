@@ -83,8 +83,8 @@ const Login = () => {
 
             {loader ? (
               <div className="d-flex justify-content-center align-item-center row mt-4">
-                <div class="spinner-border" role="status">
-                  <span class="visually-hidden">Loading...</span>
+                <div className="spinner-border" role="status">
+                  <span className="visually-hidden">Loading...</span>
                 </div>
               </div>
             ) : (

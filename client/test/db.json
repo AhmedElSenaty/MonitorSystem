@@ -43,21 +43,25 @@
     {
       "id": "6",
       "name": "علوم"
+    },
+    {
+      "id": "9416",
+      "name": "ad"
     }
   ],
   "userFaculties": [
     {
-      "id": "37f6",
+      "id": "1130",
       "userId": 1,
       "facultyId": "1"
     },
     {
-      "id": "2282",
+      "id": "3376",
       "userId": 1,
       "facultyId": "3"
     },
     {
-      "id": "f386",
+      "id": "e6ba",
       "userId": 1,
       "facultyId": "4"
     }

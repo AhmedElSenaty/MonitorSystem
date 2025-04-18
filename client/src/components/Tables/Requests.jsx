@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './Tables.css';
 
 const Requests = () => {
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
     const [requests, setRequests] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const requestsPerPage = 10;
@@ -135,7 +135,7 @@ const Requests = () => {
                                 <td className="text-break" style={{ color: request.status === 'تحت المراجعة' ? '#AD8700' : request.status === 'تم القبول' ? 'green' : 'red'}}>{request.status}</td>
                                 <td className="text-center" style={{alignContent:"center"}}>
                                     {/* TODO: onClick={() => navigate(`/staff/${request.id}`)} */}
-                                    <button className="btn btn-primary" >عرض</button>
+                                    <button className="btn btn-primary" onClick={() => navigate(`/profile/${request.id}`)}>عرض</button>
                                 </td>
                             </tr>
                         ))}

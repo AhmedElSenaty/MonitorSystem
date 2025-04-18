@@ -41,9 +41,9 @@ const Admins = () => {
         try {
             await axios.delete(`http://localhost:3000/admins/${adminId}`);
             fetchData();
-            toast.success("تم الحذف بنجاح");
+            toast.success("تم الحذف بنجاح", { rtl: true });
         } catch (error) {
-            toast.error("حدث خطأ أثناء الحذف");
+            toast.error("حدث خطأ أثناء الحذف", { rtl: true });
             console.error("Error deleting:", error);
         }
     };
@@ -56,13 +56,13 @@ const Admins = () => {
                     mail: newAdminMail,
                     pass: newAdminPass,
                 });
-                toast.success("تم التحديث بنجاح");
+                toast.success("تم التحديث بنجاح", { rtl: true });
             } else {
                 await axios.post(`http://localhost:3000/admins`, {
                     mail: newAdminMail,
                     pass: newAdminPass,
                 });
-                toast.success("تمت الإضافة بنجاح");
+                toast.success("تمت الإضافة بنجاح", { rtl: true });
             }
 
             setShowModal(false);
@@ -72,7 +72,7 @@ const Admins = () => {
             setSelectedAdmin(null);
             fetchData();
         } catch (error) {
-            toast.error("حدث خطأ أثناء الحفظ");
+            toast.error("حدث خطأ أثناء الحفظ", { rtl: true });
             console.error("Error saving admin:", error);
         }
     };

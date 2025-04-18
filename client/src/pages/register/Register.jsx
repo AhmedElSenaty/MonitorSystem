@@ -93,10 +93,10 @@ const RegisterForm = () => {
     const handleFileUpload = (e, type) => {
         const file = e.target.files[0];
         if (!file) return;
-        const isJpg = file.type === "image/jpeg";
+        const isJpg = file.type === "image/jpeg" || file.type === "image/jpg";
         const isLt1M = file.size <= 1024 * 1024;
-        if (!isJpg) return toast.error("الملف يجب أن يكون JPG.");
-        if (!isLt1M) return toast.error("حجم الملف يجب أن لا يتجاوز 1MB.");
+        if (!isJpg) return toast.error("الملف يجب أن يكون JPG.",{rtl: true});
+        if (!isLt1M) return toast.error("حجم الملف يجب أن لا يتجاوز 1MB.",{rtl: true});
         const updated = { ...files, [type]: file };
         setFiles(updated);
         toast.success(`تم اختيار الملف: ${file.name}`);
@@ -199,7 +199,8 @@ const RegisterForm = () => {
     }, [files]);
 
     return (
-      <>
+        <>
+            <ToastContainer position="top-center" />
         <div className="container mt-5">
           <div className="card shadow p-4">
             <h2 className="text-center text-primary mb-3">تقديم طلب</h2>

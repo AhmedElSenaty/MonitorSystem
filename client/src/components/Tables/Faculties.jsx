@@ -15,6 +15,15 @@ const Faculties = () => {
     const [newFacultyName, setNewFacultyName] = useState('');
     const userId = 1; // assume userId is 1
 
+    // const role = 'superadmin';
+    // const role = 'admin';
+    const role = 'employee';
+
+    const isSuperAdmin = role === 'superadmin' ;
+    const isAdmin =  role === 'admin';
+    const isEmployee = role === 'employee';
+
+
     useEffect(() => {
         fetchData();
     }, []);
@@ -29,7 +38,7 @@ const Faculties = () => {
             link.download = fileName;
             link.click();
         } catch (error) {
-            toast.error("حدث خطأ أثناء تحميل الملف");
+            toast.error("حدث خطأ أثناء تحميل الملف", { rtl: true });
             console.error("Download error:", error);
         }
     };
@@ -52,7 +61,7 @@ const Faculties = () => {
             setCheckedFaculties(checkedFaculties.filter(id => id !== facultyId));
         } else {
             if (checkedFaculties.length >= 4) {
-                toast.error("لا يمكنك اختيار أكثر من ٤ كليات");
+                toast.error("لا يمكنك اختيار أكثر من ٤ كليات", { rtl: true });
                 return;
             }
             setCheckedFaculties([...checkedFaculties, facultyId]);
@@ -75,9 +84,9 @@ const Faculties = () => {
             );
             await Promise.all(postReqs);
 
-            toast.success("تم الحفظ بنجاح");
+            toast.success("تم الحفظ بنجاح", { rtl: true });
         } catch (error) {
-            toast.error(" حدث خطأ أثناء الحفظ");
+            toast.error(" حدث خطأ أثناء الحفظ", { rtl: true });
             console.error("Error saving:", error);
         }
     };
@@ -86,9 +95,9 @@ const Faculties = () => {
         try {
             await axios.delete(`http://localhost:3000/faculties/${facultyId}`);
             fetchData();
-            toast.success(" تم حذف بنجاح");
+            toast.success(" تم حذف بنجاح", { rtl: true });
         } catch (error) {
-            toast.error(" حدث خطأ أثناء الحذف");
+            toast.error(" حدث خطأ أثناء الحذف", { rtl: true });
             console.error("Error deleting:", error);
         }
     };
@@ -102,9 +111,9 @@ const Faculties = () => {
             setShowModal(false);
             setNewFacultyName('');
             fetchData();
-            toast.success(" تمت إضافة الكلية");
+            toast.success(" تمت إضافة الكلية", { rtl: true });
         } catch (error) {
-            toast.error(" حدث خطأ أثناء الإضافة");
+            toast.error(" حدث خطأ أثناء الإضافة", { rtl: true });
             console.error("Error adding faculty:", error);
         }
     };
@@ -118,13 +127,19 @@ const Faculties = () => {
             </button>
 
             <h2 style={{ color: "#19355A" }} className="mb-4">الكليات</h2>
+            {!isEmployee && (
 
-            <div className="mb-3 d-flex gap-2" style={{justifySelf:"end"}}>
+                <div className="mb-3 d-flex gap-2" style={{ justifySelf: "end" }}>
+                    {isAdmin && (
+                        
                 <button className="btn btn-outline-warning rounded-0" onClick={handleSave}>حفظ</button>
-                <button className="btn btn-primary rounded-0" onClick={() => setShowModal(true)}>
-                    <FontAwesomeIcon icon={faPlus} className='ms-2' />
-                    اضف كلية
-                </button>
+                    )}
+                {isSuperAdmin && (    
+                    <button className="btn btn-primary rounded-0" onClick={() => setShowModal(true)}>
+                        <FontAwesomeIcon icon={faPlus} className='ms-2' />
+                        اضف كلية
+                    </button>
+                )}
                 <button
                     className="btn btn-outline-success rounded-0"
                     onClick={() => downloadFile("http://localhost:3000/faculties/export", "كل_الكليات.xlsx")}
@@ -133,6 +148,7 @@ const Faculties = () => {
                     تصدير الكل
                 </button>
             </div>
+            )}
 
             <div className="table-responsive">
                 <table className="table table-hover text-end">
@@ -149,26 +165,34 @@ const Faculties = () => {
                                 <td>{faculty.id}</td>
                                 <td  className="text-break">{faculty.name}</td>
                                 <td className="text-center fs-5" style={{ alignContent: "center" }}>
-                                    {/* <button
-                                        > */}
+                                    
+                                    {isSuperAdmin || isAdmin && (
                                     <FontAwesomeIcon icon={faFileExcel}
                                             title="تصدير الكلية"
                                             className="btn btn-outline-success  mx-1"
                                             onClick={() => downloadFile(`http://localhost:3000/faculties/${faculty.id}/export`, `الكلية_${faculty.name}.xlsx`)}
                                             />
-                                    {/* </button> */}
+                                    )}
+                                    {!isSuperAdmin && (
                                     <FontAwesomeIcon
                                         className="btn btn-outline-primary  mx-1"
                                         icon={checkedFaculties.includes(faculty.id) ? faSquareCheckRegular : faSquareRegular}
-                                        onClick={() => toggleCheck(faculty.id)}
-                                        style={{ cursor: 'pointer', marginLeft: '20px' }}
-                                        />
+                                        onClick={() => {
+                                            if(isAdmin)
+                                                toggleCheck(faculty.id)
+                                        }}
+                                        style={{ cursor: isAdmin ? 'pointer' : 'not-allowed' , marginLeft: '20px' }}
+                                        
+                                    />
+                                    )}
+                                    {isSuperAdmin && (
                                     <FontAwesomeIcon
                                         icon={faTrashCan}
                                         className="btn btn-outline-danger  mx-1"
                                         onClick={() => handleDelete(faculty.id)}
                                         style={{ cursor: 'pointer', marginLeft: '10px' }}
                                     />
+                                    )}
                                 </td>
 
                             </tr>
