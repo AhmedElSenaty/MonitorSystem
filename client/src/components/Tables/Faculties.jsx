@@ -221,7 +221,7 @@ const Faculties = () => {
             {!isEmployee && (
 
                 <div className="mb-3 d-flex gap-2" style={{ justifySelf: "end" }}>
-                    {isAdmin && empID && (
+                    {(isAdmin || isSuperAdmin) && empID && (
                       
                       
                 <button className="btn btn-outline-warning rounded-0" onClick={handleSave}>حفظ</button>
