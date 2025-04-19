@@ -49,7 +49,7 @@ const PersonalInfoPortal = () => {
         try {
             const res = await axios.put(`https://localhost:7057/api/Request/ChangeStatus`, {
                 requestId: reqID*1,
-                status: 2
+                newStatus: 2
             }, {
                 headers: {
                     'Authorization': `Bearer ${user.token}`
@@ -65,13 +65,14 @@ const PersonalInfoPortal = () => {
         try {
             const res = await axios.put(`https://localhost:7057/api/Request/ChangeStatus`, {
                 requestId: reqID,
-                status: 3
+                newStatus: 3
             }, {
                 headers: {
                     'Authorization': `Bearer ${user.token}`
                 }
             });
             toast.success(res.data.message, { rtl: true, autoClose: 5000 });
+            setRequest({...request, status: 'تم الرفض'});
         } catch (error) {
             console.log(error);
         }
@@ -85,6 +86,7 @@ const PersonalInfoPortal = () => {
     ];
     
     const [role, setRole] = useState('');
+    const isSuperAdmin = role === "superadmin";
     const isAdmin = role === "admin";
     const isEmployee = role === "employee";
     const [request, setRequest] = useState(requests[1]);
@@ -102,7 +104,12 @@ const PersonalInfoPortal = () => {
                 navigate("/login");
                 return;
             }
-            setRole(user.role);
+            if (user.role !== null) 
+            {
+                setRole(user.role.toLowerCase());
+            }
+            
+
             const fetchData = async () => {
                 try {
                     const response = await axios.get(`https://localhost:7057/api/Request/${id}`, {
@@ -136,7 +143,7 @@ const PersonalInfoPortal = () => {
                     console.error("Error fetching data:", error);
                 }
             };
-            fetchData();
+            if (user.role !== null) fetchData();
             
     
         }, [id, user.token, navigate]);
@@ -172,10 +179,22 @@ const PersonalInfoPortal = () => {
         setNoteText('');
     };
     const closeImgModal = () => setShowImgModal(false);
-    const saveNote = () => {
-        if (currentRequest) {
-            currentRequest.notes = noteText;
+    const saveNote = async() => {
+        try {
+            const res = await axios.put(`https://localhost:7057/api/Request/AddNote`, {
+                requestId: reqID,
+                note: noteText
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`
+                }
+            });
+            toast.success('تم حفظ الملاحظات', { rtl: true, autoClose: 5000 });
+            setRequest({...request, notes: noteText});
+        } catch (error) {
+            console.log(error);
         }
+        
         closeModal();
     };
 
@@ -312,7 +331,7 @@ const PersonalInfoPortal = () => {
         >
             <ToastContainer position={"top-center"}/>
             <div className="container py-4 w-100">
-                {isAdmin && (
+                {(isAdmin || isSuperAdmin) && (
                     
                 <button type="button" className="btn btn-outline-primary mb-3" onClick={() => navigate(-1)} >
                                 <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
@@ -547,7 +566,7 @@ const PersonalInfoPortal = () => {
                             >
                                 <div className="fw-bold mb-2">{label}</div>
 
-                                {isAdmin && (
+                                {(isAdmin || isSuperAdmin) && (
                                     <div
                                         className="mx-auto mb-2"
                                         style={{
@@ -568,7 +587,11 @@ const PersonalInfoPortal = () => {
                                                 }
                                                 alt={label}
                                                 className="img-fluid"
-                                                style={{ maxHeight: "100%", maxWidth: "100%" }}
+                                                style={{ maxHeight: "100%", maxWidth: "100%", cursor:"zoom-in" }}
+                                                onClick={() => {
+                                                    setZoomedImage(files[type])
+                                                    setShowImgModal(true);
+                                                }}
                                             />
                                         ) : (
                                             <i
@@ -666,19 +689,19 @@ const PersonalInfoPortal = () => {
                                         {isEmployee && (
                                             <button
                                                 className="btn btn-outline-primary btn-main btn-sm"
-                                                onClick={() => navigate('/faculties')}
+                                                onClick={() => navigate(`/faculties/${id}`  )}
                                                 disabled={request.status === "تحت المراجعة" || request.status === "تم الرفض"}
                                                 style={{ backgroundColor: '#19355A', cursor: request.status === "تحت المراجعة" || request.status === "تم الرفض" ? "not-allowed" : "pointer" }}
                                             >
                                                 عرض الكليات
                                             </button>
                                         )}
-                                        {isAdmin && request.status === "تم الرفض" && (
+                                        {(isAdmin || isSuperAdmin) && request.status === "تم الرفض" && (
                                             <button style={{ backgroundColor: '#19355A' }} className="btn btn-outline-primary btn-main btn-sm" onClick={() => openModal(request)}>
                                                 اضف ملاحظة
                                             </button>
                                         )}
-                                        {isAdmin && (
+                                        {(isAdmin || isSuperAdmin) && (
                                             <>
                                                 {request.status === "تحت المراجعة" && (
                                                     <>
@@ -694,7 +717,7 @@ const PersonalInfoPortal = () => {
                                                     </>
                                                 )}
                                                 {request.status === "تم القبول" && (
-                                                    <button className="btn btn-outline-primary btn-sm" onClick={() => navigate("/faculties")}>
+                                                    <button className="btn btn-outline-primary btn-sm" onClick={() => navigate(`/faculties/${id}`)}>
                                                         اضف كليات
                                                     </button>
                                                 )}

@@ -6,6 +6,8 @@ import axios from "axios";
 import './register.css';
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 
 // Color constants
@@ -20,6 +22,7 @@ const RegisterForm = () => {
     const [loader, setLoader] = useState(false);
     const [birthDate, setBirthDate] = useState("");
     const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false);
 
     const [form, setForm] = useState({
         name: "",
@@ -376,16 +379,19 @@ const RegisterForm = () => {
                           </div>
                         )}
                       </div>
-                      <div className="col-md-4 my-1 my-sm-2">
+                    <div className="col-md-4 my-1 my-sm-2">
+                        
                         <input
                           name="password"
-                          type="password"
+                          type={showPassword ? "text" : "password"}
                           className={`form-control ${
                             errors.password ? "is-invalid" : ""
                           }`}
                           placeholder="كلمة مرور"
                           value={form.password}
-                          onChange={handleChange}
+                            onChange={handleChange}
+                            onMouseEnter={() => setShowPassword(true)}
+                            onMouseLeave={() => setShowPassword(false)}
                         />
                         {errors.password && (
                           <div className="invalid-feedback">
@@ -393,16 +399,18 @@ const RegisterForm = () => {
                           </div>
                         )}
                       </div>
-                      <div className="col-md-4 my-1 my-sm-2">
+                        <div className="col-md-4 my-1 my-sm-2">
                         <input
                           name="confirmPassword"
-                          type="password"
+                          type={showPassword ? "text" : "password"}
                           className={`form-control ${
                             errors.confirmPassword ? "is-invalid" : ""
                           }`}
                           placeholder="تأكيد كلمة مرور"
                           value={form.confirmPassword}
-                          onChange={handleChange}
+                                                onChange={handleChange}
+                                                onMouseEnter={() => setShowPassword(true)}
+                                                onMouseLeave={() => setShowPassword(false)}
                         />
                         {errors.confirmPassword && (
                           <div className="invalid-feedback">
@@ -443,8 +451,8 @@ const RegisterForm = () => {
                           className="form-control"
                           placeholder="تاريخ الميلاد"
                           value={birthDate}
-                                                readOnly
-                                                disabled
+                            readOnly
+                            disabled
                         />
                       </div>
                     </div>

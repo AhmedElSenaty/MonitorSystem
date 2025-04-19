@@ -27,7 +27,7 @@ const App = () => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/profile/:id?/:reqID?" element={<PersonalInfoPortal />} />
                 <Route path="/requests" element={<Requests />} />
-                <Route path="/faculties/:empID" element={<Faculties />} />
+                <Route path="/faculties/:empID?" element={<Faculties />} />
                 <Route path="/admins" element={<Admins />} />
                 <Route path="/NotAuthourized" element={<NotAuthourized />} />
                 <Route path="/*" element={<NotFound />} />

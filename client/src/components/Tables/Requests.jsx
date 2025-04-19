@@ -10,23 +10,22 @@ const Requests = () => {
     const navigate = useNavigate();
     const [requests, setRequests] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const requestsPerPage = 2;
+    const requestsPerPage = 10;
 
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
 
-    // Pagination logic
-    const indexOfLastRequest = currentPage * requestsPerPage;
-    const indexOfFirstRequest = indexOfLastRequest - requestsPerPage;
 
-    const filteredRequests = requests.filter(r =>
-        r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (r.ssn && r.ssn.includes(searchTerm))
-    );
-
+    
     const [totalPages, setTotalPages] = useState(1);
-    const currentRequests = filteredRequests.slice(indexOfFirstRequest, indexOfLastRequest);
 
+    // TODO: Replace with API CALL
+    const [statusCounts, setCount] = useState({
+        "تحت المراجعة": 0,
+        "تم القبول": 0,
+        "تم الرفض": 0,
+    });
+    
 
 
 
@@ -62,7 +61,14 @@ const Requests = () => {
                     setRequests([]);
                     return;
                 }
-                console.log(apiData);
+                console.log(apiData.requestsStatistics);
+                setCount(
+                    {
+                        "تحت المراجعة": apiData.requestsStatistics.pendingCount,
+                        "تم القبول": apiData.requestsStatistics.approvedCount,
+                        "تم الرفض": apiData.requestsStatistics.rejectedCount,
+                    }
+                );
                 setCurrentPage(apiData.metadata.pagination.pageIndex);
                 setTotalPages(apiData.metadata.pagination.totalPages);
                 const formatted = apiData.requests.map(r => ({
@@ -86,15 +92,8 @@ const Requests = () => {
         };
 
         fetchData();
-    }, [currentPage, searchTerm, statusFilter, user.token, requestsPerPage]);
+    }, [currentPage, searchTerm, statusFilter, requestsPerPage]);
 
-    
-    const statusCounts = {
-        "تحت المراجعة": requests.filter(r => r.status === "تحت المراجعة").length,
-        "تم القبول": requests.filter(r => r.status === "تم القبول").length,
-        "تم الرفض": requests.filter(r => r.status === "تم الرفض").length,
-    };
-    
 
 
 
@@ -176,7 +175,7 @@ const Requests = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {currentRequests.map(request => (
+                        {requests.map(request => (
                             <tr key={request.id}>
                                 <td>{request.name}</td>
                                 <td className="text-break">{request.gender}</td>
@@ -200,7 +199,7 @@ const Requests = () => {
                             <button className="page-link rounded-0" onClick={() => setCurrentPage(currentPage - 1)}>السابق</button>
                         </li>
                         {[...Array(totalPages)].map((_, index) => (
-                            <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
+                            <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`} >
                                 <button className="page-link" onClick={() => setCurrentPage(index + 1)}>
                                     {index + 1}
                                 </button>

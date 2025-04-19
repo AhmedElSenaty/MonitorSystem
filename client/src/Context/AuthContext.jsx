@@ -28,6 +28,7 @@ export const AuthProvider = ({ children }) => {
         const empty = { id: null, token: null, isLoggedIn: false, role: null };
         setUser(empty);
         localStorage.removeItem('user');
+        
     };
 
     return (
