@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Navbar.css";
 import { useAuth } from "../Context/AuthContext";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 
 const Navbar = () => {
     const navigate = useNavigate();
@@ -28,7 +28,7 @@ const Navbar = () => {
     return (
         <nav className="navbar navbar-expand-lg shadow" style={{ backgroundColor: "#19355A" }} dir="rtl">
             <div className="container-fluid">
-                <Link className="navbar-brand" to="/">
+                <div className="navbar-brand" >
                     <img
                         src="/assets/helwan-logo.png"
                         alt="Logo"
@@ -36,7 +36,7 @@ const Navbar = () => {
                         height="50"
                         className="d-inline-block align-text-top"
                     />
-                </Link>
+                </div>
                 {isLoggedIn && (
                     <button
                         className="navbar-toggler"
@@ -52,30 +52,50 @@ const Navbar = () => {
                 )}
                 <div className="collapse navbar-collapse" id="navbarScroll">
                     {role === "superadmin" && (
-                        <ul className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll gap-2" style={{ "--bs-scroll-height": "100px" }}>
+                        <ul className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll gap-2" style={{ "--bs-scroll-height": "250px" }}>
                             <li className="nav-item">
-                                <Link className="nav-link" to="/admins" style={{ color: "white" }}>
+                                <NavLink className={({ isActive }) => {
+                                    
+                                    return (isActive ? `nav-link my-bg-warning` : `nav-link`)
+                                }} to="/admins" style={{ color: "white" }}>
                                     قائمة المشرفين
-                                </Link>
+                                </NavLink>
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link" to="/faculties" style={{ color: "white" }}>
+                                <NavLink className={({ isActive }) => {
+                                    
+                                    return (isActive ? `nav-link my-bg-warning` : `nav-link`)
+                                }} to="/faculties" style={{ color: "white" }}>
                                     قائمة الكليات
-                                </Link>
+                                </NavLink>
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link" to="/requests" style={{ color: "white" }}>
+                                <NavLink className={({ isActive }) => {
+                                    
+                                    return (isActive ? `nav-link my-bg-warning` : `nav-link`)
+                                }} to="/requests" style={{ color: "white" }}>
                                     قائمة الطلبات
-                                </Link>
+                                </NavLink>
                             </li>
                         </ul>
                     )}
                     {role === "admin" && (
                         <ul className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll gap-2" style={{ "--bs-scroll-height": "100px" }}>
                             <li className="nav-item">
-                                <Link className="nav-link" to="/faculties" style={{ color: "white" }}>
+                                <NavLink className={({ isActive }) => {
+                                    
+                                    return (isActive ? `nav-link my-bg-warning` : `nav-link`)
+                                }} to="/requests" style={{ color: "white" }}>
+                                    قائمة الطلبات
+                                </NavLink>
+                            </li>
+                            <li className="nav-item">
+                                <NavLink className={({ isActive }) => {
+                                    
+                                    return (isActive ? `nav-link my-bg-warning` : `nav-link`)
+                                }} to="/faculties" style={{ color: "white" }}>
                                     قائمة الكليات
-                                </Link>
+                                </NavLink>
                             </li>
                         </ul>
                     )}

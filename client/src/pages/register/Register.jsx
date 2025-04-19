@@ -231,7 +231,7 @@ const RegisterForm = () => {
 
     return (
         <>
-            <ToastContainer position="top-center" />
+        <ToastContainer position="top-center" />
         <div className="container mt-5">
           <div className="card shadow p-4">
             <h2 className="text-center text-primary mb-3">تقديم طلب</h2>

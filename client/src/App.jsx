@@ -61,3 +61,10 @@ const NotAuthourized = () => {
         </div>
     )
 }
+export const NotLoaded = () => {
+    return (
+        <div className='h-screen flex items-center justify-center m-5 text-center'>
+            <h1 className='alert alert-warning text-3xl font-bold'>Error: Faild To Load Data  <strong>500</strong></h1>
+        </div>
+    )
+}

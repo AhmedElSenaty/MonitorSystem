@@ -1,0 +1,25 @@
+/* size & color */
+.spinner-grow {
+    width: 10rem;
+    height: 10rem;
+    color: rgb(25, 53, 90);
+    background-color: rgb(25, 53, 90);
+    /* spinner color */
+}
+
+/* just slow it down; keep Bootstrap's keyframes for opacity & scale */
+.slow-spin {
+    animation-duration: 2s !important;
+}
+
+/* logo sizing */
+.spinner-logo {
+    width: 5rem;
+    height: 5rem;
+}
+
+/* loading text */
+.loading-text {
+    margin-top: 0.5rem;
+    text-align: center;
+}

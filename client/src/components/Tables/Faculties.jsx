@@ -8,7 +8,9 @@ import { faSquare as faSquareRegular, faSquareCheck as faSquareCheckRegular } fr
 import {  ToastContainer,toast } from 'react-toastify';
 import './Tables.css';
 import { useAuth } from '../../Context/AuthContext';
-
+import LogoSpinner from '../spinner/LogoSpinner';
+import { NotLoaded } from '../../App';
+import { set } from 'react-hook-form';
 
 const Faculties = () => {
     const { user } = useAuth();
@@ -17,6 +19,8 @@ const Faculties = () => {
     const [faculties, setFaculties] = useState([]);
     const [checkedFaculties, setCheckedFaculties] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [errPage, setErrPage] = useState(false);
     const [newFacultyName, setNewFacultyName] = useState('');
     
 
@@ -37,13 +41,17 @@ const Faculties = () => {
                     axios.get('http://localhost:5083/api/Department/List', { headers: { Authorization: `Bearer ${user.token}` } }),
                     axios.get(`http://localhost:5083/api/Department/ByEmployee/${empID}`, { headers: { Authorization: `Bearer ${user.token}` } })
                 ]);
-                if (facultiesRes.data === null) return;
+                if (facultiesRes.data === null) throw new Error(facultiesRes);
                 setFaculties(facultiesRes.data.data);
-                if (userFacsRes.data === null) return;
+                if (userFacsRes.data === null) throw new Error(userFacsRes);
                 setCheckedFaculties(userFacsRes.data.data.map(faculty => faculty.id));
                 
             } catch (error) {
-                // console.error("Error fetching data:", error);
+                console.error("Error fetching data:", error.message);
+                toast.error(error.message, { rtl: false });
+                setErrPage(true);
+            }finally {
+                setLoading(false);
             }
         };
         const fetchEmpData = async () => {
@@ -51,58 +59,38 @@ const Faculties = () => {
                 const [userFacsRes] = await Promise.all([
                     axios.get(`http://localhost:5083/api/Department/ByEmployee/${empID}`, { headers: { Authorization: `Bearer ${user.token}` } })
                 ]);
-                if (userFacsRes.data === null) return;
+                if (userFacsRes.data === null) {
+                    throw new Error(userFacsRes);
+                    
+                };
 
                 setFaculties(userFacsRes.data.data);
                 setCheckedFaculties(userFacsRes.data.data.map(faculty => faculty.id));
                 
             } catch (error) {
-                // console.error("Error fetching data:", error);
+                console.error("Error fetching data:", error.message);
+                toast.error(error.message, { rtl: false });
+                setErrPage(true);
+            }finally {
+                setLoading(false);
             }
         };
-        if (user.role.toLowerCase() == 'employee') {
+
+        if ( user.role !== null && user.role.toLowerCase() == 'employee' && empID !== null) {
             fetchEmpData();
         } else {
-            
-            fetchData();
+            if (empID !== null)
+            {
+                fetchData();
+            }
+            else
+            {
+                setLoading(false);
+                navigate(-1);
+            }
         }
     }, []);
 
-    /*
-    const downloadExcelFromApi = async () => {
-  try {
-    const res = await axios.get('https://your-api/endpoint', {
-      // if you need headers or params, include them here
-    });
-    
-    // 1. Pull out the info
-    const { fileContents: base64, contentType, fileDownloadName } = res.data.file;
-    
-    // 2. Decode base64 to a byte array
-    const binaryString = window.atob(base64);
-    const len = binaryString.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    
-    // 3. Build a Blob from the byte array
-    const blob = new Blob([bytes], { type: contentType });
-    
-    // 4. Create a temporary link and click it
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = fileDownloadName;            // e.g. "كشف المراقبين على كل الكليات.xlsx"
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);              // clean up
-  } catch (err) {
-    console.error('Download failed', err);
-    // show a toast or other error UI
-  }
-};
-    */
     const downloadFile = async (url, fileName) => {
         try {
             const res = await axios.get(url, {
@@ -209,120 +197,135 @@ const Faculties = () => {
     };
 
     return (
-        <div dir='rtl' className='p-5 bg-light  '>
+        <>
             <ToastContainer position='top-center'/>
-            {/* TODO: onClick={() => navigate(-1)} */}
-            <button type="button" className="btn btn-outline-primary mb-3" onClick={() => navigate(-1)} >
-                <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
-                رجوع
-            </button>
+            {loading && <LogoSpinner />}
+            {errPage && <NotLoaded />}
+            {!loading && !errPage && (
+                <div dir='rtl' className='container-fluid p-4 bg-light'>
 
-            <h2 style={{ color: "#19355A" }} className="mb-4">الكليات</h2>
-            {!isEmployee && (
-
-                <div className="mb-3 d-flex gap-2" style={{ justifySelf: "end" }}>
-                    {(isAdmin || isSuperAdmin) && empID && (
-                      
-                      
-                <button className="btn btn-outline-warning rounded-0" onClick={handleSave}>حفظ</button>
-                    )}
-                    {(isSuperAdmin && !empID) && (    
-                    <button className="btn btn-primary rounded-0" onClick={() => setShowModal(true)}>
-                        <FontAwesomeIcon icon={faPlus} className='ms-2' />
-                        اضف كلية
-                    </button>
-                    )}
-                    {!empID && (
-                        <button
-                            className="btn btn-outline-success rounded-0"
-                            onClick={() => downloadFile("http://localhost:5083/api/Reports/employee-departments-report", "كل_الكليات.xlsx")}
-                        >
-                            <FontAwesomeIcon icon={faFileExcel} className="ms-2" />
-                            تصدير الكل
+                    {/* Back Button */}
+                    <div className="mb-3">
+                        <button type="button" className="btn btn-outline-primary" onClick={() => navigate(-1)}>
+                            <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
+                            رجوع
                         </button>
+                    </div>
+
+                    {/* Title */}
+                    <h2 style={{ color: "#19355A" }} className="mb-4">الكليات</h2>
+
+                    {/* Action Buttons */}
+                    {!isEmployee && (
+                        <div className="row mb-3 justify-content-start justify-content-md-start g-2">
+                            {(isAdmin || isSuperAdmin) && empID && (
+                                <div className="col-auto">
+                                    <button className="btn btn-outline-warning rounded-0 w-100" onClick={handleSave}>حفظ</button>
+                                </div>
+                            )}
+                            {(isSuperAdmin && !empID) && (
+                                <div className="col-auto">
+                                    <button className="btn btn-primary rounded-0 w-100" onClick={() => setShowModal(true)}>
+                                        <FontAwesomeIcon icon={faPlus} className='ms-2' />
+                                        اضف كلية
+                                    </button>
+                                </div>
+                            )}
+                            {!empID && faculties.length > 0 && (
+                                <div className="col-auto">
+                                    <button
+                                        className="btn btn-outline-success rounded-0 w-100"
+                                        onClick={() => downloadFile("http://localhost:5083/api/Reports/employee-departments-report", "كل_الكليات.xlsx")}
+                                    >
+                                        <FontAwesomeIcon icon={faFileExcel} className="ms-2" />
+                                        تصدير الكل
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     )}
-            </div>
-            )}
 
-            <div className="table-responsive">
-                <table className="table table-hover text-end">
-                    <thead className="table-secondary">
-                        <tr>
-                            <th>رقم مسلسل</th>
-                            <th className='w-25 text-break'>الكلية</th>
-                            <th className="text-center">تحكم</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {faculties.map((faculty, index) => (
-                            <tr key={faculty.id}>
-                                <td>{faculty.id}</td>
-                                <td  className="text-break">{faculty.name}</td>
-                                <td className="text-center fs-5" style={{ alignContent: "center" }}>
-                                    
-                                    {(isSuperAdmin || isAdmin) && !empID && (
-                                    <FontAwesomeIcon icon={faFileExcel}
-                                            title="تصدير الكلية"
-                                            className="btn btn-outline-success  mx-1"
-                                            onClick={() => downloadFile(`http://localhost:5083/api/Reports/employee-departments-report/?departmentId=${faculty.id}`, `الكلية_${faculty.name}.xlsx`)}
-                                            />
-                                    )}
-                                    {  (empID) && (
-                                    <FontAwesomeIcon
-                                        className="btn btn-outline-primary  mx-1"
-                                        icon={checkedFaculties.includes(faculty.id) ? faSquareCheckRegular : faSquareRegular}
-                                        onClick={() => {
-                                            if(isAdmin || isSuperAdmin)
-                                                toggleCheck(faculty.id)
-                                        }}
-                                        style={{ cursor: (isAdmin || isSuperAdmin) ? 'pointer' : 'not-allowed' , marginLeft: '20px' }}
-                                        
-                                    />
-                                    )}
-                                    {(isSuperAdmin && !empID) && (
-                                    <FontAwesomeIcon
-                                        icon={faTrashCan}
-                                        className="btn btn-outline-danger  mx-1"
-                                        onClick={() => handleDelete(faculty.id)}
-                                        style={{ cursor: 'pointer', marginLeft: '10px' }}
-                                    />
-                                    )}
-                                </td>
+                    {/* Table */}
+                    <div className="table-responsive">
+                        <table className="table table-hover text-end align-middle">
+                            <thead className="table-secondary">
+                                <tr>
+                                    <th className='w-25'>رقم مسلسل</th>
+                                    <th className='w-50 text-break'>الكلية</th>
+                                    <th className="text-center w-25">تحكم</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {faculties.map((faculty) => (
+                                    <tr key={faculty.id}>
+                                        <td>{faculty.id}</td>
+                                        <td className="text-break">{faculty.name}</td>
+                                        <td className="text-center fs-5">
+                                            {(isSuperAdmin || isAdmin) && !empID && (
+                                                <FontAwesomeIcon
+                                                    icon={faFileExcel}
+                                                    title="تصدير الكلية"
+                                                    className="btn btn-outline-success mx-1"
+                                                    onClick={() => downloadFile(`http://localhost:5083/api/Reports/employee-departments-report/?departmentId=${faculty.id}`, `الكلية_${faculty.name}.xlsx`)}
+                                                />
+                                            )}
 
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                                            {empID && (
+                                                <FontAwesomeIcon
+                                                    className="btn btn-outline-primary mx-1"
+                                                    icon={checkedFaculties.includes(faculty.id) ? faSquareCheckRegular : faSquareRegular}
+                                                    onClick={() => {
+                                                        if (isAdmin || isSuperAdmin) toggleCheck(faculty.id)
+                                                    }}
+                                                    style={{ cursor: (isAdmin || isSuperAdmin) ? 'pointer' : 'not-allowed' }}
+                                                />
+                                            )}
 
-            {/* Add Faculty Modal */}
-            {showModal && (
-                <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.4)" }}>
-                    <div className="modal-dialog modal-dialog-centered">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <button type="button" className="btn-close ms-0" onClick={() => setShowModal(false)}></button>
-                                <h5 className="modal-title">إضافة كلية جديدة</h5>
-                            </div>
-                            <div className="modal-body">
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    value={newFacultyName}
-                                    onChange={(e) => setNewFacultyName(e.target.value)}
-                                    placeholder="اسم الكلية"
-                                />
-                            </div>
-                            <div className="modal-footer">
-                                <button className="btn btn-secondary" onClick={() => setShowModal(false)}>إغلاق</button>
-                                <button className="btn btn-primary" onClick={handleAddFaculty}>إضافة</button>
+                                            {(isSuperAdmin && !empID) && (
+                                                <FontAwesomeIcon
+                                                    icon={faTrashCan}
+                                                    className="btn btn-outline-danger mx-1"
+                                                    onClick={() => handleDelete(faculty.id)}
+                                                    style={{ cursor: 'pointer' }}
+                                                />
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Modal */}
+                    {showModal && (
+                        <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.4)" }}>
+                            <div className="modal-dialog modal-dialog-centered">
+                                <div className="modal-content">
+                                    <div className="modal-header">
+                                        <button type="button" className="btn-close ms-0" onClick={() => setShowModal(false)}></button>
+                                        <h5 className="modal-title">إضافة كلية جديدة</h5>
+                                    </div>
+                                    <div className="modal-body">
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            value={newFacultyName}
+                                            onChange={(e) => setNewFacultyName(e.target.value)}
+                                            placeholder="اسم الكلية"
+                                        />
+                                    </div>
+                                    <div className="modal-footer">
+                                        <button className="btn btn-secondary" onClick={() => setShowModal(false)}>إغلاق</button>
+                                        <button className="btn btn-primary" onClick={handleAddFaculty}>إضافة</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
-            )}
 
-        </div>
+            )}
+        </>
     );
 };
 

@@ -34,3 +34,8 @@ background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30
 background-color: rgba(255, 255, 255, 0.2);
 color: #fff;
 }
+
+.my-bg-warning{
+    background-color: #AD8700 !important;
+    transition: background-color 0.8s ease-in-out, color 0.8s ease-in-out;
+}

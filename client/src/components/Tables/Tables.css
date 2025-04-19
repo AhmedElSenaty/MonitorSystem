@@ -53,4 +53,29 @@ table td, table th {
     word-break: break-word;
     white-space: normal;
 }
+.status-card {
+    background-color: transparent;
+    border-width: 2px;
+    transition: all 0.3s ease;
+}
 
+.status-card:hover {
+    color: white !important;
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.status-card[data-color="warning"]:hover {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.status-card[data-color="success"]:hover {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+.status-card[data-color="danger"]:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
