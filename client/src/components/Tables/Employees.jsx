@@ -39,14 +39,26 @@ const Employees = () => {
 
     const fetchData = async () => {
         try {
-            const res = await axios.get(`http://localhost:5083/api/Admin?PageIndex=${currentPage}&PageSize=${adminsPerPage}`,
+            const res = await axios.get(`http://localhost:5083/api/Employee`,
                 {
+                    params: {
+                        PageIndex: currentPage,
+                        PageSize: adminsPerPage,
+                        SearchByEmployeeName: isNaN(searchTerm) ? searchTerm : '',
+                        SearchByEmployeeSSN: isNaN(searchTerm) ? '' : searchTerm,
+                    },
                     headers: {
                         Authorization: `Bearer ${user.token}`
                     }
                 }
             );
-            setAdmins(res.data.data.admins);
+            console.log(res.data.data.employees);
+            const formatted = res.data.data.employees.map(r => ({
+                            id: r.id,
+                            name: r.fullName,
+                            empId: r.guid,
+                        }));
+            setAdmins(formatted);
             setTotalPages((res.data.data.totalCount / adminsPerPage) > 0? Math.ceil(res.data.data.totalCount / adminsPerPage): 1);
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -57,59 +69,59 @@ const Employees = () => {
     };
     useEffect(() => {
         fetchData();
-    }, [currentPage,  newAdminPass]);
+    }, [currentPage, newAdminPass, searchTerm]);
 
-    useEffect(() => {
-        const fetchData = async () => {
+    // useEffect(() => {
+    //     const fetchData = async () => {
             
 
-            try {
-                const res = await axios.get('http://localhost:5083/api/Request', {
-                    params: {
-                        PageIndex: currentPage,
-                        PageSize: adminsPerPage,
-                        SearchByEmployeeName: isNaN(searchTerm) ? searchTerm : '',
-                        SearchByEmployeeSSN: isNaN(searchTerm) ? '' : searchTerm,
-                    },
-                    headers: {
-                        Authorization: `Bearer ${user.token}`
-                    }
-                });
+    //         try {
+    //             const res = await axios.get('http://localhost:5083/api/Request', {
+    //                 params: {
+    //                     PageIndex: currentPage,
+    //                     PageSize: adminsPerPage,
+    //                     SearchByEmployeeName: isNaN(searchTerm) ? searchTerm : '',
+    //                     SearchByEmployeeSSN: isNaN(searchTerm) ? '' : searchTerm,
+    //                 },
+    //                 headers: {
+    //                     Authorization: `Bearer ${user.token}`
+    //                 }
+    //             });
 
-                // API responds { status, message, data: { requests: [...] }, errors }
-                const apiData = res.data?.data;
+    //             // API responds { status, message, data: { requests: [...] }, errors }
+    //             const apiData = res.data?.data;
                 
                 
-                setCurrentPage(apiData.metadata.pagination.pageIndex);
-                setTotalPages(apiData.metadata.pagination.totalPages);
-                const formatted = apiData.requests.map(r => ({
-                    id: r.id,
-                    name: r.employeeName,
-                    empId: r.employeeID,
-                }));
+    //             setCurrentPage(apiData.metadata.pagination.pageIndex);
+    //             setTotalPages(apiData.metadata.pagination.totalPages);
+    //             const formatted = apiData.requests.map(r => ({
+    //                 id: r.id,
+    //                 name: r.employeeName,
+    //                 empId: r.employeeID,
+    //             }));
 
-                setAdmins(formatted);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                if (error.response?.data?.message && (user.role !== null || user.role.toLowerCase() !== 'employee')) {
-                    toast.error(error.response.data.message, { rtl: true });
-                } else {
-                    toast.error('حدث خطأ أثناء جلب البيانات', { rtl: true });
-                }
-                setErrPage(true);
-            } finally {
-                setLoading(false);
-            }
-        };
+    //             setAdmins(formatted);
+    //         } catch (error) {
+    //             console.error('Error fetching data:', error);
+    //             if (error.response?.data?.message && (user.role !== null || user.role.toLowerCase() !== 'employee')) {
+    //                 toast.error(error.response.data.message, { rtl: true });
+    //             } else {
+    //                 toast.error('حدث خطأ أثناء جلب البيانات', { rtl: true });
+    //             }
+    //             setErrPage(true);
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
 
-        fetchData();
-    }, [currentPage, searchTerm]);
+    //     fetchData();
+    // }, [currentPage, searchTerm]);
     
 
     const handleEdit = (admin, id) => {
         setSelectedAdmin(admin);
         setAdminID(id);
-        setNewAdminMail(admin.mail);
+        // setNewAdminMail(admin.mail);
         setNewAdminPass(admin.pass);
         setIsEditing(true);
         setShowModal(true);
@@ -226,12 +238,12 @@ const Employees = () => {
                             <tbody>
                                 {admins.map((admin,index) => (
                                     <tr key={index+1}>
-                                        <td>{index+1}</td>
-                                        <td className="text-break">{admin.username}</td>
+                                        <td>{admin.id}</td>
+                                        <td className="text-break">{admin.name}</td>
                                         <td className="text-center fs-5" style={{alignContent:"center"}}>
                                             <FontAwesomeIcon
                                                 icon={faPenRegular}
-                                                onClick={() => handleEdit(admin, admin.id)}
+                                                onClick={() => handleEdit(admin, admin.empId)}
                                                 style={{ cursor: 'pointer' }}
                                                 className='btn btn-outline-primary mx-1'
                                             />
