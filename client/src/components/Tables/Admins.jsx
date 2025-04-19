@@ -6,8 +6,11 @@ import { faPenToSquare as faPenRegular } from '@fortawesome/free-regular-svg-ico
 import { toast } from 'react-toastify';
 import './Tables.css';
 import { useAuth } from '../../Context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+
 const Admins = () => {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [admins, setAdmins] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -18,6 +21,12 @@ const Admins = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
+    useEffect(() => {
+        if (user.role === null || user.role.toLowerCase() === 'employee') {
+            navigate('/NotAuthourized');
+            return;
+        }
+    }, [])
     const adminsPerPage = 10;
 
     

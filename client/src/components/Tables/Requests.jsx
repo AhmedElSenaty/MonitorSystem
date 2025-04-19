@@ -10,7 +10,6 @@ const Requests = () => {
     const { user } = useAuth();
 
     useEffect(() => {
-        console.log(user.role);
         if (user.role === null || user.role.toLowerCase() === 'employee') {
             navigate('/NotAuthourized');
             return;
