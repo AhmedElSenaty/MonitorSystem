@@ -6,8 +6,17 @@ import { useAuth } from '../../Context/AuthContext';
 import { toast } from 'react-toastify';
 
 const Requests = () => {
-    const { user } = useAuth();
     const navigate = useNavigate();
+    const { user } = useAuth();
+
+    useEffect(() => {
+        console.log(user.role);
+        if (user.role === null || user.role.toLowerCase() === 'employee') {
+            navigate('/NotAuthourized');
+            return;
+        }
+    }, [])
+    
     const [requests, setRequests] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const requestsPerPage = 10;
@@ -82,7 +91,7 @@ const Requests = () => {
                 setRequests(formatted);
             } catch (error) {
                 console.error('Error fetching data:', error);
-                if (error.response?.data?.message) {
+                if (error.response?.data?.message && (user.role !== null || user.role.toLowerCase() !== 'employee')) {
                     toast.error(error.response.data.message, { rtl: true });
                 } else {
                     toast.error('حدث خطأ أثناء جلب البيانات', { rtl: true });
