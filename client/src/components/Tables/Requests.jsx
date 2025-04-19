@@ -49,7 +49,7 @@ const Requests = () => {
             };
 
             try {
-                const res = await axios.get('https://localhost:7057/api/Request', {
+                const res = await axios.get('http://localhost:5083/api/Request', {
                     params: {
                         PageIndex: currentPage,
                         PageSize: requestsPerPage,

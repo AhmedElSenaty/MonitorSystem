@@ -188,7 +188,7 @@ const RegisterForm = () => {
             formData.append('PersonalImage', files.personal);
             formData.append('DegreeImage', files.degree);
             const res = await axios.post(
-                "https://localhost:7057/api/Account/RegisterEmployee",
+                "http://localhost:5083/api/Account/RegisterEmployee",
                 formData
                 , {
                     params: {

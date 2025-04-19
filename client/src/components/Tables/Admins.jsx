@@ -34,7 +34,7 @@ const Admins = () => {
 
     const fetchData = async () => {
         try {
-            const res = await axios.get(`https://localhost:7057/api/Admin?PageIndex=${currentPage}&PageSize=${adminsPerPage}`,
+            const res = await axios.get(`http://localhost:5083/api/Admin?PageIndex=${currentPage}&PageSize=${adminsPerPage}`,
                 {
                     headers: {
                         Authorization: `Bearer ${user.token}`
@@ -65,7 +65,7 @@ const Admins = () => {
     const handleDelete = async (adminId) => {
         setAdminID(adminId);
         try {
-            await axios.delete(`https://localhost:7057/api/Admin/${adminId}`, {
+            await axios.delete(`http://happ.helwan.edu.eg/api/Admin/${adminId}`, {
                 headers: {
                     Authorization: `Bearer ${user.token}`
                 }
@@ -84,7 +84,7 @@ const Admins = () => {
             if (isEditing && selectedAdmin && AdminID !== 0) {
                 try {
                     
-                    await axios.post(`https://localhost:7057/api/Account/admin-reset-password`, {
+                    await axios.post(`http://happ.helwan.edu.eg/api/Account/admin-reset-password`, {
                         userId: AdminID,
                         password: newAdminPass,
                     }, {
@@ -103,7 +103,7 @@ const Admins = () => {
             } else {
                 try {
                     
-                    await axios.post(`https://localhost:7057/api/Account/RegisterAdmin`, {
+                    await axios.post(`http://happ.helwan.edu.eg/api/Account/RegisterAdmin`, {
                         username: newAdminMail,
                         password: newAdminPass,
                     }, {

@@ -23,7 +23,7 @@ const Login = () => {
       setLoader(true);
     try {
       //change url
-        const res = await axios.post(`https://localhost:7057/api/Account/Login`, {
+        const res = await axios.post(`http://localhost:5083/api/Account/Login`, {
         
           "email": data.email,
           "password": data.password

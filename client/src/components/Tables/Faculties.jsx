@@ -34,8 +34,8 @@ const Faculties = () => {
         const fetchData = async () => {
             try {
                 const [facultiesRes, userFacsRes] = await Promise.all([
-                    axios.get('https://localhost:7057/api/Department/List', { headers: { Authorization: `Bearer ${user.token}` } }),
-                    axios.get(`https://localhost:7057/api/Department/ByEmployee/${empID}`, { headers: { Authorization: `Bearer ${user.token}` } })
+                    axios.get('http://localhost:5083/api/Department/List', { headers: { Authorization: `Bearer ${user.token}` } }),
+                    axios.get(`http://localhost:5083/api/Department/ByEmployee/${empID}`, { headers: { Authorization: `Bearer ${user.token}` } })
                 ]);
                 if (facultiesRes.data === null) return;
                 setFaculties(facultiesRes.data.data);
@@ -49,7 +49,7 @@ const Faculties = () => {
         const fetchEmpData = async () => {
             try {
                 const [userFacsRes] = await Promise.all([
-                    axios.get(`https://localhost:7057/api/Department/ByEmployee/${empID}`, { headers: { Authorization: `Bearer ${user.token}` } })
+                    axios.get(`http://localhost:5083/api/Department/ByEmployee/${empID}`, { headers: { Authorization: `Bearer ${user.token}` } })
                 ]);
                 if (userFacsRes.data === null) return;
 
@@ -155,7 +155,7 @@ const Faculties = () => {
 
     const handleSave = async () => {
         try {
-            await axios.put(`https://localhost:7057/api/Department/UpdateEmployeeDepartments`, {
+            await axios.put(`http://localhost:5083/api/Department/UpdateEmployeeDepartments`, {
                 departmentsIds: checkedFaculties,
                 employeeId: empID
             },{
@@ -174,7 +174,7 @@ const Faculties = () => {
 
     const handleDelete = async (facultyId) => {
         try {
-            await axios.delete(`https://localhost:7057/api/Department/${facultyId}`, {
+            await axios.delete(`http://localhost:5083/api/Department/${facultyId}`, {
                 headers: {
                     Authorization: `Bearer ${user.token}`
                 }
@@ -190,7 +190,7 @@ const Faculties = () => {
     const handleAddFaculty = async () => {
         if (!newFacultyName.trim()) return;
         try {
-            const res = await axios.post(`https://localhost:7057/api/Department`, {
+            const res = await axios.post(`http://localhost:5083/api/Department`, {
                 name: newFacultyName
             }, {
                 headers: {
@@ -235,7 +235,7 @@ const Faculties = () => {
                     {!empID && (
                         <button
                             className="btn btn-outline-success rounded-0"
-                            onClick={() => downloadFile("https://localhost:7057/api/Reports/employee-departments-report", "كل_الكليات.xlsx")}
+                            onClick={() => downloadFile("http://localhost:5083/api/Reports/employee-departments-report", "كل_الكليات.xlsx")}
                         >
                             <FontAwesomeIcon icon={faFileExcel} className="ms-2" />
                             تصدير الكل
@@ -264,7 +264,7 @@ const Faculties = () => {
                                     <FontAwesomeIcon icon={faFileExcel}
                                             title="تصدير الكلية"
                                             className="btn btn-outline-success  mx-1"
-                                            onClick={() => downloadFile(`https://localhost:7057/api/Reports/employee-departments-report/?departmentId=${faculty.id}`, `الكلية_${faculty.name}.xlsx`)}
+                                            onClick={() => downloadFile(`http://localhost:5083/api/Reports/employee-departments-report/?departmentId=${faculty.id}`, `الكلية_${faculty.name}.xlsx`)}
                                             />
                                     )}
                                     {  (empID) && (
