@@ -15,6 +15,7 @@ const PersonalInfoPortal = () => {
     const { id , reqID} = useParams();
     
     let originalData = {
+        id: "",
         name: "",
         address: "",
         degree: "",
@@ -117,6 +118,7 @@ const PersonalInfoPortal = () => {
                             'Authorization': `Bearer ${user.token}`
                         }
                     });
+                    console.log(response.data.data);
                     setData({
                         name: response.data.data.employeeInformation.name,
                         address: response.data.data.employeeInformation.address,
@@ -127,7 +129,8 @@ const PersonalInfoPortal = () => {
                         email: response.data.data.employeeInformation.email,
                         gender: response.data.data.employeeInformation.gender,
                         DOB: response.data.data.employeeInformation.dob,
-                        age: response.data.data.employeeInformation.age
+                        age: response.data.data.employeeInformation.age,
+                        id: response.data.data.employeeInformation.id
                     });
                     setOrgData({ ...data });
 
@@ -377,7 +380,7 @@ const PersonalInfoPortal = () => {
                                         >
                                             الرقم المسلسل
                                         </td>
-                                        <td className="text-center">100001</td>
+                                        <td className="text-center">{data.id }</td>
                                         <td
                                             style={{ backgroundColor: "#ECECF1" }}
                                             className=" text-center"

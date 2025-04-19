@@ -9,6 +9,7 @@ import { decodeJWT } from "../../utils/decodeJWT";
 import {useAuth} from '../../Context/AuthContext'
 const Login = () => {
     const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false);
     const {setUser} = useAuth();
         const [loader, setLoader] = useState(false);
   const {
@@ -114,11 +115,13 @@ const Login = () => {
             </div>
 
             <div className="mb-3">
-              <input
-                type="password"
+            <input
+                type={ showPassword ? "text" : "password"}
                 className="form-control"
                 placeholder="كلمة مرور"
-                {...register("password", { required: "كلمة المرور مطلوبة" })}
+                              {...register("password", { required: "كلمة المرور مطلوبة" })}
+                              onMouseEnter={() => setShowPassword(true)}
+                              onMouseLeave={() => setShowPassword(false)}
               />
               {errors.password && (
                 <small className="text-danger">{errors.password.message}</small>

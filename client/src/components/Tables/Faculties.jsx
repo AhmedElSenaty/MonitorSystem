@@ -267,15 +267,15 @@ const Faculties = () => {
                                             onClick={() => downloadFile(`https://localhost:7057/api/Reports/employee-departments-report/?departmentId=${faculty.id}`, `الكلية_${faculty.name}.xlsx`)}
                                             />
                                     )}
-                                    {    empID && (
+                                    {  (empID) && (
                                     <FontAwesomeIcon
                                         className="btn btn-outline-primary  mx-1"
                                         icon={checkedFaculties.includes(faculty.id) ? faSquareCheckRegular : faSquareRegular}
                                         onClick={() => {
-                                            if(isAdmin)
+                                            if(isAdmin || isSuperAdmin)
                                                 toggleCheck(faculty.id)
                                         }}
-                                        style={{ cursor: isAdmin ? 'pointer' : 'not-allowed' , marginLeft: '20px' }}
+                                        style={{ cursor: (isAdmin || isSuperAdmin) ? 'pointer' : 'not-allowed' , marginLeft: '20px' }}
                                         
                                     />
                                     )}
