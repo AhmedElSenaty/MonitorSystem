@@ -55,7 +55,7 @@ const Navbar = () => {
                         <ul className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll gap-2" style={{ "--bs-scroll-height": "100px" }}>
                             <li className="nav-item">
                                 <Link className="nav-link" to="/admins" style={{ color: "white" }}>
-                                    قائمة الموظفين
+                                    قائمة المشرفين
                                 </Link>
                             </li>
                             <li className="nav-item">

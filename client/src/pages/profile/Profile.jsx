@@ -118,7 +118,6 @@ const PersonalInfoPortal = () => {
                             'Authorization': `Bearer ${user.token}`
                         }
                     });
-                    console.log(response.data.data);
                     setData({
                         name: response.data.data.employeeInformation.name,
                         address: response.data.data.employeeInformation.address,
@@ -132,8 +131,7 @@ const PersonalInfoPortal = () => {
                         age: response.data.data.employeeInformation.age,
                         id: response.data.data.employeeInformation.id
                     });
-                    setOrgData({ ...data });
-
+                    setOrgData(data );
                     setFiles({
                         personal: response.data.data.employeeImagesDto.personalImage,
                         degree: response.data.data.employeeImagesDto.degreeImage,
@@ -669,17 +667,17 @@ const PersonalInfoPortal = () => {
                             </thead>
                             <tbody>
                                 <tr className="align-middle">
-                                    <td className={statusClass(request.status)}>
+                                    <td className={`${statusClass(request.status)} w-25`}>
                                         {request.status}
                                     </td>
-                                    <td dir="rtl" className="text-break" style={{ whiteSpace: 'pre-wrap', maxWidth: '300px' }}>
+                                    <td dir="rtl" className="text-break w-50" style={{ whiteSpace: 'pre-wrap', maxWidth: '300px' }}>
                                         {request.notes || <span className="text-muted">لا توجد ملاحظات</span>}
                                     </td>
-                                    <td>
+                                    <td className="w-25">
                                         {/* TODO: add events to redirect use to the tables page */}
                                         {isEmployee && (
                                             <button
-                                                className="btn btn-outline-primary btn-main btn-sm"
+                                                className="btn btn-outline-primary btn-main btn-sm mt-1"
                                                 onClick={() => navigate(`/faculties/${id}`  )}
                                                 disabled={request.status === "تحت المراجعة" || request.status === "تم الرفض"}
                                                 style={{ backgroundColor: '#19355A', cursor: request.status === "تحت المراجعة" || request.status === "تم الرفض" ? "not-allowed" : "pointer" }}
@@ -687,8 +685,8 @@ const PersonalInfoPortal = () => {
                                                 عرض الكليات
                                             </button>
                                         )}
-                                        {(isAdmin || isSuperAdmin) && request.status === "تم الرفض" && (
-                                            <button style={{ backgroundColor: '#19355A' }} className="btn btn-outline-primary btn-main btn-sm" onClick={() => openModal(request)}>
+                                        {(isAdmin || isSuperAdmin) && (request.status === "تم الرفض" || request.status === "تحت المراجعة") && (
+                                            <button style={{ backgroundColor: '#19355A' }} className="btn btn-outline-primary btn-main btn-sm mt-1" onClick={() => openModal(request)}>
                                                 اضف ملاحظة
                                             </button>
                                         )}
@@ -697,18 +695,18 @@ const PersonalInfoPortal = () => {
                                                 {request.status === "تحت المراجعة" && (
                                                     <>
                                                         {/* TODO: add events to add requests to the database */}
-                                                        <button className="btn btn-outline-success btn-sm mx-2"
+                                                        <button className="btn btn-outline-success btn-sm mx-2 mt-2"
                                                             onClick={approve}>
                                                             قبول
                                                         </button>
-                                                        <button className="btn btn-outline-danger btn-sm mx-2"
+                                                        <button className="btn btn-outline-danger btn-sm mx-2 mt-2"
                                                             onClick={reject}>
                                                             رفض
                                                         </button>
                                                     </>
                                                 )}
                                                 {request.status === "تم القبول" && (
-                                                    <button className="btn btn-outline-primary btn-sm" onClick={() => navigate(`/faculties/${id}`)}>
+                                                    <button className="btn btn-outline-primary btn-sm mt-2" onClick={() => navigate(`/faculties/${id}`)}>
                                                         اضف كليات
                                                     </button>
                                                 )}
