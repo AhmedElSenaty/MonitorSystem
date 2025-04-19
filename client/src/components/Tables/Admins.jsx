@@ -9,6 +9,7 @@ import { useAuth } from '../../Context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import LogoSpinner from '../spinner/LogoSpinner';
 import { NotLoaded } from '../../App';
+import { base } from '../../data/api.js';
 
 const Admins = () => {
     const { user } = useAuth();
@@ -38,7 +39,7 @@ const Admins = () => {
 
     const fetchData = async () => {
         try {
-            const res = await axios.get(`http://localhost:5083/api/Admin?PageIndex=${currentPage}&PageSize=${adminsPerPage}`,
+            const res = await axios.get(`${base}/api/Admin?PageIndex=${currentPage}&PageSize=${adminsPerPage}`,
                 {
                     headers: {
                         Authorization: `Bearer ${user.token}`
@@ -49,7 +50,7 @@ const Admins = () => {
             setTotalPages((res.data.data.totalCount / adminsPerPage) > 0? Math.ceil(res.data.data.totalCount / adminsPerPage): 1);
         } catch (error) {
             console.error("Error fetching data:", error);
-            if (error.response?.stateus == 401) {
+            if (error.response?.status == 401) {
                 toast.error(error.response.data.Data, { rtl: true });
                 navigate('/');
             }
@@ -76,7 +77,7 @@ const Admins = () => {
     const handleDelete = async (adminId) => {
         setAdminID(adminId);
         try {
-            await axios.delete(`http://localhost:5083/api/Admin/${adminId}`, {
+            await axios.delete(`${base}/api/Admin/${adminId}`, {
                 headers: {
                     Authorization: `Bearer ${user.token}`
                 }
@@ -86,7 +87,7 @@ const Admins = () => {
         } catch (error) {
             toast.error("حدث خطأ أثناء الحذف", { rtl: true });
             console.error("Error deleting:", error);
-            if (error.response?.stateus == 401) {
+            if (error.response?.status == 401) {
                 toast.error(error.response.data.Data, { rtl: true });
                 navigate('/');
             }
@@ -99,7 +100,7 @@ const Admins = () => {
             if (isEditing && selectedAdmin && AdminID !== 0) {
                 try {
                     
-                    await axios.post(`http://localhost:5083/api/Account/admin-reset-password`, {
+                    await axios.post(`${base}/api/Account/admin-reset-password`, {
                         userId: AdminID,
                         password: newAdminPass,
                     }, {
@@ -118,7 +119,7 @@ const Admins = () => {
             } else {
                 try {
                     
-                    await axios.post(`http://localhost:5083/api/Account/RegisterAdmin`, {
+                    await axios.post(`${base}/api/Account/RegisterAdmin`, {
                         username: newAdminMail,
                         password: newAdminPass,
                     }, {

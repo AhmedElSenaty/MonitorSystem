@@ -9,6 +9,7 @@ import { useAuth } from '../../Context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import LogoSpinner from '../spinner/LogoSpinner';
 import { NotLoaded } from '../../App';
+import { base } from '../../data/api.js';
 
 const Employees = () => {
     const { user } = useAuth();
@@ -39,7 +40,7 @@ const Employees = () => {
 
     const fetchData = async () => {
         try {
-            const res = await axios.get(`http://localhost:5083/api/Employee`,
+            const res = await axios.get(`${base}/api/Employee`,
                 {
                     params: {
                         PageIndex: currentPage,
@@ -63,7 +64,7 @@ const Employees = () => {
         } catch (error) {
             console.error("Error fetching data:", error);
             setErrPage(true);
-            if (error.response?.stateus == 401) {
+            if (error.response?.status == 401) {
                 toast.error(error.response.data.Data, { rtl: true });
                 navigate('/');
             }
@@ -80,7 +81,7 @@ const Employees = () => {
             
 
     //         try {
-    //             const res = await axios.get('http://localhost:5083/api/Request', {
+    //             const res = await axios.get('${base}/api/Request', {
     //                 params: {
     //                     PageIndex: currentPage,
     //                     PageSize: adminsPerPage,
@@ -134,7 +135,7 @@ const Employees = () => {
     // const handleDelete = async (adminId) => {
     //     setAdminID(adminId);
     //     try {
-    //         await axios.delete(`http://localhost:5083/api/Admin/${adminId}`, {
+    //         await axios.delete(`${base}/api/Admin/${adminId}`, {
     //             headers: {
     //                 Authorization: `Bearer ${user.token}`
     //             }
@@ -153,7 +154,7 @@ const Employees = () => {
             if (isEditing && selectedAdmin && AdminID !== 0) {
                 try {
                     
-                    await axios.post(`http://localhost:5083/api/Account/admin-reset-password`, {
+                    await axios.post(`${base}/api/Account/admin-reset-password`, {
                         userId: AdminID,
                         password: newAdminPass,
                     }, {
@@ -172,7 +173,7 @@ const Employees = () => {
             } else {
                 try {
                     
-                    await axios.post(`http://localhost:5083/api/Account/RegisterAdmin`, {
+                    await axios.post(`${base}/api/Account/RegisterAdmin`, {
                         username: newAdminMail,
                         password: newAdminPass,
                     }, {

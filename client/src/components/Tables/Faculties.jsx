@@ -10,7 +10,7 @@ import './Tables.css';
 import { useAuth } from '../../Context/AuthContext';
 import LogoSpinner from '../spinner/LogoSpinner';
 import { NotLoaded } from '../../App';
-import { set } from 'react-hook-form';
+import { base } from '../../data/api.js';
 
 const Faculties = () => {
     const { user } = useAuth();
@@ -38,8 +38,8 @@ const Faculties = () => {
         const fetchData = async () => {
             try {
                 const [facultiesRes, userFacsRes] = await Promise.all([
-                    axios.get('http://localhost:5083/api/Department/List', { headers: { Authorization: `Bearer ${user.token}` } }),
-                    axios.get(`http://localhost:5083/api/Department/ByEmployee/${empID}`, { headers: { Authorization: `Bearer ${user.token}` } })
+                    axios.get(`${base}/api/Department/List`, { headers: { Authorization: `Bearer ${user.token}` } }),
+                    axios.get(`${base}/api/Department/ByEmployee/${empID}`, { headers: { Authorization: `Bearer ${user.token}` } })
                 ]);
                 if (facultiesRes.data === null) throw new Error(facultiesRes);
                 setFaculties(facultiesRes.data.data);
@@ -49,6 +49,11 @@ const Faculties = () => {
             } catch (error) {
                 console.error("Error fetching data:", error.message);
                 toast.error(error.message, { rtl: false });
+                if (error.response?.status == 401) {
+                    toast.error(error.response.data.Data, { rtl: true });
+                    navigate('/');
+                    return;
+                }
                 setErrPage(true);
             }finally {
                 setLoading(false);
@@ -57,7 +62,7 @@ const Faculties = () => {
         const fetchEmpData = async () => {
             try {
                 const [userFacsRes] = await Promise.all([
-                    axios.get(`http://localhost:5083/api/Department/ByEmployee/${empID}`, { headers: { Authorization: `Bearer ${user.token}` } })
+                    axios.get(`${base}/api/Department/ByEmployee/${empID}`, { headers: { Authorization: `Bearer ${user.token}` } })
                 ]);
                 if (userFacsRes.data === null) {
                     throw new Error(userFacsRes);
@@ -70,10 +75,10 @@ const Faculties = () => {
             } catch (error) {
                 console.error("Error fetching data:", error.message);
                 toast.error(error.message, { rtl: false });
-                if (error.response?.stateus == 401) {
+                if (error.response?.status == 401) {
                     toast.error(error.response.data.Data, { rtl: true });
                     navigate('/');
-                    
+                    return;
                 }
                 setErrPage(true);
             }finally {
@@ -148,7 +153,7 @@ const Faculties = () => {
 
     const handleSave = async () => {
         try {
-            await axios.put(`http://localhost:5083/api/Department/UpdateEmployeeDepartments`, {
+            await axios.put(`${base}/api/Department/UpdateEmployeeDepartments`, {
                 departmentsIds: checkedFaculties,
                 employeeId: empID
             },{
@@ -167,7 +172,7 @@ const Faculties = () => {
 
     const handleDelete = async (facultyId) => {
         try {
-            await axios.delete(`http://localhost:5083/api/Department/${facultyId}`, {
+            await axios.delete(`${base}/api/Department/${facultyId}`, {
                 headers: {
                     Authorization: `Bearer ${user.token}`
                 }
@@ -183,7 +188,7 @@ const Faculties = () => {
     const handleAddFaculty = async () => {
         if (!newFacultyName.trim()) return;
         try {
-            const res = await axios.post(`http://localhost:5083/api/Department`, {
+            const res = await axios.post(`${base}/api/Department`, {
                 name: newFacultyName
             }, {
                 headers: {
@@ -240,7 +245,7 @@ const Faculties = () => {
                                 <div className="col-auto">
                                     <button
                                         className="btn btn-outline-success rounded-0 w-100"
-                                        onClick={() => downloadFile("http://localhost:5083/api/Reports/employee-departments-report", "كل_الكليات.xlsx")}
+                                        onClick={() => downloadFile("${base}/api/Reports/employee-departments-report", "كل_الكليات.xlsx")}
                                     >
                                         <FontAwesomeIcon icon={faFileExcel} className="ms-2" />
                                         تصدير الكل
@@ -271,7 +276,7 @@ const Faculties = () => {
                                                     icon={faFileExcel}
                                                     title="تصدير الكلية"
                                                     className="btn btn-outline-success mx-1"
-                                                    onClick={() => downloadFile(`http://localhost:5083/api/Reports/employee-departments-report/?departmentId=${faculty.id}`, `الكلية_${faculty.name}.xlsx`)}
+                                                    onClick={() => downloadFile(`${base}/api/Reports/employee-departments-report/?departmentId=${faculty.id}`, `الكلية_${faculty.name}.xlsx`)}
                                                 />
                                             )}
 

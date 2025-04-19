@@ -8,7 +8,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-
+import { base } from "../../data/api";
 
 // Color constants
 const PRIMARY = '#19355a';
@@ -188,7 +188,7 @@ const RegisterForm = () => {
             formData.append('PersonalImage', files.personal);
             formData.append('DegreeImage', files.degree);
             const res = await axios.post(
-                "http://localhost:5083/api/Account/RegisterEmployee",
+                `${base}/api/Account/RegisterEmployee`,
                 formData
                 , {
                     params: {
