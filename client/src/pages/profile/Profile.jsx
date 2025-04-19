@@ -8,6 +8,8 @@ import { useAuth } from "../../Context/AuthContext";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import LogoSpinner from "../../components/spinner/LogoSpinner";
+import { NotLoaded } from "../../App";
 
 const PersonalInfoPortal = () => {
     const { user, setUser } = useAuth();
@@ -27,8 +29,10 @@ const PersonalInfoPortal = () => {
         DOB: "",
         age: "",
     };
+    const [loader, setLoader] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [errPage, setErrPage] = useState(false);
     const [data, setData] = useState({ ...originalData });
     const [orgdata, setOrgData] = useState({ ...originalData });
     const [zoomedImage, setZoomedImage] = useState({ ...originalData });
@@ -48,7 +52,7 @@ const PersonalInfoPortal = () => {
     
     const approve = async () => {
         try {
-            const res = await axios.put(`https://localhost:7057/api/Request/ChangeStatus`, {
+            const res = await axios.put(`http://localhost:5083/api/Request/ChangeStatus`, {
                 requestId: reqID*1,
                 newStatus: 2
             }, {
@@ -64,7 +68,7 @@ const PersonalInfoPortal = () => {
     }
     const reject = async () => {
         try {
-            const res = await axios.put(`https://localhost:7057/api/Request/ChangeStatus`, {
+            const res = await axios.put(`http://localhost:5083/api/Request/ChangeStatus`, {
                 requestId: reqID,
                 newStatus: 3
             }, {
@@ -100,20 +104,24 @@ const PersonalInfoPortal = () => {
     
     
         useEffect(() => {
-            if (!id && !user) {
-                toast.error("يرجى تسجيل الدخول",{rtl: true});
-                navigate("/login");
+            if (!id) {
+                // toast.error("يرجى تسجيل الدخول",{rtl: true});
+                navigate(-1);
                 return;
             }
+            if (!user) navigate(-1);
+
             if (user.role !== null) 
             {
                 setRole(user.role.toLowerCase());
+            }else{
+                navigate('/login');
             }
             
 
             const fetchData = async () => {
                 try {
-                    const response = await axios.get(`https://localhost:7057/api/Request/${id}`, {
+                    const response = await axios.get(`http://localhost:5083/api/Request/${id}`, {
                         headers: {
                             'Authorization': `Bearer ${user.token}`
                         }
@@ -131,7 +139,7 @@ const PersonalInfoPortal = () => {
                         age: response.data.data.employeeInformation.age,
                         id: response.data.data.employeeInformation.id
                     });
-                    setOrgData(data );
+                    setOrgData(data);
                     setFiles({
                         personal: response.data.data.employeeImagesDto.personalImage,
                         degree: response.data.data.employeeImagesDto.degreeImage,
@@ -141,6 +149,10 @@ const PersonalInfoPortal = () => {
                     setRequest(response.data.data.requestStatus);
                 } catch (error) {
                     console.error("Error fetching data:", error);
+                    setErrPage(true);
+                }
+                finally {
+                    setLoader(false);
                 }
             };
             if (user.role !== null) fetchData();
@@ -151,7 +163,10 @@ const PersonalInfoPortal = () => {
     const handleChange = (field, value) =>
         setData((prev) => ({ ...prev, [field]: value }));
 
-    const startEdit = () => setIsEditing(true);
+    const startEdit = () => {
+        setOrgData(data);
+        setIsEditing(true)
+    };
     const cancelEdit = () => {
         setData(orgdata);
         setIsEditing(false);
@@ -180,7 +195,7 @@ const PersonalInfoPortal = () => {
     const closeImgModal = () => setShowImgModal(false);
     const saveNote = async() => {
         try {
-            const res = await axios.put(`https://localhost:7057/api/Request/AddNote`, {
+            const res = await axios.put(`http://localhost:5083/api/Request/AddNote`, {
                 requestId: reqID,
                 note: noteText
             }, {
@@ -249,14 +264,14 @@ const PersonalInfoPortal = () => {
                         case "degree":
                             return "Degree";
                         case "personal":
-                            return "Personal";
+                            return "PersonalImage";
                         case "idFront":
                             return "SSNFront";
                         case "idBack":
                             return "SSNBack";
                     }
                 };
-                const response = await axios.put("https://localhost:7057/api/Request/UpdateRequestAssets", formData,
+                const response = await axios.put("http://localhost:5083/api/Request/UpdateRequestAssets", formData,
                 {
                     params: {
                         "Identifier": getIdentifier(type)
@@ -279,6 +294,7 @@ const PersonalInfoPortal = () => {
       
 
     const saveEdit = async () => {
+        
         setLoading(true);
         const errors = validateData();
         if (Object.keys(errors).length > 0) {
@@ -293,7 +309,7 @@ const PersonalInfoPortal = () => {
         try {
             
             // TODO: change url
-            const response = await axios.put("https://localhost:7057/api/Request/UpdateRequestData", {
+            const response = await axios.put("http://localhost:5083/api/Request/UpdateRequestData", {
                 ...data,
                 gender: data.gender === 'ذكر' ? 1 : 0
             }, {
@@ -304,6 +320,7 @@ const PersonalInfoPortal = () => {
             toast.success("تم تحديث البيانات بنجاح", { rtl: true });
             setIsEditing(false);
         } catch (error) {
+            console.error(error.response.data.errors)
             Object.values(error.response.data.errors).forEach(msg => toast.error(msg, { rtl: true }));
             // toast.error("حدث خطأ أثناء تحديث البيانات.", { rtl: true });
         } finally {
@@ -314,451 +331,581 @@ const PersonalInfoPortal = () => {
 
 
     return (
-        <div
-            dir="rtl"
-            className="container-fluid p-0"
-            style={{ backgroundColor: "#EBEFF5" }}
-        >
+        <>
             <ToastContainer position={"top-center"}/>
-            <div className="container py-4 w-100">
-                {(isAdmin || isSuperAdmin) && (
-                    
-                <button type="button" className="btn btn-outline-primary mb-3" onClick={() => navigate(-1)} >
-                                <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
-                                رجوع
-                            </button>
-                )}
-                {/* Personal Data Table */}
-                <div className="row justify-content-center mb-5">
-                    <div className="col-12 col-lg-12">
-                        {/* Personal Data Section */}
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                            <h2>البيانات الشخصية</h2>
-                            {!isEditing && isEmployee ? (
-                                <button className="btn btn-primary px-5" onClick={startEdit}>
-                                    تعديل
-                                </button>
-                            ) : (
-                                isEmployee && (
-                                    <div className="d-flex">
-                                        {!loading && (
-                                            <>
-                                                <button
-                                                    className="btn btn-success me-1 mx-2 px-3"
-                                                    onClick={saveEdit}
-                                                >
-                                                    حفظ
-                                                </button>
-                                                <button
-                                                    className="btn btn-danger mx-2 px-3"
-                                                    onClick={cancelEdit}
-                                                >
-                                                    إلغاء
-                                                </button>
-                                            </>
-                                        )}
-                                        {loading && (
-                                            <div className="spinner-border text-primary" role="status">
-                                                <span className="visually-hidden">Loading...</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                )
-                            )}
-                        </div>
-                        <div className="bg-white rounded shadow-lg">
-                            <table
-                                className="table mb-0 w-100"
-                                style={{ borderRadius: "8px", overflow: "hidden" }}
-                            >
-                                <tbody>
-                                    <tr>
-                                        <td
-                                            style={{ backgroundColor: "#ECECF1" }}
-                                            className=" text-center"
-                                        >
-                                            الرقم المسلسل
-                                        </td>
-                                        <td className="text-center">{data.id }</td>
-                                        <td
-                                            style={{ backgroundColor: "#ECECF1" }}
-                                            className=" text-center"
-                                        >
-                                            الرقم القومي
-                                        </td>
-                                        <td className="text-center">
-                                            {isEditing ? (
-                                                <input
-                                                    className="form-control text-center"
-                                                    value={data.ssn}
-                                                    onChange={(e) => handleChange("ssn", e.target.value)}
-                                                />
-                                            ) : (
-                                                <span>{data.ssn}</span>
-                                            )}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td
-                                            style={{ backgroundColor: "#ECECF1" }}
-                                            className=" text-center"
-                                        >
-                                            الاسم
-                                        </td>
-                                        <td className="text-center">
-                                            {isEditing ? (
-                                                <input
-                                                    className="form-control text-center"
-                                                    value={data.name}
-                                                    onChange={(e) => handleChange("name", e.target.value)}
-                                                />
-                                            ) : (
-                                                <span>{data.name}</span>
-                                            )}
-                                        </td>
-                                        <td
-                                            style={{ backgroundColor: "#ECECF1" }}
-                                            className=" text-center"
-                                        >
-                                            العنوان
-                                        </td>
-                                        <td className="text-center">
-                                            {isEditing ? (
-                                                <input
-                                                    className="form-control text-center"
-                                                    value={data.address}
-                                                    onChange={(e) =>
-                                                        handleChange("address", e.target.value)
-                                                    }
-                                                />
-                                            ) : (
-                                                <span>{data.address}</span>
-                                            )}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td
-                                            style={{ backgroundColor: "#ECECF1" }}
-                                            className=" text-center"
-                                        >
-                                            الهاتف
-                                        </td>
-                                        <td className="text-center">
-                                            {isEditing ? (
-                                                <input
-                                                    className="form-control text-center"
-                                                    value={data.phone}
-                                                    onChange={(e) =>
-                                                        handleChange("phone", e.target.value)
-                                                    }
-                                                />
-                                            ) : (
-                                                <span>{data.phone}</span>
-                                            )}
-                                        </td>
-                                        <td
-                                            style={{ backgroundColor: "#ECECF1" }}
-                                            className=" text-center"
-                                        >
-                                            المؤهل
-                                        </td>
-                                        <td className="text-center">
-                                            {isEditing ? (
-                                                <input
-                                                    className="form-control text-center"
-                                                    value={data.degree}
-                                                    onChange={(e) =>
-                                                        handleChange("degree", e.target.value)
-                                                    }
-                                                />
-                                            ) : (
-                                                <span>{data.degree}</span>
-                                            )}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td
-                                            style={{ backgroundColor: "#ECECF1" }}
-                                            className=" text-center"
-                                        >
-                                            البريد الالكتروني
-                                        </td>
-                                        <td className="text-center">
-                                            {isEditing ? (
-                                                <input
-                                                    className="form-control text-center"
-                                                    value={data.email}
-                                                    onChange={(e) =>
-                                                        handleChange("email", e.target.value)
-                                                    }
-                                                />
-                                            ) : (
-                                                <span>{data.email}</span>
-                                            )}
-                                        </td>
-                                        <td
-                                            style={{ backgroundColor: "#ECECF1" }}
-                                            className=" text-center"
-                                        >
-                                            الوظيفة
-                                        </td>
-                                        <td className="text-center">
-                                            {isEditing ? (
-                                                <input
-                                                    className="form-control text-center"
-                                                    value={data.job}
-                                                    onChange={(e) => handleChange("job", e.target.value)}
-                                                />
-                                            ) : (
-                                                <span>{data.job}</span>
-                                            )}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td
-                                            style={{ backgroundColor: "#ECECF1" }}
-                                            className=" text-center"
-                                        >
-                                            النوع
-                                        </td>
-                                        <td className="text-center">
-                                            <span>{data.gender}</span>
-                                        </td>
-                                        <td
-                                            style={{ backgroundColor: "#ECECF1" }}
-                                            className=" text-center"
-                                        >
-                                            تاريخ الميلاد
-                                        </td>
-                                        <td className="text-center">
-                                            <span>{data.DOB}</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+            {loader && <LogoSpinner />}
+            {errPage && <NotLoaded />}
+            {!loader && !errPage && (
+                <div
+                    dir="rtl"
+                    className="container-fluid p-0"
+                    style={{ backgroundColor: "#EBEFF5" }}
+                >
+                    <div className="container py-4 w-100">
+                        {(isAdmin || isSuperAdmin) && (
+                            
+                        <button type="button" className="btn btn-outline-primary mb-3" onClick={() => navigate(-1)} >
+                                        <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
+                                        رجوع
+                                    </button>
+                        )}
 
-                {/* Attachments Section */}
-                <h2 className="mb-3">المرفقات</h2>
-                <div className="row row-cols-1 row-cols-md-2 row-cols-lg-2 g-4 mb-5 justify-content-center">
-                    {[
-                        { type: "degree", label: "صورة المؤهل" },
-                        { type: "personal", label: "صورة الشخصية" },
-                        { type: "idFront", label: "صورة البطاقة وجه" },
-                        { type: "idBack", label: "صورة البطاقة ظهر" },
-                    ].map(({ type, label }) => (
-                        <div key={type} className="col d-flex justify-content-center">
-                            <div
-                                className="card shadow-sm p-3 text-center"
-                                style={{ width: "100%" }}
-                            >
-                                <div className="fw-bold mb-2">{label}</div>
-
-                                {(isAdmin || isSuperAdmin) && (
-                                    <div
-                                        className="mx-auto mb-2"
-                                        style={{
-                                            width: "100%",
-                                            height: "150px",
-                                            backgroundColor: files[type] ? "transparent" : "#EFF1F5",
-                                            border: "1px dashed #CFB53B",
-                                            borderRadius: "8px",
-                                            position: "relative",
-                                        }}
-                                    >
-                                        {files[type] ? (
-                                            <img
-                                                src={
-                                                    typeof files[type] === 'string'
-                                                        ? `${files[type]}`
-                                                        : URL.createObjectURL(files[type])
-                                                }
-                                                alt={label}
-                                                className="img-fluid"
-                                                style={{ maxHeight: "100%", maxWidth: "100%", cursor:"zoom-in" }}
-                                                onClick={() => {
-                                                    setZoomedImage(files[type])
-                                                    setShowImgModal(true);
-                                                }}
-                                            />
-                                        ) : (
-                                            <i
-                                                className="bi bi-card-image text-secondary"
-                                                style={{ fontSize: "2.5rem", lineHeight: "150px" }}
-                                            ></i>
-                                        )}
-                                    </div>
-                                )}
-                                {isEmployee && (
-                                    <>
-                                        <div
-                                            className="mx-auto mb-2"
-                                            style={{
-                                                width: "100%",
-                                                height: "150px",
-                                                backgroundColor: files[type]
-                                                    ? "transparent"
-                                                    : "#EFF1F5",
-                                                border: "1px dashed #CFB53B",
-                                                borderRadius: "8px",
-                                                
-                                                position: "relative",
-                                            }}
-                                            // onClick={() => fileInputs[type].current.click()}
-                                            // onClick={() => {
-                                            //     setZoomedImage(files[type])
-                                            //     setShowImgModal(true);
-                                            // }}
-                                        >
-                                            {files[type] ? (
-                                                <img
-                                                    src={
-                                                        typeof files[type] === 'string'
-                                                            ? `${files[type]}`
-                                                            : URL.createObjectURL(files[type])
-                                                    }
-                                                    alt={label}
-                                                    className="img-fluid"
-                                                    style={{ maxHeight: "100%", maxWidth: "100%" }}
-                                                />
-                                            ) : (
-                                                <i
-                                                    className="bi bi-card-image text-secondary"
-                                                    style={{ fontSize: "2.5rem", lineHeight: "150px" }}
-                                                ></i>
-                                            )}
-                                            <input
-                                                type="file"
-                                                accept="image/jpeg, image/jpg"
-                                                ref={fileInputs[type]}
-                                                style={{ display: "none" }}
-                                                onChange={(e) => handleFile(type, e.target.files[0])}
-                                            />
-                                        </div>
-                                        <button
-                                            className="btn btn-outline-warning"
-                                            style={{
-                                                borderRadius: "5px",
-                                                width: "100%",
-                                            }}
-                                            onClick={() => fileInputs[type].current.click()}
-                                        >
+                        {/* Personal Data Table */}
+                        <div className="row justify-content-center mb-5">
+                            <div className="col-12 col-lg-12">
+                                {/* Personal Data Section */}
+                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                    <h2>البيانات الشخصية</h2>
+                                    {!isEditing && isEmployee ? (
+                                        <button className="btn btn-primary px-5" onClick={startEdit}>
                                             تعديل
                                         </button>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Requests Section */}
-                <h2 className="mb-3">حالة الطلب</h2>
-                <div className="row justify-content-center">
-                    <div className="col-12 col-lg-12">
-                        <table className="table table-bordered text-center mb-0 w-100 shadow-lg">
-                            <thead className="bg-light">
-                                <tr>
-                                    <th>الحالة</th>
-                                    <th>ملاحظات</th>
-                                    <th>تحكم</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr className="align-middle">
-                                    <td className={`${statusClass(request.status)} w-25`}>
-                                        {request.status}
-                                    </td>
-                                    <td dir="rtl" className="text-break w-50" style={{ whiteSpace: 'pre-wrap', maxWidth: '300px' }}>
-                                        {request.notes || <span className="text-muted">لا توجد ملاحظات</span>}
-                                    </td>
-                                    <td className="w-25">
-                                        {/* TODO: add events to redirect use to the tables page */}
-                                        {isEmployee && (
-                                            <button
-                                                className="btn btn-outline-primary btn-main btn-sm mt-1"
-                                                onClick={() => navigate(`/faculties/${id}`  )}
-                                                disabled={request.status === "تحت المراجعة" || request.status === "تم الرفض"}
-                                                style={{ backgroundColor: '#19355A', cursor: request.status === "تحت المراجعة" || request.status === "تم الرفض" ? "not-allowed" : "pointer" }}
-                                            >
-                                                عرض الكليات
-                                            </button>
-                                        )}
-                                        {(isAdmin || isSuperAdmin) && (request.status === "تم الرفض" || request.status === "تحت المراجعة") && (
-                                            <button style={{ backgroundColor: '#19355A' }} className="btn btn-outline-primary btn-main btn-sm mt-1" onClick={() => openModal(request)}>
-                                                اضف ملاحظة
-                                            </button>
-                                        )}
-                                        {(isAdmin || isSuperAdmin) && (
-                                            <>
-                                                {request.status === "تحت المراجعة" && (
+                                    ) : (
+                                        isEmployee && (
+                                            <div className="d-flex">
+                                                {!loading && (
                                                     <>
-                                                        {/* TODO: add events to add requests to the database */}
-                                                        <button className="btn btn-outline-success btn-sm mx-2 mt-2"
-                                                            onClick={approve}>
-                                                            قبول
+                                                        <button
+                                                            className="btn btn-success me-1 mx-2 px-3"
+                                                            onClick={saveEdit}
+                                                        >
+                                                            حفظ
                                                         </button>
-                                                        <button className="btn btn-outline-danger btn-sm mx-2 mt-2"
-                                                            onClick={reject}>
-                                                            رفض
+                                                        <button
+                                                            className="btn btn-danger mx-2 px-3"
+                                                            onClick={cancelEdit}
+                                                        >
+                                                            إلغاء
                                                         </button>
                                                     </>
                                                 )}
-                                                {request.status === "تم القبول" && (
-                                                    <button className="btn btn-outline-primary btn-sm mt-2" onClick={() => navigate(`/faculties/${id}`)}>
-                                                        اضف كليات
-                                                    </button>
+                                                {loading && (
+                                                    <div className="spinner-border text-primary" role="status">
+                                                        <span className="visually-hidden">Loading...</span>
+                                                    </div>
                                                 )}
+                                            </div>
+                                        )
+                                    )}
+                                </div>
+
+                                {/* DESKTOP: full table */}
+                                <div className="d-none d-md-block  rounded shadow-lg table-responsive">
+                                    <table
+                                        className="table mb-0"
+                                        style={{ borderRadius: "8px", overflow: "hidden", whiteSpace: "nowrap" }}
+                                    >
+                                        <tbody>
+                                            <tr>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    الرقم المسلسل
+                                                </td>
+                                                <td className="text-center">{data.id}</td>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    الرقم القومي
+                                                </td>
+                                                <td className="text-center">
+                                                    {isEditing ? (
+                                                        <input
+                                                            className="form-control text-center"
+                                                            value={data.ssn}
+                                                            onChange={e => handleChange("ssn", e.target.value)}
+                                                        />
+                                                    ) : (
+                                                        <span>{data.ssn}</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    الاسم
+                                                </td>
+                                                <td className="text-center">
+                                                    {isEditing ? (
+                                                        <input
+                                                            className="form-control text-center"
+                                                            value={data.name}
+                                                            onChange={e => handleChange("name", e.target.value)}
+                                                        />
+                                                    ) : (
+                                                        <span>{data.name}</span>
+                                                    )}
+                                                </td>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    العنوان
+                                                </td>
+                                                <td className="text-center">
+                                                    {isEditing ? (
+                                                        <input
+                                                            className="form-control text-center"
+                                                            value={data.address}
+                                                            onChange={e => handleChange("address", e.target.value)}
+                                                        />
+                                                    ) : (
+                                                        <span>{data.address}</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    الهاتف
+                                                </td>
+                                                <td className="text-center">
+                                                    {isEditing ? (
+                                                        <input
+                                                            className="form-control text-center"
+                                                            value={data.phone}
+                                                            onChange={e => handleChange("phone", e.target.value)}
+                                                        />
+                                                    ) : (
+                                                        <span>{data.phone}</span>
+                                                    )}
+                                                </td>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    المؤهل
+                                                </td>
+                                                <td className="text-center">
+                                                    {isEditing ? (
+                                                        <input
+                                                            className="form-control text-center"
+                                                            value={data.degree}
+                                                            onChange={e => handleChange("degree", e.target.value)}
+                                                        />
+                                                    ) : (
+                                                        <span>{data.degree}</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    البريد الالكتروني
+                                                </td>
+                                                <td className="text-center">
+                                                    {isEditing ? (
+                                                        <input
+                                                            className="form-control text-center"
+                                                            value={data.email}
+                                                            onChange={e => handleChange("email", e.target.value)}
+                                                        />
+                                                    ) : (
+                                                        <span>{data.email}</span>
+                                                    )}
+                                                </td>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    الوظيفة
+                                                </td>
+                                                <td className="text-center">
+                                                    {isEditing ? (
+                                                        <input
+                                                            className="form-control text-center"
+                                                            value={data.job}
+                                                            onChange={e => handleChange("job", e.target.value)}
+                                                        />
+                                                    ) : (
+                                                        <span>{data.job}</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    النوع
+                                                </td>
+                                                <td className="text-center"><span>{data.gender}</span></td>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    تاريخ الميلاد
+                                                </td>
+                                                <td className="text-center"><span>{data.DOB}</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {/* MOBILE: two-column table */}
+                                <div className="d-block d-md-none  rounded shadow-lg table-responsive">
+                                    <table
+                                        className="table mb-0"
+                                        style={{ borderRadius: "8px", overflow: "hidden" }}
+                                    >
+                                        <tbody>
+                                            <tr>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    الرقم المسلسل
+                                                </td>
+                                                <td className="text-center">{data.id}</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    الرقم القومي
+                                                </td>
+                                                <td className="text-center">
+                                                    {isEditing ? (
+                                                        <input
+                                                            className="form-control text-center"
+                                                            value={data.ssn}
+                                                            onChange={e => handleChange("ssn", e.target.value)}
+                                                        />
+                                                    ) : (
+                                                        <span>{data.ssn}</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    الاسم
+                                                </td>
+                                                <td className="text-center">
+                                                    {isEditing ? (
+                                                        <input
+                                                            className="form-control text-center"
+                                                            value={data.name}
+                                                            onChange={e => handleChange("name", e.target.value)}
+                                                        />
+                                                    ) : (
+                                                        <span>{data.name}</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    العنوان
+                                                </td>
+                                                <td className="text-center">
+                                                    {isEditing ? (
+                                                        <input
+                                                            className="form-control text-center"
+                                                            value={data.address}
+                                                            onChange={e => handleChange("address", e.target.value)}
+                                                        />
+                                                    ) : (
+                                                        <span>{data.address}</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    الهاتف
+                                                </td>
+                                                <td className="text-center">
+                                                    {isEditing ? (
+                                                        <input
+                                                            className="form-control text-center"
+                                                            value={data.phone}
+                                                            onChange={e => handleChange("phone", e.target.value)}
+                                                        />
+                                                    ) : (
+                                                        <span>{data.phone}</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    المؤهل
+                                                </td>
+                                                <td className="text-center">
+                                                    {isEditing ? (
+                                                        <input
+                                                            className="form-control text-center"
+                                                            value={data.degree}
+                                                            onChange={e => handleChange("degree", e.target.value)}
+                                                        />
+                                                    ) : (
+                                                        <span>{data.degree}</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    البريد الالكتروني
+                                                </td>
+                                                <td className="text-center">
+                                                    {isEditing ? (
+                                                        <input
+                                                            className="form-control text-center"
+                                                            value={data.email}
+                                                            onChange={e => handleChange("email", e.target.value)}
+                                                        />
+                                                    ) : (
+                                                        <span>{data.email}</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    الوظيفة
+                                                </td>
+                                                <td className="text-center">
+                                                    {isEditing ? (
+                                                        <input
+                                                            className="form-control text-center"
+                                                            value={data.job}
+                                                            onChange={e => handleChange("job", e.target.value)}
+                                                        />
+                                                    ) : (
+                                                        <span>{data.job}</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    النوع
+                                                </td>
+                                                <td className="text-center"><span>{data.gender}</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td className="text-center" style={{ backgroundColor: "#cdcdcd" }}>
+                                                    تاريخ الميلاد
+                                                </td>
+                                                <td className="text-center"><span>{data.DOB}</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        
+
+                        {/* Attachments Section */}
+                        <h2 className="mb-3">المرفقات</h2>
+                        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-2 g-4 mb-5 justify-content-center">
+                            {[
+                                { type: "degree", label: "صورة المؤهل" },
+                                { type: "personal", label: "صورة الشخصية" },
+                                { type: "idFront", label: "صورة البطاقة وجه" },
+                                { type: "idBack", label: "صورة البطاقة ظهر" },
+                            ].map(({ type, label }) => (
+                                <div key={type} className="col d-flex justify-content-center">
+                                    <div
+                                        className="card shadow-sm p-3 text-center"
+                                        style={{ width: "100%" }}
+                                    >
+                                        <div className="fw-bold mb-2">{label}</div>
+
+                                        {(isAdmin || isSuperAdmin) && (
+                                            <div
+                                                className="mx-auto mb-2"
+                                                style={{
+                                                    width: "100%",
+                                                    height: "150px",
+                                                    backgroundColor: files[type] ? "transparent" : "#EFF1F5",
+                                                    border: "1px dashed #CFB53B",
+                                                    borderRadius: "8px",
+                                                    position: "relative",
+                                                }}
+                                            >
+                                                {files[type] ? (
+                                                    <img
+                                                        src={
+                                                            typeof files[type] === 'string'
+                                                                ? `${files[type]}`
+                                                                : URL.createObjectURL(files[type])
+                                                        }
+                                                        alt={label}
+                                                        className="img-fluid"
+                                                        style={{ maxHeight: "100%", maxWidth: "100%", cursor:"zoom-in" }}
+                                                        onClick={() => {
+                                                            setZoomedImage(files[type])
+                                                            setShowImgModal(true);
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <i
+                                                        className="bi bi-card-image text-secondary"
+                                                        style={{ fontSize: "2.5rem", lineHeight: "150px" }}
+                                                    ></i>
+                                                )}
+                                            </div>
+                                        )}
+                                        {isEmployee && (
+                                            <>
+                                                <div
+                                                    className="mx-auto mb-2"
+                                                    style={{
+                                                        width: "100%",
+                                                        height: "150px",
+                                                        backgroundColor: files[type]
+                                                            ? "transparent"
+                                                            : "#EFF1F5",
+                                                        border: "1px dashed #CFB53B",
+                                                        borderRadius: "8px",
+                                                        
+                                                        position: "relative",
+                                                    }}
+                                                    // onClick={() => fileInputs[type].current.click()}
+                                                    // onClick={() => {
+                                                    //     setZoomedImage(files[type])
+                                                    //     setShowImgModal(true);
+                                                    // }}
+                                                >
+                                                    {files[type] ? (
+                                                        <img
+                                                            src={
+                                                                typeof files[type] === 'string'
+                                                                    ? `${files[type]}`
+                                                                    : URL.createObjectURL(files[type])
+                                                            }
+                                                            alt={label}
+                                                            className="img-fluid"
+                                                            style={{ maxHeight: "100%", maxWidth: "100%" }}
+                                                        />
+                                                    ) : (
+                                                        <i
+                                                            className="bi bi-card-image text-secondary"
+                                                            style={{ fontSize: "2.5rem", lineHeight: "150px" }}
+                                                        ></i>
+                                                    )}
+                                                    <input
+                                                        type="file"
+                                                        accept="image/jpeg, image/jpg"
+                                                        ref={fileInputs[type]}
+                                                        style={{ display: "none" }}
+                                                        onChange={(e) => handleFile(type, e.target.files[0])}
+                                                    />
+                                                </div>
+                                                <button
+                                                    className="btn btn-outline-warning"
+                                                    style={{
+                                                        borderRadius: "5px",
+                                                        width: "100%",
+                                                    }}
+                                                    onClick={() => fileInputs[type].current.click()}
+                                                >
+                                                    تعديل
+                                                </button>
                                             </>
                                         )}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Requests Section */}
+                        <h2 className="mb-3">حالة الطلب</h2>
+                        <div className="row justify-content-center">
+                            <div className="col-12 col-lg-12">
+                                <div className="table-responsive shadow-lg rounded">
+                                    <table className="table table-bordered text-center mb-0 w-100">
+                                        <thead className="bg-light">
+                                            <tr>
+                                                <th>الحالة</th>
+                                                <th>ملاحظات</th>
+                                                <th>تحكم</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr className="align-middle">
+                                                <td className={`${statusClass(request.status)} w-25`}>
+                                                    {request.status}
+                                                </td>
+                                                <td dir="rtl" className="text-break w-50" style={{ whiteSpace: 'pre-wrap', maxWidth: '300px' }}>
+                                                    {request.notes || <span className="text-muted">لا توجد ملاحظات</span>}
+                                                </td>
+                                                <td className="w-25">
+                                                    {isEmployee && (
+                                                        <button
+                                                            className="btn btn-outline-primary btn-main btn-sm mt-1"
+                                                            onClick={() => navigate(`/faculties/${id}`)}
+                                                            disabled={request.status === "تحت المراجعة" || request.status === "تم الرفض"}
+                                                            style={{
+                                                                backgroundColor: '#19355A',
+                                                                cursor:
+                                                                    request.status === "تحت المراجعة" || request.status === "تم الرفض"
+                                                                        ? "not-allowed"
+                                                                        : "pointer"
+                                                            }}
+                                                        >
+                                                            عرض الكليات
+                                                        </button>
+                                                    )}
+                                                    {(isAdmin || isSuperAdmin) &&
+                                                        (request.status === "تم الرفض" || request.status === "تحت المراجعة") && (
+                                                            <button
+                                                                style={{ backgroundColor: '#19355A' }}
+                                                                className="btn btn-outline-primary btn-main btn-sm mt-1"
+                                                                onClick={() => openModal(request)}
+                                                            >
+                                                                اضف ملاحظة
+                                                            </button>
+                                                        )}
+                                                    {(isAdmin || isSuperAdmin) && (
+                                                        <>
+                                                            {request.status === "تحت المراجعة" && (
+                                                                <>
+                                                                    <button
+                                                                        className="btn btn-outline-success btn-sm mx-2 mt-2"
+                                                                        onClick={approve}
+                                                                    >
+                                                                        قبول
+                                                                    </button>
+                                                                    <button
+                                                                        className="btn btn-outline-danger btn-sm mx-2 mt-2"
+                                                                        onClick={reject}
+                                                                    >
+                                                                        رفض
+                                                                    </button>
+                                                                </>
+                                                            )}
+                                                            {request.status === "تم القبول" && (
+                                                                <button
+                                                                    className="btn btn-outline-primary btn-sm mt-2"
+                                                                    onClick={() => navigate(`/faculties/${id}`)}
+                                                                >
+                                                                    اضف كليات
+                                                                </button>
+                                                            )}
+                                                        </>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        {/* Notes Modal */}
+                        <Modal show={showModal} onHide={closeModal} dialogClassName="modal-lg text-end" dir="rtl">
+                            <Modal.Header className="flex-row-reverse " >
+                                <button type="button" className="btn-close" aria-label="إغلاق" onClick={closeModal}></button>
+                                <Modal.Title style={{ marginLeft: '68%' }}>إضافة / تعديل ملاحظة</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <textarea
+                                    className="form-control"
+                                    rows={5}
+                                    value={noteText}
+                                    onChange={e => setNoteText(e.target.value)}
+                                    dir="rtl"
+                                />
+                            </Modal.Body>
+                            <Modal.Footer className="flex-row-reverse">
+                                <Button variant="danger" onClick={closeModal}>إلغاء</Button>
+                                <Button variant="success" onClick={saveNote}>حفظ التغييرات</Button>
+                            </Modal.Footer>
+                        </Modal>
+                        {/* zoomed image Modal */}
+                        <Modal show={showImgModal} onHide={closeImgModal} dialogClassName="modal-lg text-end" >
+                            <Modal.Header closeButton className="flex-row-reverse " >
+                            </Modal.Header>
+                            <Modal.Body className="d-flex justify-content-center align-items-center">
+                                <img
+                                src={
+                                    zoomedImage
+                                }
+                                alt="zoomed Image"
+                                className="img-fluid"
+                                style={{ maxHeight: "100%", maxWidth: "100%" }}
+                                                        />
+                            </Modal.Body>
+                            
+                        </Modal>
+
                     </div>
                 </div>
-
-                {/* Notes Modal */}
-                <Modal show={showModal} onHide={closeModal} dialogClassName="modal-lg text-end" dir="rtl">
-                    <Modal.Header className="flex-row-reverse " >
-                        <button type="button" className="btn-close" aria-label="إغلاق" onClick={closeModal}></button>
-                        <Modal.Title style={{ marginLeft: '68%' }}>إضافة / تعديل ملاحظة</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <textarea
-                            className="form-control"
-                            rows={5}
-                            value={noteText}
-                            onChange={e => setNoteText(e.target.value)}
-                            dir="rtl"
-                        />
-                    </Modal.Body>
-                    <Modal.Footer className="flex-row-reverse">
-                        <Button variant="danger" onClick={closeModal}>إلغاء</Button>
-                        <Button variant="success" onClick={saveNote}>حفظ التغييرات</Button>
-                    </Modal.Footer>
-                </Modal>
-                {/* zoomed image Modal */}
-                <Modal show={showImgModal} onHide={closeImgModal} dialogClassName="modal-lg text-end" >
-                    <Modal.Header closeButton className="flex-row-reverse " >
-                    </Modal.Header>
-                    <Modal.Body className="d-flex justify-content-center align-items-center">
-                        <img
-                        src={
-                            zoomedImage
-                        }
-                        alt="zoomed Image"
-                        className="img-fluid"
-                        style={{ maxHeight: "100%", maxWidth: "100%" }}
-                                                />
-                    </Modal.Body>
-                    
-                </Modal>
-
-            </div>
-        </div>
+            )}
+        </>
     );
 };
 

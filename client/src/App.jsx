@@ -15,6 +15,7 @@ import PersonalInfoPortal from "./pages/profile/Profile";
 import Requests from "./components/Tables/Requests";
 import Faculties from "./components/Tables/Faculties";
 import Admins from './components/Tables/Admins';
+import Employees from './components/Tables/Employees';
 
 const App = () => {
     return (
@@ -29,6 +30,7 @@ const App = () => {
                 <Route path="/requests" element={<Requests />} />
                 <Route path="/faculties/:empID?" element={<Faculties />} />
                 <Route path="/admins" element={<Admins />} />
+                <Route path="/employees" element={<Employees />} />
                 <Route path="/NotAuthourized" element={<NotAuthourized />} />
                 <Route path="/*" element={<NotFound />} />
 
@@ -58,6 +60,13 @@ const NotAuthourized = () => {
     return (
         <div className='h-screen flex items-center justify-center m-5 text-center'>
             <h1 className='alert alert-warning text-3xl font-bold'>Not Authourized <strong>401</strong></h1>
+        </div>
+    )
+}
+export const NotLoaded = () => {
+    return (
+        <div className='h-screen flex items-center justify-center m-5 text-center'>
+            <h1 className='alert alert-warning text-3xl font-bold'>Error: Faild To Load Data  <strong>500</strong></h1>
         </div>
     )
 }

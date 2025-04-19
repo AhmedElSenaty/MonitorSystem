@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashCan, faPlus } from '@fortawesome/free-solid-svg-icons';
+// import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { faPenToSquare as faPenRegular } from '@fortawesome/free-regular-svg-icons';
 import { toast } from 'react-toastify';
 import './Tables.css';
@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import LogoSpinner from '../spinner/LogoSpinner';
 import { NotLoaded } from '../../App';
 
-const Admins = () => {
+const Employees = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
@@ -24,9 +24,10 @@ const Admins = () => {
     const [newAdminPass, setNewAdminPass] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        if (user.role === null || user.role.toLowerCase() === 'employee') {
+        if (user.role === null || user.role.toLowerCase() === 'employee' || user.role.toLowerCase() === 'admin') {
             navigate('/NotAuthourized');
             return;
         }
@@ -38,14 +39,26 @@ const Admins = () => {
 
     const fetchData = async () => {
         try {
-            const res = await axios.get(`http://localhost:5083/api/Admin?PageIndex=${currentPage}&PageSize=${adminsPerPage}`,
+            const res = await axios.get(`http://localhost:5083/api/Employee`,
                 {
+                    params: {
+                        PageIndex: currentPage,
+                        PageSize: adminsPerPage,
+                        SearchByEmployeeName: isNaN(searchTerm) ? searchTerm : '',
+                        SearchByEmployeeSSN: isNaN(searchTerm) ? '' : searchTerm,
+                    },
                     headers: {
                         Authorization: `Bearer ${user.token}`
                     }
                 }
             );
-            setAdmins(res.data.data.admins);
+            console.log(res.data.data.employees);
+            const formatted = res.data.data.employees.map(r => ({
+                            id: r.id,
+                            name: r.fullName,
+                            empId: r.guid,
+                        }));
+            setAdmins(formatted);
             setTotalPages((res.data.data.totalCount / adminsPerPage) > 0? Math.ceil(res.data.data.totalCount / adminsPerPage): 1);
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -56,34 +69,79 @@ const Admins = () => {
     };
     useEffect(() => {
         fetchData();
-    }, [currentPage,  newAdminPass]);
+    }, [currentPage, newAdminPass, searchTerm]);
 
+    // useEffect(() => {
+    //     const fetchData = async () => {
+            
+
+    //         try {
+    //             const res = await axios.get('http://localhost:5083/api/Request', {
+    //                 params: {
+    //                     PageIndex: currentPage,
+    //                     PageSize: adminsPerPage,
+    //                     SearchByEmployeeName: isNaN(searchTerm) ? searchTerm : '',
+    //                     SearchByEmployeeSSN: isNaN(searchTerm) ? '' : searchTerm,
+    //                 },
+    //                 headers: {
+    //                     Authorization: `Bearer ${user.token}`
+    //                 }
+    //             });
+
+    //             // API responds { status, message, data: { requests: [...] }, errors }
+    //             const apiData = res.data?.data;
+                
+                
+    //             setCurrentPage(apiData.metadata.pagination.pageIndex);
+    //             setTotalPages(apiData.metadata.pagination.totalPages);
+    //             const formatted = apiData.requests.map(r => ({
+    //                 id: r.id,
+    //                 name: r.employeeName,
+    //                 empId: r.employeeID,
+    //             }));
+
+    //             setAdmins(formatted);
+    //         } catch (error) {
+    //             console.error('Error fetching data:', error);
+    //             if (error.response?.data?.message && (user.role !== null || user.role.toLowerCase() !== 'employee')) {
+    //                 toast.error(error.response.data.message, { rtl: true });
+    //             } else {
+    //                 toast.error('حدث خطأ أثناء جلب البيانات', { rtl: true });
+    //             }
+    //             setErrPage(true);
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
+
+    //     fetchData();
+    // }, [currentPage, searchTerm]);
     
 
     const handleEdit = (admin, id) => {
         setSelectedAdmin(admin);
         setAdminID(id);
-        setNewAdminMail(admin.mail);
+        // setNewAdminMail(admin.mail);
         setNewAdminPass(admin.pass);
         setIsEditing(true);
         setShowModal(true);
     };
 
-    const handleDelete = async (adminId) => {
-        setAdminID(adminId);
-        try {
-            await axios.delete(`http://localhost:5083/api/Admin/${adminId}`, {
-                headers: {
-                    Authorization: `Bearer ${user.token}`
-                }
-            });
-            fetchData();
-            toast.success("تم الحذف بنجاح", { rtl: true });
-        } catch (error) {
-            toast.error("حدث خطأ أثناء الحذف", { rtl: true });
-            console.error("Error deleting:", error);
-        }
-    };
+    // const handleDelete = async (adminId) => {
+    //     setAdminID(adminId);
+    //     try {
+    //         await axios.delete(`http://localhost:5083/api/Admin/${adminId}`, {
+    //             headers: {
+    //                 Authorization: `Bearer ${user.token}`
+    //             }
+    //         });
+    //         fetchData();
+    //         toast.success("تم الحذف بنجاح", { rtl: true });
+    //     } catch (error) {
+    //         toast.error("حدث خطأ أثناء الحذف", { rtl: true });
+    //         console.error("Error deleting:", error);
+    //     }
+    // };
 
     const handleAddOrUpdateAdmin = async () => {
         // if (!newAdminMail.trim()) return;
@@ -147,19 +205,26 @@ const Admins = () => {
             {errPage && <NotLoaded />}
             {!loading && !errPage && (
                 <div dir='rtl' className='p-4 bg-light min-vh-100'>
-                    <h2 style={{ color: "#19355A" }} className="mb-4">المشرفين</h2>
+                    <h2 style={{ color: "#19355A" }} className="mb-4">المستخدمين</h2>
 
-                    <div className="mb-3 d-flex" style={{justifySelf:"end"}}>
-                        <button className="btn btn-primary rounded-0" onClick={() => {
-                            setIsEditing(false);
-                            setNewAdminMail('');
-                            setNewAdminPass('');
-                            setShowModal(true);
-                        }}>
-                            <FontAwesomeIcon icon={faPlus} className='ms-2' />
-                            اضف مشرف
-                        </button>
+                    <div className="mb-3">
+                        <div className="row">
+                            <div className="col-12 col-md-6 col-lg-4 ms-auto">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="بحث بالاسم أو الرقم القومي....."
+                                    value={searchTerm}
+                                    onChange={(e) => {
+                                        setSearchTerm(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                />
+                            </div>
+                        </div>
                     </div>
+
+
 
                     <div className="table-responsive">
                         <table className="table table-hover text-end">
@@ -173,21 +238,21 @@ const Admins = () => {
                             <tbody>
                                 {admins.map((admin,index) => (
                                     <tr key={index+1}>
-                                        <td>{index+1}</td>
-                                        <td className="text-break">{admin.username}</td>
+                                        <td>{admin.id}</td>
+                                        <td className="text-break">{admin.name}</td>
                                         <td className="text-center fs-5" style={{alignContent:"center"}}>
                                             <FontAwesomeIcon
                                                 icon={faPenRegular}
-                                                onClick={() => handleEdit(admin, admin.id)}
+                                                onClick={() => handleEdit(admin, admin.empId)}
                                                 style={{ cursor: 'pointer' }}
                                                 className='btn btn-outline-primary mx-1'
                                             />
-                                            <FontAwesomeIcon
+                                            {/* <FontAwesomeIcon
                                                 icon={faTrashCan}
                                                 onClick={() => handleDelete(admin.id)}
                                                 style={{ cursor: 'pointer' }}
                                                 className='btn btn-outline-danger mx-1'
-                                            />
+                                            /> */}
                                         </td>
                                     </tr>
                                 ))}
@@ -261,4 +326,4 @@ const Admins = () => {
     );
 };
 
-export default Admins;
+export default Employees;

@@ -23,7 +23,7 @@ const Login = () => {
       setLoader(true);
     try {
       //change url
-        const res = await axios.post(`https://localhost:7057/api/Account/Login`, {
+        const res = await axios.post(`http://localhost:5083/api/Account/Login`, {
         
           "email": data.email,
           "password": data.password
@@ -88,7 +88,7 @@ const Login = () => {
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div className="d-flex justify-content-center align-items-center vh-100 bg-light m-3 ">
       <div
         className="d-flex shadow rounded overflow-hidden login-container"
         style={{ maxWidth: 900, width: "100%", height: "70%" }}
@@ -101,12 +101,12 @@ const Login = () => {
 
         {/* Right Side: Form */}
         <div className="bg-white p-5 w-100" dir="rtl">
-          <h4 className="mb-4 text-center fw-bold pb-5 pt-3">تسجيل الدخول</h4>
+                  <h4 className="mb-4 text-center fw-bold pb-5 pt-3">تسجيل الدخول</h4>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-3">
               <input
                 className="form-control"
-                placeholder="البريد الإلكتروني"
+                placeholder="البريد الالكتروني"
                 {...register("email", { required: "هذا الحقل مطلوب" })}
               />
               {errors.email && (
@@ -140,7 +140,7 @@ const Login = () => {
               </button>
             )}
 
-            <div className="text-center mt-3">
+            <div className="text-center mt- ">
               {/* navigate to register  onClick={() => navigate("/register")} */}
               <p>في حالة عدم التسجيل من قبل</p>
               <button
