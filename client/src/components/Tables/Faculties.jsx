@@ -70,6 +70,11 @@ const Faculties = () => {
             } catch (error) {
                 console.error("Error fetching data:", error.message);
                 toast.error(error.message, { rtl: false });
+                if (error.response?.stateus == 401) {
+                    toast.error(error.response.data.Data, { rtl: true });
+                    navigate('/');
+                    
+                }
                 setErrPage(true);
             }finally {
                 setLoading(false);

@@ -15,7 +15,7 @@ const Requests = () => {
 
     useEffect(() => {
 
-        if (user.role === null) {
+        if (user === null || user.role === null ) {
             navigate('/');
             return;
          }
@@ -100,6 +100,10 @@ const Requests = () => {
                 setRequests(formatted);
             } catch (error) {
                 console.error('Error fetching data:', error);
+                if (error.response?.stateus == 401) {
+                    toast.error(error.response.data.Data, { rtl: true });
+                    navigate('/');
+                }
                 if (error.response?.data?.message && (user.role !== null || user.role.toLowerCase() !== 'employee')) {
                     toast.error(error.response.data.message, { rtl: true });
                 } else {

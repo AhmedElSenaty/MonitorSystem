@@ -28,7 +28,7 @@ const Employees = () => {
 
     useEffect(() => {
         if (user.role === null || user.role.toLowerCase() === 'employee' || user.role.toLowerCase() === 'admin') {
-            navigate('/NotAuthourized');
+            navigate('/');
             return;
         }
     }, [])
@@ -52,7 +52,7 @@ const Employees = () => {
                     }
                 }
             );
-            console.log(res.data.data.employees);
+
             const formatted = res.data.data.employees.map(r => ({
                             id: r.id,
                             name: r.fullName,
@@ -63,6 +63,10 @@ const Employees = () => {
         } catch (error) {
             console.error("Error fetching data:", error);
             setErrPage(true);
+            if (error.response?.stateus == 401) {
+                toast.error(error.response.data.Data, { rtl: true });
+                navigate('/');
+            }
         }finally {
             setLoading(false);
         }
