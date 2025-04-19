@@ -215,7 +215,7 @@ const PersonalInfoPortal = () => {
     };
     // Improved file handler with immediate validation
     const handleFile = (type, file) => {
-        setZoomedImage(null);
+        
         setShowImgModal(false);
         const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
         const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/jpg'];
@@ -236,6 +236,7 @@ const PersonalInfoPortal = () => {
             
             let formData = new FormData();
             formData.append('Image', file);
+            setZoomedImage(file);
             try {
                 /*
                 degreeImage
@@ -602,14 +603,14 @@ const PersonalInfoPortal = () => {
                                                     : "#EFF1F5",
                                                 border: "1px dashed #CFB53B",
                                                 borderRadius: "8px",
-                                                cursor: "zoom-in",
+                                                
                                                 position: "relative",
                                             }}
                                             // onClick={() => fileInputs[type].current.click()}
-                                            onClick={() => {
-                                                setZoomedImage(files[type])
-                                                setShowImgModal(true);
-                                            }}
+                                            // onClick={() => {
+                                            //     setZoomedImage(files[type])
+                                            //     setShowImgModal(true);
+                                            // }}
                                         >
                                             {files[type] ? (
                                                 <img
