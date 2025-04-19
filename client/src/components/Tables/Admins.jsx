@@ -27,7 +27,7 @@ const Admins = () => {
 
     useEffect(() => {
         if (user.role === null || user.role.toLowerCase() === 'employee') {
-            navigate('/NotAuthourized');
+            navigate('/');
             return;
         }
     }, [])
@@ -49,6 +49,10 @@ const Admins = () => {
             setTotalPages((res.data.data.totalCount / adminsPerPage) > 0? Math.ceil(res.data.data.totalCount / adminsPerPage): 1);
         } catch (error) {
             console.error("Error fetching data:", error);
+            if (error.response?.stateus == 401) {
+                toast.error(error.response.data.Data, { rtl: true });
+                navigate('/');
+            }
             setErrPage(true);
         }finally {
             setLoading(false);
@@ -82,6 +86,10 @@ const Admins = () => {
         } catch (error) {
             toast.error("حدث خطأ أثناء الحذف", { rtl: true });
             console.error("Error deleting:", error);
+            if (error.response?.stateus == 401) {
+                toast.error(error.response.data.Data, { rtl: true });
+                navigate('/');
+            }
         }
     };
 

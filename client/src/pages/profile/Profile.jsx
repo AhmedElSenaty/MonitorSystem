@@ -149,6 +149,10 @@ const PersonalInfoPortal = () => {
                     setRequest(response.data.data.requestStatus);
                 } catch (error) {
                     console.error("Error fetching data:", error);
+                    if (error.response?.stateus == 401) {
+                                        toast.error(error.response.data.Data, { rtl: true });
+                                        navigate('/');
+                                    }
                     setErrPage(true);
                 }
                 finally {
