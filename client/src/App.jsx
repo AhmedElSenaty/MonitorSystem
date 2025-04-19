@@ -15,6 +15,7 @@ import PersonalInfoPortal from "./pages/profile/Profile";
 import Requests from "./components/Tables/Requests";
 import Faculties from "./components/Tables/Faculties";
 import Admins from './components/Tables/Admins';
+import Employees from './components/Tables/Employees';
 
 const App = () => {
     return (
@@ -29,6 +30,7 @@ const App = () => {
                 <Route path="/requests" element={<Requests />} />
                 <Route path="/faculties/:empID?" element={<Faculties />} />
                 <Route path="/admins" element={<Admins />} />
+                <Route path="/employees" element={<Employees />} />
                 <Route path="/NotAuthourized" element={<NotAuthourized />} />
                 <Route path="/*" element={<NotFound />} />
 

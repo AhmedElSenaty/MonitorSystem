@@ -3,6 +3,7 @@ import "./Navbar.css";
 import { useAuth } from "../Context/AuthContext";
 import { useNavigate, NavLink } from "react-router-dom";
 
+
 const Navbar = () => {
     const navigate = useNavigate();
     const { logout, user } = useAuth();
@@ -52,13 +53,21 @@ const Navbar = () => {
                 )}
                 <div className="collapse navbar-collapse" id="navbarScroll">
                     {role === "superadmin" && (
-                        <ul className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll gap-2" style={{ "--bs-scroll-height": "250px" }}>
+                        <ul className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll gap-2" style={{ "--bs-scroll-height": "300px" }}>
                             <li className="nav-item">
                                 <NavLink className={({ isActive }) => {
                                     
                                     return (isActive ? `nav-link my-bg-warning` : `nav-link`)
                                 }} to="/admins" style={{ color: "white" }}>
                                     قائمة المشرفين
+                                </NavLink>
+                            </li>
+                            <li className="nav-item">
+                                <NavLink className={({ isActive }) => {
+                                    
+                                    return (isActive ? `nav-link my-bg-warning` : `nav-link`)
+                                }} to="/employees" style={{ color: "white" }}>
+                                    قائمة المستخدمين
                                 </NavLink>
                             </li>
                             <li className="nav-item">
@@ -97,6 +106,14 @@ const Navbar = () => {
                                     قائمة الكليات
                                 </NavLink>
                             </li>
+                            {/* <li className="nav-item">
+                                <NavLink className={({ isActive }) => {
+
+                                    return (isActive ? `nav-link my-bg-warning` : `nav-link`)
+                                }} to="/employees" style={{ color: "white" }}>
+                                    قائمة المستخدمين
+                                </NavLink>
+                            </li> */}
                         </ul>
                     )}
                     {isLoggedIn && (
