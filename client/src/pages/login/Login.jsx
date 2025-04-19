@@ -32,8 +32,7 @@ const Login = () => {
       if (res.data  ) {
         toast.success("تم تسجيل الدخول بنجاح", { rtl: true });
           // Proceed with navigation or state update
-          console.log(res.data);
-          console.log(decodeJWT(res.data.data.token));
+          
           const token = decodeJWT(res.data.data.token);
           const userData = {
               id: token.Id,

@@ -23,7 +23,7 @@ const Faculties = () => {
     // const role = 'superadmin';
     // const role = 'admin';
     // const role = 'employee';
-    const role = user.role.toLowerCase();
+    const role = user.role === null ? '' : user.role.toLowerCase();
 
     const isSuperAdmin = role === 'superadmin' ;
     const isAdmin =  role === 'admin';
@@ -37,14 +37,11 @@ const Faculties = () => {
                     axios.get('https://localhost:7057/api/Department/List', { headers: { Authorization: `Bearer ${user.token}` } }),
                     axios.get(`https://localhost:7057/api/Department/ByEmployee/${empID}`, { headers: { Authorization: `Bearer ${user.token}` } })
                 ]);
-                console.log(userFacsRes.data.data);
-                // console.log(facultiesRes.data);
                 if (facultiesRes.data === null) return;
                 setFaculties(facultiesRes.data.data);
                 if (userFacsRes.data === null) return;
                 setCheckedFaculties(userFacsRes.data.data.map(faculty => faculty.id));
-                console.log("checked at req");
-                console.log(checkedFaculties);
+                
             } catch (error) {
                 // console.error("Error fetching data:", error);
             }
@@ -54,14 +51,11 @@ const Faculties = () => {
                 const [userFacsRes] = await Promise.all([
                     axios.get(`https://localhost:7057/api/Department/ByEmployee/${empID}`, { headers: { Authorization: `Bearer ${user.token}` } })
                 ]);
-                console.log(userFacsRes.data.data);
-                // console.log(facultiesRes.data);
                 if (userFacsRes.data === null) return;
 
                 setFaculties(userFacsRes.data.data);
                 setCheckedFaculties(userFacsRes.data.data.map(faculty => faculty.id));
-                console.log("checked at req");
-                console.log(checkedFaculties);
+                
             } catch (error) {
                 // console.error("Error fetching data:", error);
             }
@@ -160,7 +154,6 @@ const Faculties = () => {
     };
 
     const handleSave = async () => {
-        console.log(checkedFaculties);
         try {
             await axios.put(`https://localhost:7057/api/Department/UpdateEmployeeDepartments`, {
                 departmentsIds: checkedFaculties,

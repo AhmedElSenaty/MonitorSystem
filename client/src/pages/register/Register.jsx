@@ -18,6 +18,7 @@ const SECONDARY_HOVER = '#ad8700';
 const RegisterForm = () => {
 
     const stepperRef = useRef(null);
+    const [isDirty, setIsDirty] = useState(false);
     const [stepper, setStepper] = useState(null);
     const [loader, setLoader] = useState(false);
     const [birthDate, setBirthDate] = useState("");
@@ -68,31 +69,36 @@ const RegisterForm = () => {
     };
 
     const handleChange = (e) => {
+        let newErrors = {};
         const { name, value } = e.target;
         if (name === "ssn") {
             const info = extractFromSSN(value);
             setForm((prev) => ({ ...prev, ssn: value, ...info }));
+            newErrors = validate(['ssn']);
         } else {
             setForm((prev) => ({ ...prev, [name]: value }));
+            newErrors = validate([name]);
         }
-    };
-    // Log files state whenever it changes
-    useEffect(() => {
-
-        const newErrors = validate([
-            "name",
-            "email",
-            "address",
-            "phone",
-            "ssn",
-            "job",
-            "degree",
-            "password",
-            "confirmPassword",
-        ]);
+        
         setErrors(newErrors);
+    };
 
-    }, [form]);
+
+    useEffect(() => {
+        if (form.ssn !== '')
+        {
+            let newErrors = validate(["ssn"]);
+                setErrors(newErrors);
+        }
+    }, [form.ssn]);
+    useEffect(() => {
+        if (form.password !== '')
+        {
+            let newErrors = validate(["password", "confirmPassword"]);
+                setErrors(newErrors);
+        }
+    }, [form.confirmPassword, form.password]);
+    
     const handleFileUpload = (e, type) => {
         const file = e.target.files[0];
         if (!file) return;

@@ -61,7 +61,6 @@ const Requests = () => {
                     setRequests([]);
                     return;
                 }
-                console.log(apiData.requestsStatistics);
                 setCount(
                     {
                         "تحت المراجعة": apiData.requestsStatistics.pendingCount,

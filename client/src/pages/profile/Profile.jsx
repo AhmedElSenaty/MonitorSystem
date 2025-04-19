@@ -138,7 +138,6 @@ const PersonalInfoPortal = () => {
                         idBack: response.data.data.employeeImagesDto.ssnBackImage
                     })
                     setRequest(response.data.data.requestStatus);
-                    console.log(response.data.data.requestStatus);
                 } catch (error) {
                     console.error("Error fetching data:", error);
                 }
@@ -153,7 +152,6 @@ const PersonalInfoPortal = () => {
 
     const startEdit = () => setIsEditing(true);
     const cancelEdit = () => {
-        console.log(orgdata);
         setData(orgdata);
         setIsEditing(false);
     };
@@ -192,7 +190,7 @@ const PersonalInfoPortal = () => {
             toast.success('تم حفظ الملاحظات', { rtl: true, autoClose: 5000 });
             setRequest({...request, notes: noteText});
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
         
         closeModal();
@@ -211,15 +209,13 @@ const PersonalInfoPortal = () => {
         if (!data.degree.trim()) errors.degree = 'المؤهل مطلوب';
         if (!data.job.trim()) errors.job = 'الوظيفة مطلوبة';
         if (!data.gender.trim()) errors.gender = 'النوع مطلوب';
-        console.log(errors);
+        
         return errors;
     };
     // Improved file handler with immediate validation
     const handleFile = (type, file) => {
         setZoomedImage(null);
         setShowImgModal(false);
-        console.log(file);
-        console.log(type);
         const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
         const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/jpg'];
 
@@ -231,12 +227,10 @@ const PersonalInfoPortal = () => {
             toast.error(`${label}: نوع الملف غير مدعوم \n(jpg, jpeg فقط)`, { rtl: true,autoClose: 5000 });
             return;
         }
-        console.log(file.size > MAX_FILE_SIZE);
         if (file.size > MAX_FILE_SIZE) {
             toast.error(`${label}: حجم الملف كبير جدًا \n( 1MB أقصى حجم)`, { rtl: true,autoClose: 5000 });
             return;
         }
-        // console.log('send...');
         const updateProfile = async () => {
             
             let formData = new FormData();
@@ -260,8 +254,6 @@ const PersonalInfoPortal = () => {
                             return "SSNBack";
                     }
                 };
-                // console.log(user.token);
-                // console.log(formData);
                 const response = await axios.put("https://localhost:7057/api/Request/UpdateRequestAssets", formData,
                 {
                     params: {
@@ -272,7 +264,6 @@ const PersonalInfoPortal = () => {
                         // 'Content-Type': 'multipart/form-data'
                     }
                 });
-                console.log(response.data);
                 toast.success("تم تحديث البيانات بنجاح", { rtl: true });
 
                 setFiles(prev => ({ ...prev, [type]: file }));
@@ -286,8 +277,6 @@ const PersonalInfoPortal = () => {
       
 
     const saveEdit = async () => {
-        console.log("saving...");
-        console.log(data);
         setLoading(true);
         const errors = validateData();
         if (Object.keys(errors).length > 0) {
@@ -310,12 +299,11 @@ const PersonalInfoPortal = () => {
                     'Authorization': `Bearer ${user.token}`,
                 }
             });
-            console.log(response.data);
             toast.success("تم تحديث البيانات بنجاح", { rtl: true });
             setIsEditing(false);
         } catch (error) {
-            console.error("Error updating profile:", error);
-            toast.error("حدث خطأ أثناء تحديث البيانات.", { rtl: true });
+            Object.values(error.response.data.errors).forEach(msg => toast.error(msg, { rtl: true }));
+            // toast.error("حدث خطأ أثناء تحديث البيانات.", { rtl: true });
         } finally {
             setLoading(false);
         }

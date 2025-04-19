@@ -5,32 +5,48 @@ import { faTrashCan, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faPenToSquare as faPenRegular } from '@fortawesome/free-regular-svg-icons';
 import { toast } from 'react-toastify';
 import './Tables.css';
-
+import { useAuth } from '../../Context/AuthContext';
 const Admins = () => {
+    const { user } = useAuth();
     const [admins, setAdmins] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [selectedAdmin, setSelectedAdmin] = useState(null);
+    const [AdminID, setAdminID] = useState(0);
     const [newAdminMail, setNewAdminMail] = useState('');
     const [newAdminPass, setNewAdminPass] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+
     const adminsPerPage = 10;
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    
+
 
     const fetchData = async () => {
         try {
-            const res = await axios.get(`http://localhost:3000/admins`);
-            setAdmins(res.data);
+            const res = await axios.get(`https://localhost:7057/api/Admin?PageIndex=${currentPage}&PageSize=${adminsPerPage}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${user.token}`
+                    }
+                }
+            );
+            setAdmins(res.data.data.admins);
+            setTotalPages((res.data.data.totalCount / adminsPerPage) > 0? Math.ceil(res.data.data.totalCount / adminsPerPage): 1);
         } catch (error) {
             console.error("Error fetching data:", error);
         }
     };
+    useEffect(() => {
+        fetchData();
+    }, [currentPage,  newAdminPass]);
 
-    const handleEdit = (admin) => {
+    
+
+    const handleEdit = (admin, id) => {
         setSelectedAdmin(admin);
+        setAdminID(id);
         setNewAdminMail(admin.mail);
         setNewAdminPass(admin.pass);
         setIsEditing(true);
@@ -38,8 +54,13 @@ const Admins = () => {
     };
 
     const handleDelete = async (adminId) => {
+        setAdminID(adminId);
         try {
-            await axios.delete(`http://localhost:3000/admins/${adminId}`);
+            await axios.delete(`https://localhost:7057/api/Admin/${adminId}`, {
+                headers: {
+                    Authorization: `Bearer ${user.token}`
+                }
+            });
             fetchData();
             toast.success("تم الحذف بنجاح", { rtl: true });
         } catch (error) {
@@ -49,20 +70,47 @@ const Admins = () => {
     };
 
     const handleAddOrUpdateAdmin = async () => {
-        if (!newAdminMail.trim()) return;
+        // if (!newAdminMail.trim()) return;
         try {
-            if (isEditing && selectedAdmin) {
-                await axios.put(`http://localhost:3000/admins/${selectedAdmin.id}`, {
-                    mail: newAdminMail,
-                    pass: newAdminPass,
-                });
-                toast.success("تم التحديث بنجاح", { rtl: true });
+            if (isEditing && selectedAdmin && AdminID !== 0) {
+                try {
+                    
+                    await axios.post(`https://localhost:7057/api/Account/admin-reset-password`, {
+                        userId: AdminID,
+                        password: newAdminPass,
+                    }, {
+                        headers: {
+                            Authorization: `Bearer ${user.token}`
+                        }
+                    });
+                    toast.success("تم التحديث بنجاح", { rtl: true });
+                }catch (error) {
+                    error.response.data.errors.forEach(err => {
+
+                        toast.error(err, { rtl: true });
+                    })
+                    console.error("Error saving admin:", error);
+                }
             } else {
-                await axios.post(`http://localhost:3000/admins`, {
-                    mail: newAdminMail,
-                    pass: newAdminPass,
-                });
-                toast.success("تمت الإضافة بنجاح", { rtl: true });
+                try {
+                    
+                    await axios.post(`https://localhost:7057/api/Account/RegisterAdmin`, {
+                        username: newAdminMail,
+                        password: newAdminPass,
+                    }, {
+                        headers: {
+                            Authorization: `Bearer ${user.token}`
+                        }
+                    });
+                
+                    toast.success("تمت الإضافة بنجاح", { rtl: true });
+                } catch (error) {
+                    error.response.data.errors.forEach(err => {
+                        
+                        toast.error(err, { rtl: true });
+                    })
+                    console.error("Error saving admin:", error);
+                }
             }
 
             setShowModal(false);
@@ -76,12 +124,6 @@ const Admins = () => {
             console.error("Error saving admin:", error);
         }
     };
-
-    // Pagination logic
-    const indexOfLastAdmin = currentPage * adminsPerPage;
-    const indexOfFirstAdmin = indexOfLastAdmin - adminsPerPage;
-    const currentAdmins = admins.slice(indexOfFirstAdmin, indexOfLastAdmin);
-    const totalPages = Math.ceil(admins.length / adminsPerPage);
 
     return (
         <div dir='rtl' className='p-4 bg-light min-vh-100'>
@@ -103,20 +145,20 @@ const Admins = () => {
                 <table className="table table-hover text-end">
                     <thead className="table-secondary">
                         <tr>
-                            <th>رقم مسلسل</th>
-                            <th className='w-25 text-break'>البريد</th>
+                            <th> الترتيب </th>
+                            <th className='w-25 text-break'>اسم المستخدم</th>
                             <th className="text-center">تحكم</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {currentAdmins.map(admin => (
-                            <tr key={admin.id}>
-                                <td>{admin.id}</td>
-                                <td className="text-break">{admin.mail}</td>
+                        {admins.map((admin,index) => (
+                            <tr key={index+1}>
+                                <td>{index+1}</td>
+                                <td className="text-break">{admin.username}</td>
                                 <td className="text-center fs-5" style={{alignContent:"center"}}>
                                     <FontAwesomeIcon
                                         icon={faPenRegular}
-                                        onClick={() => handleEdit(admin)}
+                                        onClick={() => handleEdit(admin, admin.id)}
                                         style={{ cursor: 'pointer' }}
                                         className='btn btn-outline-primary mx-1'
                                     />
@@ -164,13 +206,16 @@ const Admins = () => {
                                 <h5 className="modal-title">{isEditing ? 'تعديل مستخدم' : 'إضافة مستخدم جديد'}</h5>
                             </div>
                             <div className="modal-body">
+                                {!isEditing && (
+                                    
                                 <input
                                     type="text"
                                     className="form-control"
                                     value={newAdminMail}
                                     onChange={(e) => setNewAdminMail(e.target.value)}
-                                    placeholder="البريد الإلكتروني "
+                                    placeholder="اسم المستخدم"
                                 />
+                                )}
                                 <input
                                     type="text"
                                     className="form-control mt-3"
