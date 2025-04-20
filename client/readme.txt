@@ -8,6 +8,10 @@
 
 	* API url is http://happ.helwan.edu.eg
 
-2- dist_local_port7057 ( HTTPS )
+3- dist_local_port7057 ( HTTPS )
 
 	* API url is https://localhost:7057
+
+4- dist_happ_port5083 ( HTTPS )
+
+	* API url is https://happ.helwan.edu.eg:5083
