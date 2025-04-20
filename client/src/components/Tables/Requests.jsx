@@ -6,6 +6,7 @@ import { useAuth } from '../../Context/AuthContext';
 import { toast } from 'react-toastify';
 import LogoSpinner from '../spinner/LogoSpinner';
 import { NotLoaded } from '../../App';
+import { base } from '../../data/api.js';
 
 const Requests = () => {
     const navigate = useNavigate();
@@ -49,8 +50,8 @@ const Requests = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const getStatus = (stateus) => {
-                switch (stateus) {
+            const getStatus = (status) => {
+                switch (status) {
                     case 'تحت المراجعة': return 1;
                     case 'تم القبول': return 2;
                     case 'تم الرفض': return 3;
@@ -59,7 +60,7 @@ const Requests = () => {
             };
 
             try {
-                const res = await axios.get('http://localhost:5083/api/Request', {
+                const res = await axios.get(`${base}/api/Request`, {
                     params: {
                         PageIndex: currentPage,
                         PageSize: requestsPerPage,
@@ -100,7 +101,7 @@ const Requests = () => {
                 setRequests(formatted);
             } catch (error) {
                 console.error('Error fetching data:', error);
-                if (error.response?.stateus == 401) {
+                if (error.response?.status == 401) {
                     toast.error(error.response.data.Data, { rtl: true });
                     navigate('/');
                 }

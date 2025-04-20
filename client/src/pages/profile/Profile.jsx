@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import LogoSpinner from "../../components/spinner/LogoSpinner";
 import { NotLoaded } from "../../App";
+import { base } from "../../data/api";
 
 const PersonalInfoPortal = () => {
     const { user, setUser } = useAuth();
@@ -52,7 +53,7 @@ const PersonalInfoPortal = () => {
     
     const approve = async () => {
         try {
-            const res = await axios.put(`http://localhost:5083/api/Request/ChangeStatus`, {
+            const res = await axios.put(`${base}/api/Request/ChangeStatus`, {
                 requestId: reqID*1,
                 newStatus: 2
             }, {
@@ -68,7 +69,7 @@ const PersonalInfoPortal = () => {
     }
     const reject = async () => {
         try {
-            const res = await axios.put(`http://localhost:5083/api/Request/ChangeStatus`, {
+            const res = await axios.put(`${base}/api/Request/ChangeStatus`, {
                 requestId: reqID,
                 newStatus: 3
             }, {
@@ -121,7 +122,7 @@ const PersonalInfoPortal = () => {
 
             const fetchData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:5083/api/Request/${id}`, {
+                    const response = await axios.get(`${base}/api/Request/${id}`, {
                         headers: {
                             'Authorization': `Bearer ${user.token}`
                         }
@@ -149,7 +150,7 @@ const PersonalInfoPortal = () => {
                     setRequest(response.data.data.requestStatus);
                 } catch (error) {
                     console.error("Error fetching data:", error);
-                    if (error.response?.stateus == 401) {
+                    if (error.response?.status == 401) {
                                         toast.error(error.response.data.Data, { rtl: true });
                                         navigate('/');
                                     }
@@ -199,7 +200,7 @@ const PersonalInfoPortal = () => {
     const closeImgModal = () => setShowImgModal(false);
     const saveNote = async() => {
         try {
-            const res = await axios.put(`http://localhost:5083/api/Request/AddNote`, {
+            const res = await axios.put(`${base}/api/Request/AddNote`, {
                 requestId: reqID,
                 note: noteText
             }, {
@@ -275,7 +276,7 @@ const PersonalInfoPortal = () => {
                             return "SSNBack";
                     }
                 };
-                const response = await axios.put("http://localhost:5083/api/Request/UpdateRequestAssets", formData,
+                const response = await axios.put(`${base}/api/Request/UpdateRequestAssets`, formData,
                 {
                     params: {
                         "Identifier": getIdentifier(type)
@@ -313,7 +314,7 @@ const PersonalInfoPortal = () => {
         try {
             
             // TODO: change url
-            const response = await axios.put("http://localhost:5083/api/Request/UpdateRequestData", {
+            const response = await axios.put("${base}/api/Request/UpdateRequestData", {
                 ...data,
                 gender: data.gender === 'ذكر' ? 1 : 0
             }, {

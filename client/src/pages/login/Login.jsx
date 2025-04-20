@@ -6,7 +6,9 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Login.css"; // for custom styles
 import { decodeJWT } from "../../utils/decodeJWT";
-import {useAuth} from '../../Context/AuthContext'
+import { useAuth } from '../../Context/AuthContext'
+import { base } from "../../data/api";
+
 const Login = () => {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +25,7 @@ const Login = () => {
       setLoader(true);
     try {
       //change url
-        const res = await axios.post(`http://localhost:5083/api/Account/Login`, {
+        const res = await axios.post(`${base}/api/Account/Login`, {
         
           "email": data.email,
           "password": data.password
