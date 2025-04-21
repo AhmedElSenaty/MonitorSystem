@@ -2,13 +2,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import Stepper from "bs-stepper";
-import axios from "axios";
+
 import './register.css';
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { base } from "../../data/api";
+import { api } from "../../data/api";
+import { useAuth } from "../../Context/AuthContext";
 
 // Color constants
 const PRIMARY = '#19355a';
@@ -17,6 +18,7 @@ const SECONDARY = PRIMARY;
 const SECONDARY_HOVER = '#ad8700';
 const RegisterForm = () => {
 
+    const {user} = useAuth();
     const stepperRef = useRef(null);
     const [isDirty, setIsDirty] = useState(false);
     const [stepper, setStepper] = useState(null);
@@ -24,6 +26,22 @@ const RegisterForm = () => {
     const [birthDate, setBirthDate] = useState("");
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+
+    useEffect(() => {
+            if(user.isLoggedIn){
+                switch (user.role.toLowerCase()) {
+                    case "admin":
+                        navigate("/requests");
+                        break;
+                    case "superadmin":
+                        navigate("/admins");
+                        break;
+                    case "employee":
+                        navigate(`/profile/${user.id}`);
+                        break;
+                }
+            }
+        }, []);
 
     const [form, setForm] = useState({
         name: "",
@@ -187,8 +205,8 @@ const RegisterForm = () => {
             formData.append('SSNBackImage', files.backId);
             formData.append('PersonalImage', files.personal);
             formData.append('DegreeImage', files.degree);
-            const res = await axios.post(
-                `${base}/api/Account/RegisterEmployee`,
+            const res = await api.post(
+                `/api/Account/RegisterEmployee`,
                 formData
                 , {
                     params: {
@@ -214,7 +232,7 @@ const RegisterForm = () => {
         } catch (err) {
             console.warn(err.response.data.errors);
              Object.values(err.response.data.errors).forEach(msg => toast.error(msg, { rtl: true }));
-            toast.error("حدث خطأ أثناء الإرسال.", { rtl: true });
+            // toast.error("حدث خطأ أثناء الإرسال.", { rtl: true });
         } finally {
             setLoader(false);
         }

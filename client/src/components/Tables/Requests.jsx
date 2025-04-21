@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+
+import { api } from '../../data/api.js'; 
 import { useNavigate } from 'react-router-dom';
 import './Tables.css';
 import { useAuth } from '../../Context/AuthContext';
 import { toast } from 'react-toastify';
 import LogoSpinner from '../spinner/LogoSpinner';
 import { NotLoaded } from '../../App';
-import { base } from '../../data/api.js';
 
 const Requests = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [loader, setLoader] = useState(true);
     const [errPage, setErrPage] = useState(false);
+    const [reloading, setReloading] = useState(true);
 
     useEffect(() => {
 
@@ -60,16 +61,13 @@ const Requests = () => {
             };
 
             try {
-                const res = await axios.get(`${base}/api/Request`, {
+                const res = await api.get(`/api/Request`, {
                     params: {
                         PageIndex: currentPage,
                         PageSize: requestsPerPage,
                         SearchByEmployeeName: isNaN(searchTerm) ? searchTerm : '',
                         SearchByEmployeeSSN: isNaN(searchTerm) ? '' : searchTerm,
                         Status: statusFilter === '' ? null : getStatus(statusFilter)
-                    },
-                    headers: {
-                        Authorization: `Bearer ${user.token}`
                     }
                 });
 
@@ -111,13 +109,14 @@ const Requests = () => {
                     toast.error('حدث خطأ أثناء جلب البيانات', { rtl: true });
                 }
                 setErrPage(true);
-            }finally {
+            } finally {
+                setReloading(false);
                 setLoader(false);
             }
         };
 
         fetchData();
-    }, [currentPage, searchTerm, statusFilter, requestsPerPage]);
+    }, [currentPage, searchTerm, statusFilter, requestsPerPage,reloading]);
 
 
 
@@ -126,7 +125,7 @@ const Requests = () => {
     return (
         <>
             {loader && (<LogoSpinner />)}
-            {errPage && (<NotLoaded />)}
+            {errPage && <NotLoaded reload={() => { setErrPage(false); setLoader(true); setReloading(true); }} />}
             {!loader && !errPage && (
                 <div dir="rtl" className="p-4 bg-light min-vh-100">
 

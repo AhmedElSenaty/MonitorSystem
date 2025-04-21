@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from "react";
 import { Modal, Button, Toast } from "react-bootstrap";
-import axios from "axios";
+
 import { useNavigate, useParams } from "react-router";
 import { ToastContainer, toast } from "react-toastify";
 import { useAuth } from "../../Context/AuthContext";
@@ -10,13 +10,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import LogoSpinner from "../../components/spinner/LogoSpinner";
 import { NotLoaded } from "../../App";
-import { base } from "../../data/api";
+import { api } from "../../data/api";
 
 const PersonalInfoPortal = () => {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const { id, reqID } = useParams();
 
+    const [reloading, setReloading] = useState(true);
   let originalData = {
     id: "",
     name: "",
@@ -53,16 +54,11 @@ const PersonalInfoPortal = () => {
 
   const approve = async () => {
     try {
-      const res = await axios.put(
-        `${base}/api/Request/ChangeStatus`,
+      const res = await api.put(
+        `/api/Request/ChangeStatus`,
         {
           requestId: reqID * 1,
           newStatus: 2,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
         }
       );
       toast.success(res.data.message, { rtl: true, autoClose: 5000 });
@@ -73,16 +69,11 @@ const PersonalInfoPortal = () => {
   };
   const reject = async () => {
     try {
-      const res = await axios.put(
-        `${base}/api/Request/ChangeStatus`,
+      const res = await api.put(
+        `/api/Request/ChangeStatus`,
         {
           requestId: reqID,
           newStatus: 3,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
         }
       );
       toast.success(res.data.message, { rtl: true, autoClose: 5000 });
@@ -127,11 +118,7 @@ const PersonalInfoPortal = () => {
 
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${base}/api/Request/${id}`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
+        const response = await api.get(`/api/Request/${id}`);
         setData({
           name: response.data.data.employeeInformation.name,
           address: response.data.data.employeeInformation.address,
@@ -161,11 +148,12 @@ const PersonalInfoPortal = () => {
         }
         setErrPage(true);
       } finally {
+          setReloading(false);
         setLoader(false);
       }
     };
     if (user.role !== null) fetchData();
-  }, [id, user.token, navigate]);
+  }, [id, user.token, navigate,reloading]);
 
   const handleChange = (field, value) =>
     setData((prev) => ({ ...prev, [field]: value }));
@@ -200,16 +188,11 @@ const PersonalInfoPortal = () => {
   const closeImgModal = () => setShowImgModal(false);
   const saveNote = async () => {
     try {
-      const res = await axios.put(
-        `${base}/api/Request/AddNote`,
+      const res = await api.put(
+        `/api/Request/AddNote`,
         {
           requestId: reqID,
           note: noteText,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
         }
       );
       toast.success("تم حفظ الملاحظات", { rtl: true, autoClose: 5000 });
@@ -292,17 +275,13 @@ const PersonalInfoPortal = () => {
               return "SSNBack";
           }
         };
-        const response = await axios.put(
-          `${base}/api/Request/UpdateRequestAssets`,
+        const response = await api.put(
+          `/api/Request/UpdateRequestAssets`,
           formData,
           {
             params: {
               Identifier: getIdentifier(type),
-            },
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-              // 'Content-Type': 'multipart/form-data'
-            },
+            }
           }
         );
         toast.success("تم تحديث البيانات بنجاح", { rtl: true });
@@ -332,16 +311,11 @@ const PersonalInfoPortal = () => {
 
     try {
       // TODO: change url
-      const response = await axios.put(
-        `${base}/api/Request/UpdateRequestData`,
+      const response = await api.put(
+        `/api/Request/UpdateRequestData`,
         {
           ...data,
           gender: data.gender === "ذكر" ? 1 : 0,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
         }
       );
       toast.success("تم تحديث البيانات بنجاح", { rtl: true });
@@ -361,7 +335,7 @@ const PersonalInfoPortal = () => {
     <>
       <ToastContainer position={"top-center"} />
       {loader && <LogoSpinner />}
-      {errPage && <NotLoaded />}
+          {errPage && <NotLoaded reload={() => { setErrPage(false); setLoader(true); setReloading(true); }} />}
       {!loader && !errPage && (
         <div
           dir="rtl"

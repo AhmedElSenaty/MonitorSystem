@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
-import axios from "axios";
+
 import { useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -18,7 +18,7 @@ import "./Tables.css";
 import { useAuth } from "../../Context/AuthContext";
 import LogoSpinner from "../spinner/LogoSpinner";
 import { NotLoaded } from "../../App";
-import { base } from "../../data/api.js";
+import { api } from "../../data/api.js";
 
 const Faculties = () => {
   const { user } = useAuth();
@@ -30,7 +30,8 @@ const Faculties = () => {
   const [loading, setLoading] = useState(true);
   const [errPage, setErrPage] = useState(false);
   const [newFacultyName, setNewFacultyName] = useState("");
-
+    
+    const [reloading, setReloading] = useState(true);
   // const role = 'superadmin';
   // const role = 'admin';
   // const role = 'employee';
@@ -44,12 +45,8 @@ const Faculties = () => {
     const fetchData = async () => {
       try {
         const [facultiesRes, userFacsRes] = await Promise.all([
-          axios.get(`${base}/api/Department/List`, {
-            headers: { Authorization: `Bearer ${user.token}` },
-          }),
-          axios.get(`${base}/api/Department/ByEmployee/${empID}`, {
-            headers: { Authorization: `Bearer ${user.token}` },
-          }),
+          api.get(`/api/Department/List` ),
+          api.get(`/api/Department/ByEmployee/${empID}` ),
         ]);
         if (facultiesRes.data === null) throw new Error(facultiesRes);
         setFaculties(facultiesRes.data.data);
@@ -57,7 +54,7 @@ const Faculties = () => {
         setCheckedFaculties(userFacsRes.data.data.map((faculty) => faculty.id));
       } catch (error) {
         console.error("Error fetching data:", error.message);
-        toast.error(error.message, { rtl: false });
+        // toast.error(error.message, { rtl: false });
         if (error.response?.status == 401) {
           toast.error(error.response.data.Data, { rtl: true });
           navigate("/");
@@ -65,15 +62,14 @@ const Faculties = () => {
         }
         setErrPage(true);
       } finally {
+        setReloading(false);
         setLoading(false);
       }
     };
     const fetchEmpData = async () => {
       try {
         const [userFacsRes] = await Promise.all([
-          axios.get(`${base}/api/Department/ByEmployee/${empID}`, {
-            headers: { Authorization: `Bearer ${user.token}` },
-          }),
+          api.get(`/api/Department/ByEmployee/${empID}` ),
         ]);
         if (userFacsRes.data === null) {
           throw new Error(userFacsRes);
@@ -83,7 +79,7 @@ const Faculties = () => {
         setCheckedFaculties(userFacsRes.data.data.map((faculty) => faculty.id));
       } catch (error) {
         console.error("Error fetching data:", error.message);
-        toast.error(error.message, { rtl: false });
+        // toast.error(error.message, { rtl: false });
         if (error.response?.status == 401) {
           toast.error(error.response.data.Data, { rtl: true });
           navigate("/");
@@ -91,6 +87,7 @@ const Faculties = () => {
         }
         setErrPage(true);
       } finally {
+        setReloading(false);
         setLoading(false);
       }
     };
@@ -109,13 +106,11 @@ const Faculties = () => {
         navigate(-1);
       }
     }
-  }, []);
+  }, [reloading]);
 
   const downloadFile = async (url, fileName) => {
     try {
-      const res = await axios.get(url, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      const res = await api.get(url);
 
       // 1. Pull out the info
       const {
@@ -165,16 +160,11 @@ const Faculties = () => {
 
   const handleSave = async () => {
     try {
-      await axios.put(
-        `${base}/api/Department/UpdateEmployeeDepartments`,
+      await api.put(
+        `/api/Department/UpdateEmployeeDepartments`,
         {
           departmentsIds: checkedFaculties,
           employeeId: empID,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
         }
       );
 
@@ -187,11 +177,7 @@ const Faculties = () => {
 
   const handleDelete = async (facultyId) => {
     try {
-      await axios.delete(`${base}/api/Department/${facultyId}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
+      await api.delete(`/api/Department/${facultyId}`);
       toast.success(" تم حذف بنجاح", { rtl: true });
       setFaculties(faculties.filter((faculty) => faculty.id !== facultyId));
     } catch (error) {
@@ -203,15 +189,10 @@ const Faculties = () => {
   const handleAddFaculty = async () => {
     if (!newFacultyName.trim()) return;
     try {
-      const res = await axios.post(
-        `${base}/api/Department`,
+      const res = await api.post(
+        `/api/Department`,
         {
           name: newFacultyName,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
         }
       );
       setShowModal(false);
@@ -228,8 +209,8 @@ const Faculties = () => {
   return (
     <>
       <ToastContainer position="top-center" />
-      {loading && <LogoSpinner />}
-      {errPage && <NotLoaded />}
+          {loading && <LogoSpinner />}
+          {errPage && <NotLoaded reload={() => { setErrPage(false); setLoading(true); setReloading(true); }} />}
       {!loading && !errPage && (
         <div dir="rtl" className="container-fluid p-4 bg-light">
           {/* Back Button */}
@@ -279,7 +260,7 @@ const Faculties = () => {
                     className="btn btn-outline-success rounded-0 w-100"
                     onClick={() =>
                       downloadFile(
-                        `${base}/api/Reports/employee-departments-report`,
+                        `/api/Reports/employee-departments-report`,
                         "كل_الكليات.xlsx"
                       )
                     }
@@ -315,7 +296,7 @@ const Faculties = () => {
                           className="btn btn-outline-success mx-1"
                           onClick={() =>
                             downloadFile(
-                              `${base}/api/Reports/employee-departments-report/?departmentId=${faculty.id}`,
+                              `/api/Reports/employee-departments-report/?departmentId=${faculty.id}`,
                               `الكلية_${faculty.name}.xlsx`
                             )
                           }

@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 // import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { faPenToSquare as faPenRegular } from '@fortawesome/free-regular-svg-icons';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import './Tables.css';
 import { useAuth } from '../../Context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import LogoSpinner from '../spinner/LogoSpinner';
 import { NotLoaded } from '../../App';
-import { base } from '../../data/api.js';
+import { api } from './../../data/api';
 
 const Employees = () => {
     const { user } = useAuth();
@@ -26,6 +26,7 @@ const Employees = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
+    const [reloading, setReloading] = useState(true);
 
     useEffect(() => {
         if (user.role === null || user.role.toLowerCase() === 'employee' || user.role.toLowerCase() === 'admin') {
@@ -40,16 +41,13 @@ const Employees = () => {
 
     const fetchData = async () => {
         try {
-            const res = await axios.get(`${base}/api/Employee`,
+            const res = await api.get(`/api/Employee`,
                 {
                     params: {
                         PageIndex: currentPage,
                         PageSize: adminsPerPage,
                         SearchByEmployeeName: isNaN(searchTerm) ? searchTerm : '',
                         SearchByEmployeeSSN: isNaN(searchTerm) ? '' : searchTerm,
-                    },
-                    headers: {
-                        Authorization: `Bearer ${user.token}`
                     }
                 }
             );
@@ -68,13 +66,14 @@ const Employees = () => {
                 toast.error(error.response.data.Data, { rtl: true });
                 navigate('/');
             }
-        }finally {
+        } finally {
+            setReloading(false);
             setLoading(false);
         }
     };
     useEffect(() => {
         fetchData();
-    }, [currentPage, newAdminPass, searchTerm]);
+    }, [currentPage, searchTerm,reloading]);
 
     // useEffect(() => {
     //     const fetchData = async () => {
@@ -154,13 +153,9 @@ const Employees = () => {
             if (isEditing && selectedAdmin && AdminID !== 0) {
                 try {
                     
-                    await axios.post(`${base}/api/Account/admin-reset-password`, {
+                    await api.post(`/api/Account/admin-reset-password`, {
                         userId: AdminID,
                         password: newAdminPass,
-                    }, {
-                        headers: {
-                            Authorization: `Bearer ${user.token}`
-                        }
                     });
                     toast.success("تم التحديث بنجاح", { rtl: true });
                 }catch (error) {
@@ -173,13 +168,9 @@ const Employees = () => {
             } else {
                 try {
                     
-                    await axios.post(`${base}/api/Account/RegisterAdmin`, {
+                    await api.post(`/api/Account/RegisterAdmin`, {
                         username: newAdminMail,
                         password: newAdminPass,
-                    }, {
-                        headers: {
-                            Authorization: `Bearer ${user.token}`
-                        }
                     });
                 
                     toast.success("تمت الإضافة بنجاح", { rtl: true });
@@ -207,9 +198,10 @@ const Employees = () => {
     return (
         <>
             {loading && <LogoSpinner />}
-            {errPage && <NotLoaded />}
+            {errPage && <NotLoaded reload={() => { setErrPage(false); setLoading(true); setReloading(true); }} />}
             {!loading && !errPage && (
                 <div dir='rtl' className='p-4 bg-light min-vh-100'>
+                    <ToastContainer position='top-center'/>
                     <h2 style={{ color: "#19355A" }} className="mb-4">المستخدمين</h2>
 
                     <div className="mb-3">
@@ -308,7 +300,7 @@ const Employees = () => {
                                         <input
                                             type="text"
                                             className="form-control mt-3"
-                                            value={newAdminPass}
+                                            // value={newAdminPass}
                                             onChange={(e) => setNewAdminPass(e.target.value)}
                                             placeholder="كلمة المرور "
                                         />

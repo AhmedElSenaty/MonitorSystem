@@ -1,18 +1,18 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from "axios";
+
 import { useNavigate } from "react-router-dom";
 import "./Login.css"; // for custom styles
 import { decodeJWT } from "../../utils/decodeJWT";
 import { useAuth } from '../../Context/AuthContext'
-import { base } from "../../data/api";
+import { api } from "../../data/api";
 
 const Login = () => {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
-    const {setUser} = useAuth();
+    const {setUser, user} = useAuth();
         const [loader, setLoader] = useState(false);
   const {
     register,
@@ -20,12 +20,28 @@ const Login = () => {
     formState: { errors }
   } = useForm();
 
+    
+    useEffect(() => {
+        if(user.isLoggedIn){
+            switch (user.role.toLowerCase()) {
+                case "admin":
+                    navigate("/requests");
+                    break;
+                case "superadmin":
+                    navigate("/admins");
+                    break;
+                case "employee":
+                    navigate(`/profile/${user.id}`);
+                    break;
+            }
+        }
+    }, []);
   //TODO: post method
     const onSubmit = async (data) => {
       setLoader(true);
     try {
       //change url
-        const res = await axios.post(`${base}/api/Account/Login`, {
+        const res = await api.post(`/api/Account/Login`, {
         
           "email": data.email,
           "password": data.password
@@ -44,7 +60,7 @@ const Login = () => {
               isLoggedIn: true
           }
           setUser(userData);
-          localStorage.setItem("user", JSON.stringify(userData));
+          sessionStorage.setItem("user", JSON.stringify(userData));
           switch (token.role.toLowerCase()) {
               case "admin":
                   navigate("/requests");
@@ -65,7 +81,7 @@ const Login = () => {
         // console.warn(error.response.data.data.errors);
         setLoader(false);
 
-        // If axios got a response from the server with an error status:
+        // If api got a response from the server with an error status:
         if (error.response && error.response.data) {
             const errs = error.response.data.data?.errors;
             if (errs) {

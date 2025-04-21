@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashCan, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faPenToSquare as faPenRegular } from '@fortawesome/free-regular-svg-icons';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import './Tables.css';
 import { useAuth } from '../../Context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import LogoSpinner from '../spinner/LogoSpinner';
 import { NotLoaded } from '../../App';
-import { base } from '../../data/api.js';
+import { api } from '../../data/api.js';
 
 const Admins = () => {
     const { user } = useAuth();
@@ -25,6 +25,7 @@ const Admins = () => {
     const [newAdminPass, setNewAdminPass] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [reloading, setReloading] = useState(true);
 
     useEffect(() => {
         if (user.role === null || user.role.toLowerCase() === 'employee') {
@@ -39,12 +40,8 @@ const Admins = () => {
 
     const fetchData = async () => {
         try {
-            const res = await axios.get(`${base}/api/Admin?PageIndex=${currentPage}&PageSize=${adminsPerPage}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${user.token}`
-                    }
-                }
+            const res = await api.get(`/api/Admin?PageIndex=${currentPage}&PageSize=${adminsPerPage}`,
+                
             );
             setAdmins(res.data.data.admins);
             setTotalPages((res.data.data.totalCount / adminsPerPage) > 0? Math.ceil(res.data.data.totalCount / adminsPerPage): 1);
@@ -53,22 +50,25 @@ const Admins = () => {
             if (error.response?.status == 401) {
                 toast.error(error.response.data.Data, { rtl: true });
                 navigate('/');
+                sessionStorage.removeItem('user');
+                return;
             }
             setErrPage(true);
         }finally {
+            setReloading(false);
             setLoading(false);
         }
     };
     useEffect(() => {
         fetchData();
-    }, [currentPage,  newAdminPass]);
+    }, [currentPage,reloading]);
 
     
 
     const handleEdit = (admin, id) => {
         setSelectedAdmin(admin);
         setAdminID(id);
-        setNewAdminMail(admin.mail);
+        if (admin.mail !== null) setNewAdminMail(admin.mail);
         setNewAdminPass(admin.pass);
         setIsEditing(true);
         setShowModal(true);
@@ -77,11 +77,7 @@ const Admins = () => {
     const handleDelete = async (adminId) => {
         setAdminID(adminId);
         try {
-            await axios.delete(`${base}/api/Admin/${adminId}`, {
-                headers: {
-                    Authorization: `Bearer ${user.token}`
-                }
-            });
+            await api.delete(`/api/Admin/${adminId}`);
             fetchData();
             toast.success("تم الحذف بنجاح", { rtl: true });
         } catch (error) {
@@ -100,13 +96,9 @@ const Admins = () => {
             if (isEditing && selectedAdmin && AdminID !== 0) {
                 try {
                     
-                    await axios.post(`${base}/api/Account/admin-reset-password`, {
+                    await api.post(`/api/Account/admin-reset-password`, {
                         userId: AdminID,
                         password: newAdminPass,
-                    }, {
-                        headers: {
-                            Authorization: `Bearer ${user.token}`
-                        }
                     });
                     toast.success("تم التحديث بنجاح", { rtl: true });
                 }catch (error) {
@@ -119,13 +111,9 @@ const Admins = () => {
             } else {
                 try {
                     
-                    await axios.post(`${base}/api/Account/RegisterAdmin`, {
+                    await api.post(`/api/Account/RegisterAdmin`, {
                         username: newAdminMail,
                         password: newAdminPass,
-                    }, {
-                        headers: {
-                            Authorization: `Bearer ${user.token}`
-                        }
                     });
                 
                     toast.success("تمت الإضافة بنجاح", { rtl: true });
@@ -153,9 +141,10 @@ const Admins = () => {
     return (
         <>
             {loading && <LogoSpinner />}
-            {errPage && <NotLoaded />}
+            {errPage && <NotLoaded reload={() => { setErrPage(false); setLoading(true); setReloading(true); }} />}
             {!loading && !errPage && (
                 <div dir='rtl' className='p-4 bg-light min-vh-100'>
+                    <ToastContainer position='top-center'/>
                     <h2 style={{ color: "#19355A" }} className="mb-4">المشرفين</h2>
 
                     <div className="mb-3 d-flex" style={{justifySelf:"end"}}>
@@ -247,7 +236,7 @@ const Admins = () => {
                                         <input
                                             type="text"
                                             className="form-control mt-3"
-                                            value={newAdminPass}
+                                            // value={newAdminPass}
                                             onChange={(e) => setNewAdminPass(e.target.value)}
                                             placeholder="كلمة المرور "
                                         />

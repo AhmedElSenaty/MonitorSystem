@@ -3,36 +3,32 @@ import React, { createContext, useContext, useState } from "react";
 const AuthContext = createContext();
 
 // Initialize user from localStorage or defaults
-const getInitialUser = () => {
-    const raw = localStorage.getItem('user');
-    if (raw && raw !== 'null') {
-        try {
-            return JSON.parse(raw);
-        } catch {
-            localStorage.removeItem('user');
-        }
-    }
-    return { id: null, token: null, isLoggedIn: false, role: null };
-};
+
 
 export const AuthProvider = ({ children }) => {
+    const getInitialUser = () => {
+        const raw = sessionStorage.getItem('user');
+        if (raw && raw !== 'null') {
+            try {
+                return JSON.parse(raw);
+            } catch {
+                sessionStorage.removeItem('user');
+            }
+        }
+        return { id: null, token: null, isLoggedIn: false, role: null };
+    };
     const [user, setUser] = useState(getInitialUser);
 
-    const login = (userData) => {
-        // userData should include id, token, role, isLoggedIn
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
-    };
-
+    
     const logout = () => {
         const empty = { id: null, token: null, isLoggedIn: false, role: null };
         setUser(empty);
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
         
     };
 
     return (
-        <AuthContext.Provider value={{ user, setUser,login, logout }}>
+        <AuthContext.Provider value={{ user, setUser, logout }}>
             {children}
         </AuthContext.Provider>
     );

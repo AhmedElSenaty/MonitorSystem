@@ -49,6 +49,7 @@ const Navbar = () => {
                         aria-controls="navbarScroll"
                         aria-expanded="false"
                         aria-label="Toggle navigation"
+                        
                     >
                         <span className="navbar-toggler-icon"></span>
                     </button>
@@ -62,7 +63,9 @@ const Navbar = () => {
                                     return (isActive ? `nav-link my-bg-warning` : `nav-link`)
                                 }} to="/admins" style={{ color: "white" }}
                                     onClick={() => {
-                                        burger.current.click();
+                                        if (window.getComputedStyle(burger.current).display !== 'none'){
+                                            burger.current.click();
+                                        }
                                     }}
                                 >
                                     قائمة المشرفين
@@ -74,7 +77,9 @@ const Navbar = () => {
                                     return (isActive ? `nav-link my-bg-warning` : `nav-link`)
                                 }} to="/employees" style={{ color: "white" }}
                                     onClick={() => {
-                                        burger.current.click();
+                                        if (window.getComputedStyle(burger.current).display !== 'none') {
+                                            burger.current.click();
+                                        }
                                     }}
                                 >
                                     قائمة المستخدمين
@@ -86,7 +91,9 @@ const Navbar = () => {
                                     return (isActive ? `nav-link my-bg-warning` : `nav-link`)
                                 }} to="/faculties" style={{ color: "white" }}
                                     onClick={() => {
-                                        burger.current.click();
+                                        if (window.getComputedStyle(burger.current).display !== 'none') {
+                                            burger.current.click();
+                                        }
                                     }}
                                 >
                                     قائمة الكليات
@@ -98,7 +105,9 @@ const Navbar = () => {
                                     return (isActive ? `nav-link my-bg-warning` : `nav-link`)
                                 }} to="/requests" style={{ color: "white" }}
                                     onClick={() => {
-                                        burger.current.click();
+                                        if (window.getComputedStyle(burger.current).display !== 'none') {
+                                            burger.current.click();
+                                        }
                                     }}
                                 >
                                     قائمة الطلبات
@@ -114,7 +123,9 @@ const Navbar = () => {
                                     return (isActive ? `nav-link my-bg-warning` : `nav-link`)
                                 }} to="/requests" style={{ color: "white" }}
                                     onClick={() => {
-                                        burger.current.click();
+                                        if (window.getComputedStyle(burger.current).display !== 'none') {
+                                            burger.current.click();
+                                        }
                                     }}
                                 >
                                     قائمة الطلبات
@@ -126,7 +137,9 @@ const Navbar = () => {
                                     return (isActive ? `nav-link my-bg-warning` : `nav-link`)
                                 }} to="/faculties" style={{ color: "white" }}
                                     onClick={() => {
-                                        burger.current.click();
+                                        if (window.getComputedStyle(burger.current).display !== 'none') {
+                                            burger.current.click();
+                                        }
                                     }}
                                 >
                                     قائمة الكليات
