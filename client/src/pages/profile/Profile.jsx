@@ -52,21 +52,21 @@ const PersonalInfoPortal = () => {
     idBack: null,
   });
 
-  const approve = async () => {
-    try {
-      const res = await api.put(
-        `/api/Request/ChangeStatus`,
-        {
-          requestId: reqID * 1,
-          newStatus: 2,
-        }
-      );
-      toast.success(res.data.message, { rtl: true, autoClose: 5000 });
-      navigate(`/faculties/${id}`);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+//   const approve = async () => {
+//     try {
+//       const res = await api.put(
+//         `/api/Request/ChangeStatus`,
+//         {
+//           requestId: reqID * 1,
+//           newStatus: 2,
+//         }
+//       );
+//       toast.success(res.data.message, { rtl: true, autoClose: 5000 });
+//       navigate(`/faculties/${id}`);
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   };
   const reject = async () => {
     try {
       const res = await api.put(
@@ -948,14 +948,23 @@ const PersonalInfoPortal = () => {
                           )}
                           {(isAdmin || isSuperAdmin) &&
                             (request.status === "تم الرفض" ||
-                              request.status === "تحت المراجعة") && (
-                              <button
-                                style={{ backgroundColor: "#19355A" }}
-                                className="btn btn-outline-primary btn-main btn-sm mt-1"
-                                onClick={() => openModal(request)}
-                              >
-                                اضف ملاحظة
-                              </button>
+                                request.status === "تحت المراجعة") && (
+                                <> 
+                                    <button
+                                        style={{ backgroundColor: "#19355A" }}
+                                        className="btn btn-outline-primary btn-main btn-sm mt-1 mx-1"
+                                        onClick={() => openModal(request)}
+                                    >
+                                        اضف ملاحظة
+                                    </button>
+                                    <button
+                                        style={{ backgroundColor: "#AD8700" }}
+                                        className="btn btn-outline-warning btn-main-s btn-sm mt-1 mx-1"
+                                        onClick={() => navigate(`/faculties/${id}`)}
+                                    >
+                                        قبول مره اخري
+                                    </button>
+                                </>
                             )}
                           {(isAdmin || isSuperAdmin) && (
                             <>
@@ -963,7 +972,8 @@ const PersonalInfoPortal = () => {
                                 <>
                                   <button
                                     className="btn btn-outline-success btn-sm mx-2 mt-2"
-                                    onClick={approve}
+                                    // onClick={approve}
+                                    onClick={() => navigate(`/faculties/${id}`)}
                                   >
                                     قبول
                                   </button>

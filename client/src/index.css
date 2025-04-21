@@ -77,3 +77,12 @@ input[type="time"]::-moz-calendar-picker-indicator {
     background-color: transparent !important;
     color: #19355a !important;
 }
+.btn-main-s:hover {
+    background-color: #AD8700 !important;
+    color: white !important;
+}
+
+.btn-main-s {
+    background-color: transparent !important;
+    color: #AD8700 !important;
+}

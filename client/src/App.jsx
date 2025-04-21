@@ -16,6 +16,7 @@ import Requests from "./components/Tables/Requests";
 import Faculties from "./components/Tables/Faculties";
 import Admins from './components/Tables/Admins';
 import Employees from './components/Tables/Employees';
+import Home from './pages/Home';
 
 const App = () => {
     return (
@@ -23,7 +24,7 @@ const App = () => {
             <Navbar />
             <ToastContainer position="top-center" />
             <Routes>
-                <Route index element={<Login />} />
+                <Route index element={<Home />} />
                 <Route path="/register" element={<RegisterForm />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/profile/:id?/:reqID?" element={<PersonalInfoPortal />} />
