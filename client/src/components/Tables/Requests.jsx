@@ -194,7 +194,7 @@ const Requests = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {requests.map(request => (
+                                {requests.length > 0 && requests.map(request => (
                                     <tr key={request.id}>
                                         <td>{request.name}</td>
                                         <td className="text-break">{request.gender}</td>
@@ -207,6 +207,13 @@ const Requests = () => {
                                         </td>
                                     </tr>
                                 ))}
+                                {
+                                    requests.length === 0 && (
+                                        <tr>
+                                            <td colSpan="5">لا يوجد بيانات</td>
+                                        </tr>
+                                    )
+                                }
                             </tbody>
                         </table>
                     </div>

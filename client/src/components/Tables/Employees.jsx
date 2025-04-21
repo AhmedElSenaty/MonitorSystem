@@ -233,7 +233,7 @@ const Employees = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {admins.map((admin,index) => (
+                                {admins.length > 0 && admins.map((admin,index) => (
                                     <tr key={index+1}>
                                         <td>{admin.id}</td>
                                         <td className="text-break">{admin.name}</td>
@@ -253,6 +253,13 @@ const Employees = () => {
                                         </td>
                                     </tr>
                                 ))}
+                                {
+                                    admins.length === 0 && (
+                                        <tr>
+                                            <td colSpan="3">لا يوجد مستخدمين</td>
+                                        </tr>
+                                    )
+                                }
                             </tbody>
                         </table>
                     </div>

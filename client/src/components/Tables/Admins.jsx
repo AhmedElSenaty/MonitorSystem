@@ -169,7 +169,7 @@ const Admins = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {admins.map((admin,index) => (
+                                {admins.length > 0 && admins.map((admin,index) => (
                                     <tr key={index+1}>
                                         <td>{index+1}</td>
                                         <td className="text-break">{admin.username}</td>
@@ -189,6 +189,15 @@ const Admins = () => {
                                         </td>
                                     </tr>
                                 ))}
+                                {
+                                    admins.length === 0 && (
+                                        <tr>
+                                            <td colSpan="3" className="text-center">
+                                                لا يوجد مشرفين
+                                            </td>
+                                        </tr>
+                                    )
+                                }
                             </tbody>
                         </table>
                     </div>
