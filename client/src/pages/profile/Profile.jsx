@@ -957,13 +957,17 @@ const PersonalInfoPortal = () => {
                                     >
                                         اضف ملاحظة
                                     </button>
-                                    <button
-                                        style={{ backgroundColor: "#AD8700" }}
-                                        className="btn btn-outline-warning btn-main-s btn-sm mt-1 mx-1"
-                                        onClick={() => navigate(`/faculties/${id}`)}
-                                    >
-                                        قبول مره اخري
-                                    </button>
+                                    {
+                                        request.status === "تم الرفض" && (
+                                            <button
+                                                style={{ backgroundColor: "#AD8700" }}
+                                                className="btn btn-outline-warning btn-main-s btn-sm mt-1 mx-1"
+                                                onClick={() => navigate(`/faculties/${id}`)}
+                                            >
+                                                قبول مره اخري
+                                            </button>
+                                        )
+                                    }
                                 </>
                             )}
                           {(isAdmin || isSuperAdmin) && (

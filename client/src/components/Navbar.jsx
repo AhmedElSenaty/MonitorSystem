@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./Navbar.css";
 import { useAuth } from "../Context/AuthContext";
 import { useNavigate, NavLink, useLocation } from "react-router-dom";
+import Login from './../pages/login/Login';
 
 
 const Navbar = () => {
@@ -26,7 +27,7 @@ const Navbar = () => {
     const onLogout = () => {
         logout();
         navigate("/login");
-    };console.log(location.pathname)
+    };
 
     return (
         <nav className="navbar navbar-expand-lg shadow" style={{ backgroundColor: "#19355A" }} dir="rtl">
@@ -168,14 +169,14 @@ const Navbar = () => {
                         <div className={"d-flex me-auto my-2 my-lg-0"} >
                             {(location.pathname.includes('register') || location.pathname === '/' )&& 
                                 (
-                                <button className="btn btn-outline-info me-5" type="button" onClick={() => navigate("/login")}>
+                                <button className="btn btn-outline-warning me-5" type="button" onClick={() => navigate("/login")}>
                                     تسجيل دخول
                                 </button>
                                 )}
                             {
                                 (location.pathname.includes('/login') || location.pathname === '/') && 
                                 (
-                                <button className="btn btn-outline-info me-5" type="button" onClick={() => navigate("/register")}>
+                                <button className="btn btn-outline-warning me-5" type="button" onClick={() => navigate("/register")}>
                                     تسجيل طلب
                                 </button>
                                 )
