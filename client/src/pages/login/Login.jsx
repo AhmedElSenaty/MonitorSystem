@@ -66,7 +66,7 @@ const Login = () => {
                   navigate("/requests");
                   break;
               case "superadmin":
-                  navigate("/admins");
+                  navigate("/requests");
                   break;
               case "employee":
                   navigate(`/profile/${token.Id}`);

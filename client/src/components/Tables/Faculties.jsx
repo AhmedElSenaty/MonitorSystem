@@ -170,7 +170,7 @@ const Faculties = () => {
 
       toast.success("تم الحفظ بنجاح", { rtl: true });
     } catch (error) {
-      toast.error(" حدث خطأ أثناء الحفظ", { rtl: true });
+        error.response.data.errors.map((err) => toast.error(err, { rtl: true }));
       console.error("Error saving:", error);
     }
   };

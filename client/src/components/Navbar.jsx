@@ -170,14 +170,18 @@ const Navbar = () => {
                             {(location.pathname.includes('register') || location.pathname === '/' )&& 
                                 (
                                 <button className="btn btn-outline-warning me-5" type="button" onClick={() => navigate("/login")}>
+                                    <span className="text-white">
                                     تسجيل دخول
+                                    </span>
                                 </button>
                                 )}
                             {
                                 (location.pathname.includes('/login') || location.pathname === '/') && 
                                 (
                                 <button className="btn btn-outline-warning me-5" type="button" onClick={() => navigate("/register")}>
-                                    تسجيل طلب
+                                        <span className="text-white">
+                                            تسجيل طلب
+                                        </span>
                                 </button>
                                 )
                             }
