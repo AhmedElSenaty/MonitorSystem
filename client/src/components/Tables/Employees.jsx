@@ -224,7 +224,7 @@ const Employees = () => {
 
 
                     <div className="table-responsive">
-                        <table className="table table-hover text-end">
+                        <table className="table table-hover text-end table-striped">
                             <thead className="table-secondary">
                                 <tr>
                                     <th> الترتيب </th>

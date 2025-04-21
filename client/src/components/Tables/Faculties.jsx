@@ -275,7 +275,7 @@ const Faculties = () => {
 
           {/* Table */}
           <div className="table-responsive">
-            <table className="table table-hover text-end align-middle">
+            <table className="table table-hover text-end align-middle table-striped">
               <thead className="table-secondary">
                 <tr>
                   <th className="w-25">رقم مسلسل</th>

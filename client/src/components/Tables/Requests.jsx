@@ -7,8 +7,6 @@ import { useAuth } from '../../Context/AuthContext';
 import { toast } from 'react-toastify';
 import LogoSpinner from '../spinner/LogoSpinner';
 import { NotLoaded } from '../../App';
-import Faculties from './Faculties.jsx';
-import { set } from 'react-hook-form';
 
 const Requests = () => {
     const navigate = useNavigate();
@@ -225,106 +223,51 @@ const Requests = () => {
 
                     {/* Table */}
                     <div className="table-responsive">
-                        <table className="table table-hover text-end align-middle">
+                        <table className="table table-hover text-end align-middle table-striped">
                             <thead className="table-secondary">
-                                {/* <tr>
-                                    <th className="w-25">الإسم</th>
-                                    <th className=" text-break">نوع</th>
-                                    <th className=" text-break">المؤهل</th>
-                                    <th style={{ maxWidth: "200px" }} className="text-break">الكليات</th>
-                                    <th className=" text-break">الحالة</th>
-                                    <th className="text-center" style={{ minWidth: "80px" }}>تحكم</th>
-                                </tr> */}
                                 <tr>
                                     <th className="w-25">الإسم</th>
-                                    <th className="d-none d-md-table-cell text-break">نوع</th> {/* GENDER */}
+                                    <th className="d-none d-md-table-cell text-break">نوع</th>
                                     <th className="text-break">المؤهل</th>
                                     <th className="w-25 text-break">الكليات</th>
-                                    <th className="d-none d-md-table-cell text-break">الحالة</th> {/* STATUS */}
-                                    <th style={{ minWidth: "80px" }}>تحكم</th>
+                                    <th className="d-none d-md-table-cell text-break">الحالة</th>
+                                    <th className="text-center" style={{ minWidth: "80px" }}>تحكم</th>
                                 </tr>
                             </thead>
-                            {/* <tbody>
-                                {requests.length > 0 && requests.map((request, index) => (
-                                    <tr key={index}>
-                                        <td>{request.name}</td>
-                                        <td className="text-break">{request.gender}</td>
-                                        <td className="text-break">{request.degree}</td>
-                                        <td
-                                            className="text-break"
-                                            style={{
-                                                maxWidth: "200px",
-                                                whiteSpace: "normal",
-                                                wordWrap: "break-word"
-                                            }}
-                                        >
-                                            {request.faculties.length > 0
-                                                ? request.faculties.map((f, i) => (
-                                                    <span key={i}>
-                                                        {f}
-                                                        {i !== request.faculties.length - 1 && ', '}
-                                                    </span>
-                                                ))
-                                                : 'لا يوجد كليات'}
-                                        </td>
-
-
-                                        <td className="text-break" style={{ color: request.status === 'تحت المراجعة' ? '#AD8700' : request.status === 'تم القبول' ? 'green' : 'red' }}>
-                                            {request.status}
-                                        </td>
-                                        <td className="text-center">
-                                            <button className="btn btn-primary" onClick={() => navigate(`/profile/${request.ssn}/${request.id}`)}>عرض</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {
-                                    requests.length === 0 && (
-                                        <tr>
-                                            <td colSpan="6">لا يوجد بيانات</td>
-                                        </tr>
-                                    )
-                                }
-                            </tbody> */}
                             <tbody>
-                                {requests.length > 0 && requests.map((request, index) => (
-                                    <tr key={index}>
-                                        <td>{request.name}</td>
-                                        <td className="d-none d-md-table-cell text-break">{request.gender}</td> {/* GENDER */}
-                                        <td className="text-break">{request.degree}</td>
-                                        <td
-                                            className="text-break"
-                                            style={{
-                                                maxWidth: "200px",
-                                                whiteSpace: "normal",
-                                                wordWrap: "break-word"
-                                            }}
-                                        >
-                                            {request.faculties.length > 0
-                                                ? request.faculties.map((f, i) => (
-                                                    <span key={i}>
-                                                        {f}
-                                                        {i !== request.faculties.length - 1 && ', '}
-                                                    </span>
-                                                ))
-                                                : 'لا يوجد كليات'}
-                                        </td>
-                                        <td className="d-none d-md-table-cell text-break" style={{ color: request.status === 'تحت المراجعة' ? '#AD8700' : request.status === 'تم القبول' ? 'green' : 'red' }}>
-                                            {request.status}
-                                        </td>
-                                        <td>
-                                            <button className="btn btn-primary" onClick={() => navigate(`/profile/${request.ssn}/${request.id}`)}>عرض</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {requests.length === 0 && (
+                                {requests.length > 0 ? (
+                                    requests.map((request, index) => (
+                                        <tr key={index}>
+                                            <td>{request.name}</td>
+                                            <td className="d-none d-md-table-cell text-break">{request.gender}</td>
+                                            <td className="text-break">{request.degree}</td>
+                                            <td className="text-break" style={{ maxWidth: "200px", whiteSpace: "normal", wordWrap: "break-word" }}>
+                                                {request.faculties.length > 0
+                                                    ? request.faculties.map((f, i) => (
+                                                        <span key={i} style={{ display: "inline-block" }}>
+                                                            {f}
+                                                            {i !== request.faculties.length - 1 && ', '}
+                                                        </span>
+                                                    ))
+                                                    : <span>لا يوجد كليات</span>}
+                                            </td>
+                                            <td className="d-none d-md-table-cell text-break" style={{ color: request.status === 'تحت المراجعة' ? '#AD8700' : request.status === 'تم القبول' ? 'green' : 'red' }}>
+                                                {request.status}
+                                            </td>
+                                            <td className="text-center">
+                                                <button className="btn btn-primary" onClick={() => navigate(`/profile/${request.ssn}/${request.id}`)}>عرض</button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
                                     <tr>
-                                        <td colSpan="6">لا يوجد بيانات</td>
+                                        <td colSpan="6" className="text-center">لا يوجد بيانات</td>
                                     </tr>
                                 )}
                             </tbody>
-
                         </table>
                     </div>
+
 
                     {/* Pagination */}
                     <div className="d-flex justify-content-center mt-4">
