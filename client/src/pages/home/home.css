@@ -4,4 +4,14 @@
   background-position: center;
   min-height: 100dvh;
   width: 100%; 
+  
+  overflow: hidden;
+}
+.overlay {
+  background: rgba(0, 0, 0, 0.5); /* Dark backdrop */
+  z-index: 1;
+}
+
+.content {
+  z-index: 2;
 }

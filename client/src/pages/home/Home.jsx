@@ -1,22 +1,16 @@
 import React from 'react';
-import './Home.css'; // Optional, for custom styles
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom'; // Correct import
+import './Home.css';
+
 const Home = () => {
     return (
-        <div className="home-page d-flex justify-content-center align-items-start pt-5 text-dark  text-center">
-            <div className="container">
-                <img
-                    src="/assets/helwan-logo.png"
-                    alt="Background"
-                    className='p-4 rounded-5 '
-                    style={{ zIndex: -1, backgroundColor: '#19355A' }}
-                    width={150}
-                    height={150}
-                />
-                <h1 className="display-2 fw-bolder">مرحبًا بك في نظام تسجيل الملاحظين</h1>
-                <p className="lead fw-bold">هذه الصفحة الرئيسية لموقعنا. استمتع بتجربتك!</p>
-                <Link to={"/login"} >
-                    <span className="btn rounded-3 btn-warning mt-3 px-4">ابداء الان</span>
+        <div className="home-page position-relative d-flex justify-content-center align-items-center text-white text-center">
+            <div className="overlay position-absolute top-0 start-0 w-100 h-100" />
+            <div className="container position-relative z-2">
+                <h1 className="display-4 fw-bold">مرحبًا بك في نظام تسجيل الملاحظين</h1>
+                <p className="lead fw-semibold">هذه الصفحة الرئيسية لموقعنا. استمتع بتجربتك!</p>
+                <Link to="/login">
+                    <span className="btn btn-warning mt-3 px-4 rounded-3">ابدأ الآن</span>
                 </Link>
             </div>
         </div>
