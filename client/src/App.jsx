@@ -16,7 +16,7 @@ import Requests from "./components/Tables/Requests";
 import Faculties from "./components/Tables/Faculties";
 import Admins from './components/Tables/Admins';
 import Employees from './components/Tables/Employees';
-import Home from './pages/Home';
+import Home from './pages/home/Home';
 
 const App = () => {
     return (

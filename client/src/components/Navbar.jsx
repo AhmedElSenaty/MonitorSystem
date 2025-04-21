@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./Navbar.css";
 import { useAuth } from "../Context/AuthContext";
-import { useNavigate, NavLink } from "react-router-dom";
+import { useNavigate, NavLink, useLocation } from "react-router-dom";
 
 
 const Navbar = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const burger = useRef(null);
     const { logout, user } = useAuth();
     const [role, setRole] = useState(null);
@@ -25,7 +26,7 @@ const Navbar = () => {
     const onLogout = () => {
         logout();
         navigate("/login");
-    };
+    };console.log(location.pathname)
 
     return (
         <nav className="navbar navbar-expand-lg shadow" style={{ backgroundColor: "#19355A" }} dir="rtl">
@@ -36,7 +37,8 @@ const Navbar = () => {
                         alt="Logo"
                         width="50"
                         height="50"
-                        className="d-inline-block align-text-top"
+                        className="d-inline-block align-text-top cursor-pointer"
+                        onClick={() => navigate("/")}
                     />
                 </div>
                 {isLoggedIn && (
@@ -160,6 +162,24 @@ const Navbar = () => {
                             <button className="btn btn-outline-info me-5" type="button" onClick={onLogout}>
                                 تسجيل خروج
                             </button>
+                        </div>
+                    )}
+                    {!isLoggedIn && (
+                        <div className={"d-flex me-auto my-2 my-lg-0"} >
+                            {(location.pathname.includes('register') || location.pathname === '/' )&& 
+                                (
+                                <button className="btn btn-outline-info me-5" type="button" onClick={() => navigate("/login")}>
+                                    تسجيل دخول
+                                </button>
+                                )}
+                            {
+                                (location.pathname.includes('/login') || location.pathname === '/') && 
+                                (
+                                <button className="btn btn-outline-info me-5" type="button" onClick={() => navigate("/register")}>
+                                    تسجيل طلب
+                                </button>
+                                )
+                            }
                         </div>
                     )}
                 </div>

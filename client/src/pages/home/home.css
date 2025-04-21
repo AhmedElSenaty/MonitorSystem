@@ -1,0 +1,7 @@
+.home-page {
+  background-image: url('../../../public/assets/home.jpg'); 
+  background-size: cover;
+  background-position: center;
+  min-height: 100dvh;
+  width: 100%; 
+}
