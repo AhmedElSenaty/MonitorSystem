@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Navbar.css";
 import { useAuth } from "../Context/AuthContext";
 import { useNavigate, NavLink } from "react-router-dom";
@@ -6,6 +6,7 @@ import { useNavigate, NavLink } from "react-router-dom";
 
 const Navbar = () => {
     const navigate = useNavigate();
+    const burger = useRef(null);
     const { logout, user } = useAuth();
     const [role, setRole] = useState(null);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -40,6 +41,7 @@ const Navbar = () => {
                 </div>
                 {isLoggedIn && (
                     <button
+                        ref={burger}
                         className="navbar-toggler"
                         type="button"
                         data-bs-toggle="collapse"
@@ -58,7 +60,11 @@ const Navbar = () => {
                                 <NavLink className={({ isActive }) => {
                                     
                                     return (isActive ? `nav-link my-bg-warning` : `nav-link`)
-                                }} to="/admins" style={{ color: "white" }}>
+                                }} to="/admins" style={{ color: "white" }}
+                                    onClick={() => {
+                                        burger.current.click();
+                                    }}
+                                >
                                     قائمة المشرفين
                                 </NavLink>
                             </li>
@@ -66,7 +72,11 @@ const Navbar = () => {
                                 <NavLink className={({ isActive }) => {
                                     
                                     return (isActive ? `nav-link my-bg-warning` : `nav-link`)
-                                }} to="/employees" style={{ color: "white" }}>
+                                }} to="/employees" style={{ color: "white" }}
+                                    onClick={() => {
+                                        burger.current.click();
+                                    }}
+                                >
                                     قائمة المستخدمين
                                 </NavLink>
                             </li>
@@ -74,7 +84,11 @@ const Navbar = () => {
                                 <NavLink className={({ isActive }) => {
                                     
                                     return (isActive ? `nav-link my-bg-warning` : `nav-link`)
-                                }} to="/faculties" style={{ color: "white" }}>
+                                }} to="/faculties" style={{ color: "white" }}
+                                    onClick={() => {
+                                        burger.current.click();
+                                    }}
+                                >
                                     قائمة الكليات
                                 </NavLink>
                             </li>
@@ -82,7 +96,11 @@ const Navbar = () => {
                                 <NavLink className={({ isActive }) => {
                                     
                                     return (isActive ? `nav-link my-bg-warning` : `nav-link`)
-                                }} to="/requests" style={{ color: "white" }}>
+                                }} to="/requests" style={{ color: "white" }}
+                                    onClick={() => {
+                                        burger.current.click();
+                                    }}
+                                >
                                     قائمة الطلبات
                                 </NavLink>
                             </li>
@@ -94,7 +112,11 @@ const Navbar = () => {
                                 <NavLink className={({ isActive }) => {
                                     
                                     return (isActive ? `nav-link my-bg-warning` : `nav-link`)
-                                }} to="/requests" style={{ color: "white" }}>
+                                }} to="/requests" style={{ color: "white" }}
+                                    onClick={() => {
+                                        burger.current.click();
+                                    }}
+                                >
                                     قائمة الطلبات
                                 </NavLink>
                             </li>
@@ -102,7 +124,11 @@ const Navbar = () => {
                                 <NavLink className={({ isActive }) => {
                                     
                                     return (isActive ? `nav-link my-bg-warning` : `nav-link`)
-                                }} to="/faculties" style={{ color: "white" }}>
+                                }} to="/faculties" style={{ color: "white" }}
+                                    onClick={() => {
+                                        burger.current.click();
+                                    }}
+                                >
                                     قائمة الكليات
                                 </NavLink>
                             </li>

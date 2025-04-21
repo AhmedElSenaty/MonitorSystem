@@ -207,19 +207,18 @@ const Admins = () => {
                     {/* Pagination */}
                     <div className="d-flex justify-content-center mt-4">
                         <nav>
-                            <ul className="pagination">
+                            <ul className="pagination flex-wrap">
                                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                                    <button className="page-link rounded-0" onClick={() => setCurrentPage(currentPage - 1)}>السابق</button>
+                                    <button className={`page-link rounded-end-5  bg-warning ${currentPage === 1 ? 'text-gray' : 'text-dark'}`} onClick={() => setCurrentPage(currentPage - 1)}>السابق</button>
                                 </li>
-                                {[...Array(totalPages)].map((_, index) => (
-                                    <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
-                                        <button className="page-link" onClick={() => setCurrentPage(index + 1)}>
-                                            {index + 1}
-                                        </button>
-                                    </li>
-                                ))}
+                                <li className="page-item" >
+                                    <span className="page-link text-dark bg-white" >
+                                        {` ${totalPages} / ${currentPage}  `}
+                                    </span>
+                                </li>
+
                                 <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                                    <button className="page-link rounded-0" onClick={() => setCurrentPage(currentPage + 1)}>التالي</button>
+                                    <button className={`page-link rounded-start-5  bg-warning ${currentPage === totalPages ? 'text-gray' : 'text-dark'}`} onClick={() => setCurrentPage(currentPage + 1)}>التالي</button>
                                 </li>
                             </ul>
                         </nav>
