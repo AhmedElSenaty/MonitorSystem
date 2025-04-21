@@ -7,6 +7,8 @@ import { useAuth } from '../../Context/AuthContext';
 import { toast } from 'react-toastify';
 import LogoSpinner from '../spinner/LogoSpinner';
 import { NotLoaded } from '../../App';
+import Faculties from './Faculties.jsx';
+import { set } from 'react-hook-form';
 
 const Requests = () => {
     const navigate = useNavigate();
@@ -30,7 +32,7 @@ const Requests = () => {
     
     const [requests, setRequests] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const requestsPerPage = 10;
+    const requestsPerPage = 5;
 
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
@@ -85,17 +87,57 @@ const Requests = () => {
                         "تم الرفض": apiData.requestsStatistics.rejectedCount,
                     }
                 );
+
                 setCurrentPage(apiData.metadata.pagination.pageIndex);
                 setTotalPages(apiData.metadata.pagination.totalPages);
-                const formatted = apiData.requests.map(r => ({
-                    id: r.requestId,
-                    name: r.employeeName,
-                    ssn: r.employeeId,
-                    degree: r.degree,
-                    gender: r.employeeGender,
-                    status: r.status   
-                }));
-
+                // const getFaculties = async (empid) => {
+                //     const userFac = await api.get(`/api/Department/ByEmployee/${empid}`);
+                //     const userFacData = userFac.data?.data ;
+                //     const fac = userFacData.map(f => f.name);
+                //     // console.log(fac);
+                //     return fac;
+                // }
+                // const formatted = apiData.requests.map((r) => {
+                    
+                
+                //     getFaculties(r.employeeId).then((faculties) => {
+                //         setUserFaculties(faculties);
+                //     })
+                    
+                //     const record = {
+                //         id: r.requestId,
+                //         name: r.employeeName,
+                //         ssn: r.employeeId,
+                //         degree: r.degree,
+                //         gender: r.employeeGender,
+                //         status: r.status,
+                //         faculties: userFacuilties??[],
+                //     }
+                //     console.log('record');
+                //     console.log(record);
+                //     return record;
+                // }
+                // );
+                
+                const getFaculties = async (empid) => {
+                    const userFac = await api.get(`/api/Department/ByEmployee/${empid}`);
+                    return userFac.data?.data?.map(f => f.name) ?? [];
+                };
+                const formatted = await Promise.all(
+                    apiData.requests.map(async (r) => {
+                        const faculties = await getFaculties(r.employeeId);
+                        return {
+                            id: r.requestId,
+                            name: r.employeeName,
+                            ssn: r.employeeId,
+                            degree: r.degree,
+                            gender: r.employeeGender,
+                            status: r.status,
+                            faculties: faculties,
+                        };
+                    })
+                );
+                console.log(formatted);
                 setRequests(formatted);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -187,18 +229,28 @@ const Requests = () => {
                             <thead className="table-secondary">
                                 <tr>
                                     <th className="w-25">الإسم</th>
-                                    <th className="w-25 text-break">نوع</th>
-                                    <th className="w-25 text-break">المؤهل</th>
-                                    <th className="w-25 text-break">الحالة</th>
+                                    <th className=" text-break">نوع</th>
+                                    <th className=" text-break">المؤهل</th>
+                                    <th className="w-25 text-break">الكليات</th>
+                                    <th className=" text-break">الحالة</th>
                                     <th className="text-center" style={{ minWidth: "80px" }}>تحكم</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {requests.length > 0 && requests.map(request => (
-                                    <tr key={request.id}>
+                                {requests.length > 0 && requests.map((request, index) => (
+                                    <tr key={index}>
                                         <td>{request.name}</td>
                                         <td className="text-break">{request.gender}</td>
                                         <td className="text-break">{request.degree}</td>
+                                        <td className="text-break">
+                                            {request.faculties.length > 0 && request.faculties.map((f, index) => (
+                                                <>
+                                                    <span>{f}</span>
+                                                    {index !== request.faculties.length - 1 && (<span>, </span>)}
+                                                </>
+                                                ))}   
+                                            {request.faculties.length === 0 && 'لا يوجد كليات'}
+                                        </td>
                                         <td className="text-break" style={{ color: request.status === 'تحت المراجعة' ? '#AD8700' : request.status === 'تم القبول' ? 'green' : 'red' }}>
                                             {request.status}
                                         </td>
