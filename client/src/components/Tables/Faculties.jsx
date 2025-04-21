@@ -284,7 +284,7 @@ const Faculties = () => {
                 </tr>
               </thead>
               <tbody>
-                {faculties.map((faculty) => (
+                {faculties.length > 0 && faculties.map((faculty) => (
                   <tr key={faculty.id}>
                     <td>{faculty.id}</td>
                     <td className="text-break">{faculty.name}</td>
@@ -335,6 +335,13 @@ const Faculties = () => {
                     </td>
                   </tr>
                 ))}
+                              {faculties.length === 0 && (
+                                <tr>
+                                  <td colSpan="3" className="text-center">
+                                     لا يوجد كليات
+                                  </td>
+                                </tr>
+                              )}
               </tbody>
             </table>
           </div>
