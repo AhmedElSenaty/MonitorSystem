@@ -137,7 +137,7 @@ const Requests = () => {
                         };
                     })
                 );
-                console.log(formatted);
+                // console.log(formatted);
                 setRequests(formatted);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -225,32 +225,50 @@ const Requests = () => {
 
                     {/* Table */}
                     <div className="table-responsive">
-                        <table className="table table-hover text-end">
+                        <table className="table table-hover text-end align-middle">
                             <thead className="table-secondary">
-                                <tr>
+                                {/* <tr>
                                     <th className="w-25">الإسم</th>
                                     <th className=" text-break">نوع</th>
                                     <th className=" text-break">المؤهل</th>
-                                    <th className="w-25 text-break">الكليات</th>
+                                    <th style={{ maxWidth: "200px" }} className="text-break">الكليات</th>
                                     <th className=" text-break">الحالة</th>
                                     <th className="text-center" style={{ minWidth: "80px" }}>تحكم</th>
+                                </tr> */}
+                                <tr>
+                                    <th className="w-25">الإسم</th>
+                                    <th className="d-none d-md-table-cell text-break">نوع</th> {/* GENDER */}
+                                    <th className="text-break">المؤهل</th>
+                                    <th className="w-25 text-break">الكليات</th>
+                                    <th className="d-none d-md-table-cell text-break">الحالة</th> {/* STATUS */}
+                                    <th style={{ minWidth: "80px" }}>تحكم</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            {/* <tbody>
                                 {requests.length > 0 && requests.map((request, index) => (
                                     <tr key={index}>
                                         <td>{request.name}</td>
                                         <td className="text-break">{request.gender}</td>
                                         <td className="text-break">{request.degree}</td>
-                                        <td className="text-break">
-                                            {request.faculties.length > 0 && request.faculties.map((f, index) => (
-                                                <>
-                                                    <span>{f}</span>
-                                                    {index !== request.faculties.length - 1 && (<span>, </span>)}
-                                                </>
-                                                ))}   
-                                            {request.faculties.length === 0 && 'لا يوجد كليات'}
+                                        <td
+                                            className="text-break"
+                                            style={{
+                                                maxWidth: "200px",
+                                                whiteSpace: "normal",
+                                                wordWrap: "break-word"
+                                            }}
+                                        >
+                                            {request.faculties.length > 0
+                                                ? request.faculties.map((f, i) => (
+                                                    <span key={i}>
+                                                        {f}
+                                                        {i !== request.faculties.length - 1 && ', '}
+                                                    </span>
+                                                ))
+                                                : 'لا يوجد كليات'}
                                         </td>
+
+
                                         <td className="text-break" style={{ color: request.status === 'تحت المراجعة' ? '#AD8700' : request.status === 'تم القبول' ? 'green' : 'red' }}>
                                             {request.status}
                                         </td>
@@ -262,11 +280,49 @@ const Requests = () => {
                                 {
                                     requests.length === 0 && (
                                         <tr>
-                                            <td colSpan="5">لا يوجد بيانات</td>
+                                            <td colSpan="6">لا يوجد بيانات</td>
                                         </tr>
                                     )
                                 }
+                            </tbody> */}
+                            <tbody>
+                                {requests.length > 0 && requests.map((request, index) => (
+                                    <tr key={index}>
+                                        <td>{request.name}</td>
+                                        <td className="d-none d-md-table-cell text-break">{request.gender}</td> {/* GENDER */}
+                                        <td className="text-break">{request.degree}</td>
+                                        <td
+                                            className="text-break"
+                                            style={{
+                                                maxWidth: "200px",
+                                                whiteSpace: "normal",
+                                                wordWrap: "break-word"
+                                            }}
+                                        >
+                                            {request.faculties.length > 0
+                                                ? request.faculties.map((f, i) => (
+                                                    <span key={i}>
+                                                        {f}
+                                                        {i !== request.faculties.length - 1 && ', '}
+                                                    </span>
+                                                ))
+                                                : 'لا يوجد كليات'}
+                                        </td>
+                                        <td className="d-none d-md-table-cell text-break" style={{ color: request.status === 'تحت المراجعة' ? '#AD8700' : request.status === 'تم القبول' ? 'green' : 'red' }}>
+                                            {request.status}
+                                        </td>
+                                        <td>
+                                            <button className="btn btn-primary" onClick={() => navigate(`/profile/${request.ssn}/${request.id}`)}>عرض</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {requests.length === 0 && (
+                                    <tr>
+                                        <td colSpan="6">لا يوجد بيانات</td>
+                                    </tr>
+                                )}
                             </tbody>
+
                         </table>
                     </div>
 
