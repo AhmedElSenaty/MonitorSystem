@@ -34,7 +34,7 @@ const Requests = () => {
 
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
-
+    const MAX_CONTENT = 50;
 
     
     const [totalPages, setTotalPages] = useState(1);
@@ -216,6 +216,26 @@ const Requests = () => {
                                     <option value="تحت المراجعة">تحت المراجعة</option>
                                     <option value="تم القبول">تم القبول</option>
                                     <option value="تم الرفض">تم الرفض</option>
+                                </select>
+                            </div>
+                            <div className="col-12 col-md-6 col-lg-3">
+                                <select
+                                    className="form-select"
+                                    value={statusFilter}
+                                    onChange={(e) => {
+                                        setStatusFilter(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    
+                                    <option value="5">اختار عدد الطلبات (5)</option>
+                                    <option value="10">10</option>
+                                    <option value="15">15</option>
+                                    <option value="20">20</option>
+                                    <option value="25">25</option>
+                                    <option value="30">30</option>
+                                    <option value="35">35</option>
+                                    
                                 </select>
                             </div>
                         </div>

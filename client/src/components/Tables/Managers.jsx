@@ -34,7 +34,7 @@ const Managers = () => {
     const [faculties, setFaculties] = useState([]);
 
     useEffect(() => {
-        if (user.role === null || user.role.toLowerCase() !== 'manager' ) {
+        if (user.role === null || user.role.toLowerCase() !== 'superadmin'  ) {
             navigate('/');
             return;
         }

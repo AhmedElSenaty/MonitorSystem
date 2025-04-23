@@ -21,22 +21,24 @@ import Employees from './components/Tables/Employees';
 import Home from './pages/home/Home';
 
 const App = () => {
+    // const base = "/HU-FingerPrint2";
+    const base = "";
     return (
         <BrowserRouter>
             <Navbar />
             <ToastContainer position="top-center" />
             <Routes>
-                <Route index element={<Home />} />
-                <Route path="/register" element={<RegisterForm />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/profile/:id?/:reqID?" element={<PersonalInfoPortal />} />
-                <Route path="/requests" element={<Requests />} />
-                <Route path="/faculties/:empID?" element={<Faculties />} />
-                <Route path="/admins" element={<Admins />} />
-                <Route path="/managers" element={<Managers />} />
-                <Route path="/faculty/requestes" element={<UnderDevelopment />} />
-                <Route path="/employees" element={<Employees />} />
-                <Route path="/NotAuthourized" element={<NotAuthourized />} />
+                <Route path={base} element={<Home />} />
+                <Route path={`${base}/register`} element={<RegisterForm />} />
+                <Route path={`${base}/login`} element={<Login />} />
+                <Route path={`${base}/profile:id?/:reqID?`} element={<PersonalInfoPortal />} />
+                <Route path={`${base}/requests`} element={<Requests />} />
+                <Route path={`${base}/faculties:empID?`} element={<Faculties />} />
+                <Route path={`${base}/admins`} element={<Admins />} />
+                <Route path={`${base}/managers`} element={<Managers />} />
+                <Route path={`${base}/facultyrequestes`} element={<UnderDevelopment />} />
+                <Route path={`${base}/employees`} element={<Employees />} />
+                <Route path={`${base}/NotAuthourized`} element={<NotAuthourized />} />
                 <Route path="/*" element={<NotFound />} />
 
             </Routes>

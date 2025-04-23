@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { faPenToSquare as faPenRegular } from '@fortawesome/free-regular-svg-icons';
 import { toast, ToastContainer } from 'react-toastify';
 import './Tables.css';
@@ -131,21 +131,18 @@ const Employees = () => {
         setShowModal(true);
     };
 
-    // const handleDelete = async (adminId) => {
-    //     setAdminID(adminId);
-    //     try {
-    //         await axios.delete(`${base}/api/Admin/${adminId}`, {
-    //             headers: {
-    //                 Authorization: `Bearer ${user.token}`
-    //             }
-    //         });
-    //         fetchData();
-    //         toast.success("تم الحذف بنجاح", { rtl: true });
-    //     } catch (error) {
-    //         toast.error("حدث خطأ أثناء الحذف", { rtl: true });
-    //         console.error("Error deleting:", error);
-    //     }
-    // };
+    const handleDelete = async (adminId) => {
+        setAdminID(adminId);
+        try {
+            console.log(adminId)
+            await api.delete(`/api/Admin/${adminId}`);
+            fetchData();
+            toast.success("تم الحذف بنجاح", { rtl: true });
+        } catch (error) {
+            toast.error("حدث خطأ أثناء الحذف", { rtl: true });
+            console.error("Error deleting:", error);
+        }
+    };
 
     const handleAddOrUpdateAdmin = async () => {
         // if (!newAdminMail.trim()) return;
@@ -244,12 +241,12 @@ const Employees = () => {
                                                 style={{ cursor: 'pointer' }}
                                                 className='btn btn-outline-primary mx-1'
                                             />
-                                            {/* <FontAwesomeIcon
+                                             <FontAwesomeIcon
                                                 icon={faTrashCan}
-                                                onClick={() => handleDelete(admin.id)}
+                                                onClick={() => handleDelete(admin.empId)}
                                                 style={{ cursor: 'pointer' }}
                                                 className='btn btn-outline-danger mx-1'
-                                            /> */}
+                                            /> 
                                         </td>
                                     </tr>
                                 ))}
