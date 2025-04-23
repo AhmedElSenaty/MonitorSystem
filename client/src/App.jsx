@@ -19,6 +19,7 @@ import Admins from './components/Tables/Admins';
 import Managers from './components/Tables/Managers';
 import Employees from './components/Tables/Employees';
 import Home from './pages/home/Home';
+import FacultyRequests from './components/Tables/FacultyRequests';
 
 const App = () => {
     // const base = "/HU-FingerPrint2";
@@ -36,7 +37,7 @@ const App = () => {
                 <Route path={`${base}/faculties:empID?`} element={<Faculties />} />
                 <Route path={`${base}/admins`} element={<Admins />} />
                 <Route path={`${base}/managers`} element={<Managers />} />
-                <Route path={`${base}/facultyrequestes`} element={<UnderDevelopment />} />
+                <Route path={`${base}/facultyrequestes`} element={<FacultyRequests />} />
                 <Route path={`${base}/employees`} element={<Employees />} />
                 <Route path={`${base}/NotAuthourized`} element={<NotAuthourized />} />
                 <Route path="/*" element={<NotFound />} />
