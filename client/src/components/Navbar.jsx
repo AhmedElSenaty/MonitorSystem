@@ -3,6 +3,7 @@ import "./Navbar.css";
 import { useAuth } from "../Context/AuthContext";
 import { useNavigate, NavLink, useLocation } from "react-router-dom";
 import Login from './../pages/login/Login';
+import Managers from './Tables/Managers';
 
 
 const Navbar = () => {
@@ -60,6 +61,20 @@ const Navbar = () => {
                 <div className="collapse navbar-collapse" id="navbarScroll">
                     {role === "superadmin" && (
                         <ul className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll gap-2" style={{ "--bs-scroll-height": "300px" }}>
+                            <li className="nav-item">
+                                <NavLink className={({ isActive }) => {
+                                    
+                                    return (isActive ? `nav-link my-bg-warning` : `nav-link`)
+                                }} to="/managers" style={{ color: "white" }}
+                                    onClick={() => {
+                                        if (window.getComputedStyle(burger.current).display !== 'none'){
+                                            burger.current.click();
+                                        }
+                                    }}
+                                >
+                                    قائمة المديرين
+                                </NavLink>
+                            </li>
                             <li className="nav-item">
                                 <NavLink className={({ isActive }) => {
                                     
@@ -156,6 +171,24 @@ const Navbar = () => {
                                     قائمة المستخدمين
                                 </NavLink>
                             </li> */}
+                        </ul>
+                    )}
+                    {role === "manager" && (
+                        <ul className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll gap-2" style={{ "--bs-scroll-height": "100px" }}>
+                            <li className="nav-item">
+                                <NavLink className={({ isActive }) => {
+                                    
+                                    return (isActive ? `nav-link my-bg-warning` : `nav-link`)
+                                }} to="/faculty/requestes" style={{ color: "white" }}
+                                    onClick={() => {
+                                        if (window.getComputedStyle(burger.current).display !== 'none') {
+                                            burger.current.click();
+                                        }
+                                    }}
+                                >
+                                    قائمة الطلبات
+                                </NavLink>
+                            </li>
                         </ul>
                     )}
                     {isLoggedIn && (

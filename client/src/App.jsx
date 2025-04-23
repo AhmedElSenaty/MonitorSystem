@@ -1,4 +1,5 @@
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import '../node_modules/bootstrap/dist/js/bootstrap.min.js';
 import '../node_modules/bs-stepper/dist/css/bs-stepper.min.css';
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./App.css";
@@ -15,6 +16,7 @@ import PersonalInfoPortal from "./pages/profile/Profile";
 import Requests from "./components/Tables/Requests";
 import Faculties from "./components/Tables/Faculties";
 import Admins from './components/Tables/Admins';
+import Managers from './components/Tables/Managers';
 import Employees from './components/Tables/Employees';
 import Home from './pages/home/Home';
 
@@ -31,6 +33,8 @@ const App = () => {
                 <Route path="/requests" element={<Requests />} />
                 <Route path="/faculties/:empID?" element={<Faculties />} />
                 <Route path="/admins" element={<Admins />} />
+                <Route path="/managers" element={<Managers />} />
+                <Route path="/faculty/requestes" element={<UnderDevelopment />} />
                 <Route path="/employees" element={<Employees />} />
                 <Route path="/NotAuthourized" element={<NotAuthourized />} />
                 <Route path="/*" element={<NotFound />} />

@@ -5,13 +5,17 @@ import { faTrashCan, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faPenToSquare as faPenRegular } from '@fortawesome/free-regular-svg-icons';
 import { toast, ToastContainer } from 'react-toastify';
 import './Tables.css';
-import { useAuth } from '../../Context/AuthContext';
+import { useAuth } from '../../Context/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
-import LogoSpinner from '../spinner/LogoSpinner';
-import { NotLoaded } from '../../App';
+import LogoSpinner from '../spinner/LogoSpinner.jsx';
+import { NotLoaded } from '../../App.jsx';
 import { api } from '../../data/api.js';
 
-const Admins = () => {
+
+
+
+// TODO : fix list names and add select faculty and make api requestes 
+const Managers = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
@@ -26,25 +30,50 @@ const Admins = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [reloading, setReloading] = useState(true);
+    const [statusFilter, setStatusFilter] = useState('');
+    const [faculties, setFaculties] = useState([]);
 
     useEffect(() => {
-        if (user.role === null || user.role.toLowerCase() === 'employee') {
+        if (user.role === null || user.role.toLowerCase() !== 'manager' ) {
             navigate('/');
             return;
         }
     }, [])
     const adminsPerPage = 10;
 
-    
+
+    useEffect(() => {
+        try {
+            
+            const getFaculties = async () => {
+                const userFac = await api.get(`/api/Department/List`);
+                // return userFac.data?.data?.map(f => {f.name, f.id}) ?? [];
+        
+                const fac = userFac.data?.data ??[];
+                // console.log(userFac.data?.data);
+                setFaculties(fac)
+                return fac ;
+            };
+            // console.log(faculties)
+            getFaculties();
+        } catch (err) {
+            console.error(err);
+            setFaculties([{
+                name: 'لا يوجد',
+                id: 0
+            }])
+        }
+        
+    }, [showModal])
 
 
     const fetchData = async () => {
+        // TODO: update url to get managers
         try {
             const res = await api.get(`/api/Admin?PageIndex=${currentPage}&PageSize=${adminsPerPage}`,
-                
             );
             setAdmins(res.data.data.admins);
-            setTotalPages((res.data.data.totalCount / adminsPerPage) > 0? Math.ceil(res.data.data.totalCount / adminsPerPage): 1);
+            setTotalPages((res.data.data.totalCount / adminsPerPage) > 0 ? Math.ceil(res.data.data.totalCount / adminsPerPage) : 1);
         } catch (error) {
             console.error("Error fetching data:", error);
             if (error.response?.status == 401) {
@@ -54,16 +83,16 @@ const Admins = () => {
                 return;
             }
             setErrPage(true);
-        }finally {
+        } finally {
             setReloading(false);
             setLoading(false);
         }
     };
     useEffect(() => {
         fetchData();
-    }, [currentPage,reloading]);
+    }, [currentPage, reloading]);
 
-    
+
 
     const handleEdit = (admin, id) => {
         setSelectedAdmin(admin);
@@ -74,6 +103,7 @@ const Admins = () => {
         setShowModal(true);
     };
 
+    // TODO: update url to delete manager
     const handleDelete = async (adminId) => {
         setAdminID(adminId);
         try {
@@ -91,17 +121,19 @@ const Admins = () => {
     };
 
     const handleAddOrUpdateAdmin = async () => {
-        // if (!newAdminMail.trim()) return;
+        console.log(statusFilter);
+        if (!newAdminMail.trim()) return;
         try {
             if (isEditing && selectedAdmin && AdminID !== 0) {
+                // TODO: Update the url to add new manager
                 try {
-                    
+
                     await api.post(`/api/Account/admin-reset-password`, {
                         userId: AdminID,
                         password: newAdminPass,
                     });
                     toast.success("تم التحديث بنجاح", { rtl: true });
-                }catch (error) {
+                } catch (error) {
                     error.response.data.errors.forEach(err => {
 
                         toast.error(err, { rtl: true });
@@ -110,16 +142,16 @@ const Admins = () => {
                 }
             } else {
                 try {
-                    
+                    // TODO: Update url to change manger password
                     await api.post(`/api/Account/RegisterAdmin`, {
                         username: newAdminMail,
                         password: newAdminPass,
                     });
-                
+
                     toast.success("تمت الإضافة بنجاح", { rtl: true });
                 } catch (error) {
                     error.response.data.errors.forEach(err => {
-                        
+
                         toast.error(err, { rtl: true });
                     })
                     console.error("Error saving admin:", error);
@@ -144,10 +176,10 @@ const Admins = () => {
             {errPage && <NotLoaded reload={() => { setErrPage(false); setLoading(true); setReloading(true); }} />}
             {!loading && !errPage && (
                 <div dir='rtl' className='p-4 bg-light min-vh-100'>
-                    <ToastContainer position='top-center'/>
-                    <h2 style={{ color: "#19355A" }} className="mb-4">المشرفين</h2>
+                    <ToastContainer position='top-center' />
+                    <h2 style={{ color: "#19355A" }} className="mb-4">المديرين</h2>
 
-                    <div className="mb-3 d-flex " style={{justifySelf:"start"}}>
+                    <div className="mb-3 d-flex" style={{ justifySelf: "start" }}>
                         <button className="btn btn-primary rounded-0" onClick={() => {
                             setIsEditing(false);
                             setNewAdminMail('');
@@ -155,7 +187,7 @@ const Admins = () => {
                             setShowModal(true);
                         }}>
                             <FontAwesomeIcon icon={faPlus} className='ms-2' />
-                            اضف مشرف
+                            اضف مدير
                         </button>
                     </div>
 
@@ -165,15 +197,17 @@ const Admins = () => {
                                 <tr>
                                     <th> الترتيب </th>
                                     <th className='w-25 text-break'>اسم المستخدم</th>
+                                    <th className='w-25 text-break'>اسم الكلية</th>
                                     <th className="text-center">تحكم</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {admins.length > 0 && admins.map((admin,index) => (
-                                    <tr key={index+1}>
-                                        <td>{index+1}</td>
+                                {admins.length > 0 && admins.map((admin, index) => (
+                                    <tr key={index + 1}>
+                                        <td>{index + 1}</td>
                                         <td className="text-break">{admin.username}</td>
-                                        <td className="text-center fs-5" style={{alignContent:"center"}}>
+                                        <td className="text-break">{admin.username}</td>
+                                        <td className="text-center fs-5" style={{ alignContent: "center" }}>
                                             <FontAwesomeIcon
                                                 icon={faPenRegular}
                                                 onClick={() => handleEdit(admin, admin.id)}
@@ -233,14 +267,50 @@ const Admins = () => {
                                     </div>
                                     <div className="modal-body">
                                         {!isEditing && (
+                                            <>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={newAdminMail}
+                                                    onChange={(e) => setNewAdminMail(e.target.value)}
+                                                    placeholder="اسم المستخدم"
+                                                />
+                                                <div className="my-3">
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={statusFilter}
+                                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                                        placeholder="اسم الكليه او الرقم المسلسل الخاص بها"
+                                                        list='faclist'
+                                                />
+
+                                                    <datalist
+                                                        id='faclist'
+                                                    >
+                                                        {faculties.length > 0 &&  faculties?.map((f,i) => (
+                                                            <option key={i} value={f.name}>{f.name}</option>
+                                                            
+                                                        ))}
+                                                        {/* <option value="2">تم القبول</option>
+                                                        <option value="3">تم الرفض</option> */}
+                                                    </datalist>
+                                                    {/* <select
+                                                        className="form-select"
+                                                        value={statusFilter}
+                                                        onChange={(e) => {
+                                                            setStatusFilter(e.target.value);
+                                                            setCurrentPage(1);
+                                                        }}
+                                                    >
+                                                        <option value="">كل الحالات</option>
+                                                        <option value="1">تحت المراجعة</option>
+                                                        <option value="2">تم القبول</option>
+                                                        <option value="3">تم الرفض</option>
+                                                    </select> */}
+                                                </div>
+                                            </>
                                             
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            value={newAdminMail}
-                                            onChange={(e) => setNewAdminMail(e.target.value)}
-                                            placeholder="اسم المستخدم"
-                                        />
                                         )}
                                         <input
                                             type="text"
@@ -249,6 +319,9 @@ const Admins = () => {
                                             onChange={(e) => setNewAdminPass(e.target.value)}
                                             placeholder="كلمة المرور "
                                         />
+
+                                        {/* Add faculty select list */}
+
                                     </div>
                                     <div className="modal-footer">
                                         <button className="btn btn-secondary" onClick={() => setShowModal(false)}>إغلاق</button>
@@ -267,4 +340,4 @@ const Admins = () => {
     );
 };
 
-export default Admins;
+export default Managers;
