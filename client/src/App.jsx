@@ -17,6 +17,7 @@ import Faculties from "./components/Tables/Faculties";
 import Admins from './components/Tables/Admins';
 import Employees from './components/Tables/Employees';
 import Home from './pages/home/Home';
+import FacultyRequests from './components/Tables/FacultyRequests';
 
 const App = () => {
     return (
@@ -30,6 +31,8 @@ const App = () => {
                 <Route path="/profile/:id?/:reqID?" element={<PersonalInfoPortal />} />
                 <Route path="/requests" element={<Requests />} />
                 <Route path="/faculties/:empID?" element={<Faculties />} />
+                {/* TODO: change url */}
+                <Route path="/requests/:facultyID?" element={<FacultyRequests />} />
                 <Route path="/admins" element={<Admins />} />
                 <Route path="/employees" element={<Employees />} />
                 <Route path="/NotAuthourized" element={<NotAuthourized />} />
