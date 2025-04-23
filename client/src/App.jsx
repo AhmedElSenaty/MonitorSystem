@@ -6,7 +6,7 @@ import "./App.css";
 
 
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import {ToastContainer} from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/footer";
@@ -30,14 +30,15 @@ const App = () => {
             <ToastContainer position="top-center" />
             <Routes>
                 <Route path={base} element={<Home />} />
+                <Route path='/' element={<Home />} />
                 <Route path={`${base}/register`} element={<RegisterForm />} />
                 <Route path={`${base}/login`} element={<Login />} />
-                <Route path={`${base}/profile:id?/:reqID?`} element={<PersonalInfoPortal />} />
+                <Route path={`${base}/profile/:id?/:reqID?`} element={<PersonalInfoPortal />} />
                 <Route path={`${base}/requests`} element={<Requests />} />
-                <Route path={`${base}/faculties:empID?`} element={<Faculties />} />
+                <Route path={`${base}/faculties/:empID?`} element={<Faculties />} />
                 <Route path={`${base}/admins`} element={<Admins />} />
                 <Route path={`${base}/managers`} element={<Managers />} />
-                <Route path={`${base}/facultyrequestes`} element={<FacultyRequests />} />
+                <Route path={`${base}/faculty/requestes`} element={<FacultyRequests />} />
                 <Route path={`${base}/employees`} element={<Employees />} />
                 <Route path={`${base}/NotAuthourized`} element={<NotAuthourized />} />
                 <Route path="/*" element={<NotFound />} />
@@ -59,21 +60,21 @@ const UnderDevelopment = () => {
 }
 const NotFound = () => {
     return (
-        <div className='h-screen flex items-center justify-center m-5 text-center'>
+        <div className='h-screen vh-100 flex items-center justify-center m-5 text-center'>
             <h1 className='alert alert-danger text-3xl font-bold'>Not Found <strong>404</strong></h1>
         </div>
     )
 }
 const NotAuthourized = () => {
     return (
-        <div className='h-screen flex items-center justify-center m-5 text-center'>
+        <div className='vh-100 h-screen flex items-center justify-center m-5 text-center'>
             <h1 className='alert alert-warning text-3xl font-bold'>Not Authourized <strong>401</strong></h1>
         </div>
     )
 }
-export const NotLoaded = ({reload}) => {
+export const NotLoaded = ({ reload }) => {
     return (
-        <div className='h-screen flex items-center justify-center m-5 text-center'>
+        <div className='vh-100 h-screen flex items-center justify-center m-5 text-center'>
             {/* <h1 className='alert alert-warning text-3xl font-bold'>Error: Faild To Load Data  <strong>500</strong></h1> */}
             <h2 className='alert alert-warning text-3xl font-bold'>حدث خطأ اثناء تحميل البيانات</h2>
             <button className='btn btn-primary w-25' onClick={reload}>

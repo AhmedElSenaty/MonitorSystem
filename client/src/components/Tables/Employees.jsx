@@ -34,7 +34,7 @@ const Employees = () => {
             return;
         }
     }, [])
-    const adminsPerPage = 10;
+    const [adminsPerPage, setAdminsPerPage] = useState(5);
 
     
 
@@ -73,7 +73,7 @@ const Employees = () => {
     };
     useEffect(() => {
         fetchData();
-    }, [currentPage, searchTerm,reloading]);
+    }, [currentPage, searchTerm, reloading, adminsPerPage]);
 
     // useEffect(() => {
     //     const fetchData = async () => {
@@ -203,7 +203,7 @@ const Employees = () => {
 
                     <div className="mb-3">
                         <div className="row">
-                            <div className="col-12 col-md-6 col-lg-4 ms-auto">
+                            <div className="col-12 col-md-6 col-lg-4 ">
                                 <input
                                     type="text"
                                     className="form-control"
@@ -214,6 +214,26 @@ const Employees = () => {
                                         setCurrentPage(1);
                                     }}
                                 />
+                            </div>
+                            <div className="col-12 col-md-6 col-lg-3">
+                                <select
+                                    className="form-select"
+                                    value={adminsPerPage}
+                                    onChange={(e) => {
+                                        setAdminsPerPage(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                >
+
+                                    <option value="5">اختار عدد الطلبات (5)</option>
+                                    <option value="10">10</option>
+                                    <option value="15">15</option>
+                                    <option value="20">20</option>
+                                    <option value="25">25</option>
+                                    <option value="30">30</option>
+                                    <option value="35">35</option>
+
+                                </select>
                             </div>
                         </div>
                     </div>

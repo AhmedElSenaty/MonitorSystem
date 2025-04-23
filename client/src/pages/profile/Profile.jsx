@@ -94,6 +94,7 @@ const PersonalInfoPortal = () => {
   const isSuperAdmin = role === "superadmin";
   const isAdmin = role === "admin";
   const isEmployee = role === "employee";
+  const isManager = role === "manager";
   const [request, setRequest] = useState(requests[1]);
   const statusClass = (s) =>
     s === "تم القبول"
@@ -343,7 +344,7 @@ const PersonalInfoPortal = () => {
           style={{ backgroundColor: "#EBEFF5" }}
         >
           <div className="container py-4 w-100">
-            {(isAdmin || isSuperAdmin) && (
+            {(isAdmin || isSuperAdmin || isManager) && (
               <button
                 type="button"
                 className="btn btn-outline-primary mb-3"
@@ -789,7 +790,7 @@ const PersonalInfoPortal = () => {
                   >
                     <div className="fw-bold mb-2">{label}</div>
 
-                    {(isAdmin || isSuperAdmin) && (
+                    {(isAdmin || isSuperAdmin || isManager) && (
                       <div
                         className="mx-auto mb-2"
                         style={{
@@ -898,114 +899,119 @@ const PersonalInfoPortal = () => {
               ))}
             </div>
 
+                      
             {/* Requests Section */}
-            <h2 className="mb-3">حالة الطلب</h2>
-            <div className="row justify-content-center">
-              <div className="col-12 col-lg-12">
-                <div className="table-responsive shadow-lg rounded">
-                  <table className="table table-bordered text-center mb-0 w-100">
-                    <thead className="bg-light">
-                      <tr>
-                        <th>الحالة</th>
-                        <th>ملاحظات</th>
-                        <th>تحكم</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="align-middle">
-                        <td className={`${statusClass(request.status)} w-25`}>
-                          {request.status}
-                        </td>
-                        <td
-                          dir="rtl"
-                          className="text-break w-50"
-                          style={{ whiteSpace: "pre-wrap", maxWidth: "300px" }}
-                        >
-                          {request.notes || (
-                            <span className="text-muted">لا توجد ملاحظات</span>
-                          )}
-                        </td>
-                        <td className="w-25">
-                          {isEmployee && (
-                            <button
-                              className="btn btn-outline-primary btn-main btn-sm mt-1"
-                              onClick={() => navigate(`/faculties/${id}`)}
-                              disabled={
-                                request.status === "تحت المراجعة" ||
-                                request.status === "تم الرفض"
-                              }
-                              style={{
-                                backgroundColor: "#19355A",
-                                cursor:
-                                  request.status === "تحت المراجعة" ||
-                                  request.status === "تم الرفض"
-                                    ? "not-allowed"
-                                    : "pointer",
-                              }}
-                            >
-                              عرض الكليات
-                            </button>
-                          )}
-                          {(isAdmin || isSuperAdmin) &&
-                            (request.status === "تم الرفض" ||
-                                request.status === "تحت المراجعة") && (
-                                <> 
-                                    <button
-                                        style={{ backgroundColor: "#19355A" }}
-                                        className="btn btn-outline-primary btn-main btn-sm mt-1 mx-1"
-                                        onClick={() => openModal(request)}
-                                    >
-                                        اضف ملاحظة
-                                    </button>
-                                    {
-                                        request.status === "تم الرفض" && (
+            {!isManager && (
+                        <>
+                            <h2 className="mb-3">حالة الطلب</h2>
+                            <div className="row justify-content-center">
+                            <div className="col-12 col-lg-12">
+                                <div className="table-responsive shadow-lg rounded">
+                                <table className="table table-bordered text-center mb-0 w-100">
+                                    <thead className="bg-light">
+                                    <tr>
+                                        <th>الحالة</th>
+                                        <th>ملاحظات</th>
+                                        <th>تحكم</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr className="align-middle">
+                                        <td className={`${statusClass(request.status)} w-25`}>
+                                        {request.status}
+                                        </td>
+                                        <td
+                                        dir="rtl"
+                                        className="text-break w-50"
+                                        style={{ whiteSpace: "pre-wrap", maxWidth: "300px" }}
+                                        >
+                                        {request.notes || (
+                                            <span className="text-muted">لا توجد ملاحظات</span>
+                                        )}
+                                        </td>
+                                        <td className="w-25">
+                                        {isEmployee && (
                                             <button
-                                                style={{ backgroundColor: "#AD8700" }}
-                                                className="btn btn-outline-warning btn-main-s btn-sm mt-1 mx-1"
-                                                onClick={() => navigate(`/faculties/${id}`)}
+                                            className="btn btn-outline-primary btn-main btn-sm mt-1"
+                                            onClick={() => navigate(`/faculties/${id}`)}
+                                            disabled={
+                                                request.status === "تحت المراجعة" ||
+                                                request.status === "تم الرفض"
+                                            }
+                                            style={{
+                                                backgroundColor: "#19355A",
+                                                cursor:
+                                                request.status === "تحت المراجعة" ||
+                                                request.status === "تم الرفض"
+                                                    ? "not-allowed"
+                                                    : "pointer",
+                                            }}
                                             >
-                                                قبول مره اخري
+                                            عرض الكليات
                                             </button>
-                                        )
-                                    }
-                                </>
-                            )}
-                          {(isAdmin || isSuperAdmin) && (
-                            <>
-                              {request.status === "تحت المراجعة" && (
-                                <>
-                                  <button
-                                    className="btn btn-outline-success btn-sm mx-2 mt-2"
-                                    // onClick={approve}
-                                    onClick={() => navigate(`/faculties/${id}`)}
-                                  >
-                                    قبول
-                                  </button>
-                                  <button
-                                    className="btn btn-outline-danger btn-sm mx-2 mt-2"
-                                    onClick={reject}
-                                  >
-                                    رفض
-                                  </button>
-                                </>
-                              )}
-                              {request.status === "تم القبول" && (
-                                <button
-                                  className="btn btn-outline-primary btn-sm mt-2"
-                                  onClick={() => navigate(`/faculties/${id}`)}
-                                >
-                                  اضف كليات
-                                </button>
-                              )}
-                            </>
-                          )}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
+                                        )}
+                                        {(isAdmin || isSuperAdmin) &&
+                                            (request.status === "تم الرفض" ||
+                                                request.status === "تحت المراجعة") && (
+                                                <> 
+                                                    <button
+                                                        style={{ backgroundColor: "#19355A" }}
+                                                        className="btn btn-outline-primary btn-main btn-sm mt-1 mx-1"
+                                                        onClick={() => openModal(request)}
+                                                    >
+                                                        اضف ملاحظة
+                                                    </button>
+                                                    {
+                                                        request.status === "تم الرفض" && (
+                                                            <button
+                                                                style={{ backgroundColor: "#AD8700" }}
+                                                                className="btn btn-outline-warning btn-main-s btn-sm mt-1 mx-1"
+                                                                onClick={() => navigate(`/faculties/${id}`)}
+                                                            >
+                                                                قبول مره اخري
+                                                            </button>
+                                                        )
+                                                    }
+                                                </>
+                                            )}
+                                        {(isAdmin || isSuperAdmin) && (
+                                            <>
+                                            {request.status === "تحت المراجعة" && (
+                                                <>
+                                                <button
+                                                    className="btn btn-outline-success btn-sm mx-2 mt-2"
+                                                    // onClick={approve}
+                                                    onClick={() => navigate(`/faculties/${id}`)}
+                                                >
+                                                    قبول
+                                                </button>
+                                                <button
+                                                    className="btn btn-outline-danger btn-sm mx-2 mt-2"
+                                                    onClick={reject}
+                                                >
+                                                    رفض
+                                                </button>
+                                                </>
+                                            )}
+                                            {request.status === "تم القبول" && (
+                                                <button
+                                                className="btn btn-outline-primary btn-sm mt-2"
+                                                onClick={() => navigate(`/faculties/${id}`)}
+                                                >
+                                                اضف كليات
+                                                </button>
+                                            )}
+                                            </>
+                                        )}
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                </div>
+                            </div>
+                            </div>
+                        </>
+            )}    
 
             {/* Notes Modal */}
             <Modal

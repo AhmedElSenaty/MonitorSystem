@@ -71,6 +71,9 @@ const Login = () => {
               case "employee":
                   navigate(`/profile/${token.Id}`);
                   break;
+              case "manager":
+                  navigate(`/faculty/requestes`);
+                  break;
           }
       } else {
         toast.error("بيانات الدخول غير صحيحة", { rtl: true });
@@ -84,6 +87,7 @@ const Login = () => {
         // If api got a response from the server with an error status:
         if (error.response && error.response.data) {
             const errs = error.response.data.data?.errors;
+            
             if (errs) {
                 // iterate over API validation errors
                 Object.values(errs).forEach(msg => toast.error(msg, { rtl: true }));

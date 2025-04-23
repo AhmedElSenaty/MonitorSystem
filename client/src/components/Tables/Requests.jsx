@@ -30,7 +30,8 @@ const Requests = () => {
     
     const [requests, setRequests] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const requestsPerPage = 5;
+    // const requestsPerPage = 5;
+    const [requestsPerPage, setRequestsPerPage] = useState(5);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
@@ -221,9 +222,9 @@ const Requests = () => {
                             <div className="col-12 col-md-6 col-lg-3">
                                 <select
                                     className="form-select"
-                                    value={statusFilter}
+                                    value={requestsPerPage}
                                     onChange={(e) => {
-                                        setStatusFilter(e.target.value);
+                                        setRequestsPerPage(e.target.value);
                                         setCurrentPage(1);
                                     }}
                                 >

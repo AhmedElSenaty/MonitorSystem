@@ -17,6 +17,8 @@ const FacultyRequests = () => {
     const [loader, setLoader] = useState(true);
     const [errPage, setErrPage] = useState(false);
     const [reloading, setReloading] = useState(true);
+    const [deptID, setDeptID] = useState(0);
+    const [deptName, setDeptName] = useState('');
 
     useEffect(() => {
 
@@ -25,7 +27,7 @@ const FacultyRequests = () => {
             return;
         }
 
-        if (user.role.toLowerCase() === 'employee') {
+        if (user.role.toLowerCase() !== 'manager') {
             navigate('/NotAuthourized');
             return;
         }
@@ -33,7 +35,7 @@ const FacultyRequests = () => {
     
     const [requests, setRequests] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const requestsPerPage = 5;
+    const [requestsPerPage, setRequestsPerPage] = useState(5);
 
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -51,7 +53,7 @@ const FacultyRequests = () => {
 
             try {
                 // TODO: change URL
-                const res = await api.get(`/api/Request`, {
+                const res = await api.get(`/api/Request/ApprovedColleage`, {
                     params: {
                         PageIndex: currentPage,
                         PageSize: requestsPerPage,
@@ -72,56 +74,21 @@ const FacultyRequests = () => {
 
                 setCurrentPage(apiData.metadata.pagination.pageIndex);
                 setTotalPages(apiData.metadata.pagination.totalPages);
-                // const getFaculties = async (empid) => {
-                //     const userFac = await api.get(`/api/Department/ByEmployee/${empid}`);
-                //     const userFacData = userFac.data?.data ;
-                //     const fac = userFacData.map(f => f.name);
-                //     // console.log(fac);
-                //     return fac;
-                // }
-                // const formatted = apiData.requests.map((r) => {
-                    
-                
-                //     getFaculties(r.employeeId).then((faculties) => {
-                //         setUserFaculties(faculties);
-                //     })
-                    
-                //     const record = {
-                //         id: r.requestId,
-                //         name: r.employeeName,
-                //         ssn: r.employeeId,
-                //         degree: r.degree,
-                //         gender: r.employeeGender,
-                //         status: r.status,
-                //         faculties: userFacuilties??[],
-                //     }
-                //     console.log('record');
-                //     console.log(record);
-                //     return record;
-                // }
-                // );
-                
-                const getFaculties = async (empid) => {
-                    // TODO: change URL 
-                    const userFac = await api.get(`/api/Department/ByEmployee/${empid}`);
-                    return userFac.data?.data?.map(f => f.name) ?? [];
-                };
-                const formatted = await Promise.all(
-                    apiData.requests.map(async (r) => {
-                        const faculties = await getFaculties(r.employeeId);
-                        return {
-                            id: r.requestId,
-                            name: r.employeeName,
-                            ssn: r.employeeId,
-                            degree: r.degree,
-                            phone: r.phone,
-                            gender: r.employeeGender,
-                            status: r.status,
-                            faculties: faculties,
-                        };
-                    })
-                );
+                setDeptID(apiData.departmentId);
+                setDeptName(apiData.departmentName);
+                // console.log(apiData);
+                const formatted = apiData.requests.map( (r) => {
+                    return {
+                        id: r.requestId,
+                        name: r.employeeName,
+                        ssn: r.employeeId,
+                        degree: r.degree,
+                        phone: r.phoneNumber,
+                        gender: r.employeeGender
+                    };
+                });
                 // console.log(formatted);
+                
                 setRequests(formatted);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -191,7 +158,7 @@ const FacultyRequests = () => {
                 <div dir="rtl" className="p-4 bg-light min-vh-100">
 
                     <h2 style={{ color: "#19355A" }} className="mb-4">
-                                طلبات الكلية
+                                مراقبين  {deptName}
                     </h2>
 
                     {/* Search and Export */}
@@ -209,20 +176,41 @@ const FacultyRequests = () => {
                                     }}
                                 />
                             </div>
-                        </div>
-                        <div className="col-auto">
-                        <button
-                            className="btn btn-outline-success rounded-0 w-100"
-                            onClick={() =>
-                                downloadFile(
-                                `/api/Reports/employee-departments-report`,
-                                "مراقبين_الكلية.xlsx"
-                            )
-                            }
-                        >
-                            <FontAwesomeIcon icon={faFileExcel} className="ms-2" />
-                            تصدير الكل
-                        </button>
+                            <div className="col-auto">
+                            <button
+                                className="btn btn-outline-success rounded-0 "
+                                    onClick={() =>
+                                    // TODO: change URL
+                                    downloadFile(
+                                        `/api/Reports/employee-departments-report?departmentId=${deptID}`,
+                                    "مراقبين_الكلية.xlsx"
+                                )
+                                }
+                            >
+                                <FontAwesomeIcon icon={faFileExcel} className="ms-2" />
+                                تصدير الكل
+                            </button>
+                            </div>
+                            <div className="col-12 col-md-6 col-lg-3">
+                                <select
+                                    className="form-select"
+                                    value={requestsPerPage}
+                                    onChange={(e) => {
+                                        setRequestsPerPage(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                >
+
+                                    <option value="5">اختار عدد الطلبات (5)</option>
+                                    <option value="10">10</option>
+                                    <option value="15">15</option>
+                                    <option value="20">20</option>
+                                    <option value="25">25</option>
+                                    <option value="30">30</option>
+                                    <option value="35">35</option>
+
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -233,8 +221,7 @@ const FacultyRequests = () => {
                                 <tr>
                                     <th className="w-25">الإسم</th>
                                     <th className="d-none d-md-table-cell text-break">نوع</th>
-                                    <th className="text-break">المؤهل</th>
-                                    <th className="w-25 text-break">الكليات</th>
+                                    <th className="text-break ">المؤهل</th>
                                     <th className="d-none d-md-table-cell text-break">الهاتف</th>
                                     <th className="text-center" style={{ minWidth: "80px" }}>تحكم</th>
                                 </tr>
@@ -246,16 +233,6 @@ const FacultyRequests = () => {
                                             <td>{request.name}</td>
                                             <td className="d-none d-md-table-cell text-break">{request.gender}</td>
                                             <td className="text-break">{request.degree}</td>
-                                            <td className="text-break" style={{ maxWidth: "200px", whiteSpace: "normal", wordWrap: "break-word" }}>
-                                                {request.faculties.length > 0
-                                                    ? request.faculties.map((f, i) => (
-                                                        <span key={i} style={{ display: "inline-block" }}>
-                                                            {f}
-                                                            {i !== request.faculties.length - 1 && ', '}
-                                                        </span>
-                                                    ))
-                                                    : <span>لا يوجد كليات</span>}
-                                            </td>
                                             <td className="d-none d-md-table-cell text-break">
                                                 {request.phone}
                                             </td>
@@ -266,7 +243,7 @@ const FacultyRequests = () => {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="6" className="text-center">لا يوجد بيانات</td>
+                                        <td colSpan="5" className="text-center">لا يوجد بيانات</td>
                                     </tr>
                                 )}
                             </tbody>

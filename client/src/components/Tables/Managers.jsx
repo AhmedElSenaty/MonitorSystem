@@ -39,7 +39,7 @@ const Managers = () => {
             return;
         }
     }, [])
-    const adminsPerPage = 10;
+    const [adminsPerPage, setAdminsPerPage] = useState(5);
 
 
     useEffect(() => {
@@ -70,9 +70,9 @@ const Managers = () => {
     const fetchData = async () => {
         // TODO: update url to get managers
         try {
-            const res = await api.get(`/api/Admin?PageIndex=${currentPage}&PageSize=${adminsPerPage}`,
+            const res = await api.get(`/api/Manager?PageIndex=${currentPage}&PageSize=${adminsPerPage}`,
             );
-            setAdmins(res.data.data.admins);
+            setAdmins(res.data.data.managers);
             setTotalPages((res.data.data.totalCount / adminsPerPage) > 0 ? Math.ceil(res.data.data.totalCount / adminsPerPage) : 1);
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -90,7 +90,7 @@ const Managers = () => {
     };
     useEffect(() => {
         fetchData();
-    }, [currentPage, reloading]);
+    }, [currentPage, reloading, adminsPerPage]);
 
 
 
@@ -121,8 +121,9 @@ const Managers = () => {
     };
 
     const handleAddOrUpdateAdmin = async () => {
-        console.log(statusFilter);
-        if (!newAdminMail.trim()) return;
+        // console.log(statusFilter);
+        // if (!newAdminMail.trim()) return;
+        console.log(AdminID);
         try {
             if (isEditing && selectedAdmin && AdminID !== 0) {
                 // TODO: Update the url to add new manager
@@ -142,10 +143,13 @@ const Managers = () => {
                 }
             } else {
                 try {
+                    const facID = faculties.filter(f => f.name === statusFilter ? f.id : 0)[0];
+                    // console.log(facID);
                     // TODO: Update url to change manger password
-                    await api.post(`/api/Account/RegisterAdmin`, {
+                    await api.post(`/api/Account/RegisterManager`, {
                         username: newAdminMail,
                         password: newAdminPass,
+                        departmentId: facID.id,
                     });
 
                     toast.success("تمت الإضافة بنجاح", { rtl: true });
@@ -189,6 +193,26 @@ const Managers = () => {
                             <FontAwesomeIcon icon={faPlus} className='ms-2' />
                             اضف مدير
                         </button>
+                        <div className="col-12 col-md-6 col-lg-3 mx-3">
+                            <select
+                                className="form-select"
+                                value={adminsPerPage}
+                                onChange={(e) => {
+                                    setAdminsPerPage(e.target.value);
+                                    setCurrentPage(1);
+                                }}
+                            >
+
+                                <option value="5">اختار عدد الطلبات (5)</option>
+                                <option value="10">10</option>
+                                <option value="15">15</option>
+                                <option value="20">20</option>
+                                <option value="25">25</option>
+                                <option value="30">30</option>
+                                <option value="35">35</option>
+
+                            </select>
+                        </div>
                     </div>
 
                     <div className="table-responsive">
@@ -206,7 +230,7 @@ const Managers = () => {
                                     <tr key={index + 1}>
                                         <td>{index + 1}</td>
                                         <td className="text-break">{admin.username}</td>
-                                        <td className="text-break">{admin.username}</td>
+                                        <td className="text-break">{admin.colleageName}</td>
                                         <td className="text-center fs-5" style={{ alignContent: "center" }}>
                                             <FontAwesomeIcon
                                                 icon={faPenRegular}

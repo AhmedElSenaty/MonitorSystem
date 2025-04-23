@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./Navbar.css";
 import { useAuth } from "../Context/AuthContext";
 import { useNavigate, NavLink, useLocation } from "react-router-dom";
-import Login from './../pages/login/Login';
-import Managers from './Tables/Managers';
+import logo from '../assets/helwan-logo.png'
 
 
 const Navbar = () => {
@@ -35,7 +34,7 @@ const Navbar = () => {
             <div className="container-fluid">
                 <div className="navbar-brand" >
                     <img
-                        src="/assets/helwan-logo.png"
+                        src={logo}
                         alt="Logo"
                         width="50"
                         height="50"
@@ -192,7 +191,7 @@ const Navbar = () => {
                         </ul>
                     )}
                     {isLoggedIn && (
-                        <div className={( role === "superadmin" || role === "admin") ? "d-flex" : "d-flex me-auto my-2 my-lg-0"} role="logout">
+                        <div className={( role === "superadmin" || role === "admin" || role === "manager") ? "d-flex" : "d-flex me-auto my-2 my-lg-0"} role="logout">
                             <button className="btn btn-outline-info me-5" type="button" onClick={onLogout}>
                                 تسجيل خروج
                             </button>

@@ -33,7 +33,7 @@ const Admins = () => {
             return;
         }
     }, [])
-    const adminsPerPage = 10;
+    const [adminsPerPage, setAdminsPerPage] = useState(5);
 
     
 
@@ -61,7 +61,7 @@ const Admins = () => {
     };
     useEffect(() => {
         fetchData();
-    }, [currentPage,reloading]);
+    }, [currentPage,reloading,adminsPerPage]);
 
     
 
@@ -157,6 +157,26 @@ const Admins = () => {
                             <FontAwesomeIcon icon={faPlus} className='ms-2' />
                             اضف مشرف
                         </button>
+                        <div className="col-12 col-md-6 col-lg-3 mx-3">
+                            <select
+                                className="form-select"
+                                value={adminsPerPage}
+                                onChange={(e) => {
+                                    setAdminsPerPage(e.target.value);
+                                    setCurrentPage(1);
+                                }}
+                            >
+
+                                <option value="5">اختار عدد الطلبات (5)</option>
+                                <option value="10">10</option>
+                                <option value="15">15</option>
+                                <option value="20">20</option>
+                                <option value="25">25</option>
+                                <option value="30">30</option>
+                                <option value="35">35</option>
+
+                            </select>
+                        </div>
                     </div>
 
                     <div className="table-responsive">
