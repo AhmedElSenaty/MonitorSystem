@@ -16,8 +16,21 @@ const PersonalInfoPortal = () => {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const { id, reqID } = useParams();
+  const employeeTypeOptions = [
+    { value: "MwazfFeElGam3a", label: "موظف في الجامعة" },
+    { value: "Mwazf3alaElM3a4FeElGam3a", label: "موظف على المعاش في الجامعة" },
+    { value: "MwazfMenEl5areg", label: "موظف من الخارج" },
+  ];
+  const degreeOptions = [
+    { value: "Illiterate", label: "أمي" },
+    { value: "Diploma", label: "دبلوم" },
+    { value: "SecondarySchool", label: "ثانوية عامة" },
+    { value: "AboveIntermediate", label: "فوق المتوسط" },
+    { value: "UniversityDegree", label: "مؤهل عالي" },
+    { value: "PostgraduateStudies", label: "دراسات عليا" },
+  ];
 
-    const [reloading, setReloading] = useState(true);
+  const [reloading, setReloading] = useState(true);
   let originalData = {
     id: "",
     name: "",
@@ -30,6 +43,7 @@ const PersonalInfoPortal = () => {
     gender: "",
     DOB: "",
     age: "",
+    employeeType: "",
   };
   const [loader, setLoader] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -52,30 +66,27 @@ const PersonalInfoPortal = () => {
     idBack: null,
   });
 
-//   const approve = async () => {
-//     try {
-//       const res = await api.put(
-//         `/api/Request/ChangeStatus`,
-//         {
-//           requestId: reqID * 1,
-//           newStatus: 2,
-//         }
-//       );
-//       toast.success(res.data.message, { rtl: true, autoClose: 5000 });
-//       navigate(`/faculties/${id}`);
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   };
+  //   const approve = async () => {
+  //     try {
+  //       const res = await api.put(
+  //         `/api/Request/ChangeStatus`,
+  //         {
+  //           requestId: reqID * 1,
+  //           newStatus: 2,
+  //         }
+  //       );
+  //       toast.success(res.data.message, { rtl: true, autoClose: 5000 });
+  //       navigate(`/faculties/${id}`);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
   const reject = async () => {
     try {
-      const res = await api.put(
-        `/api/Request/ChangeStatus`,
-        {
-          requestId: reqID,
-          newStatus: 3,
-        }
-      );
+      const res = await api.put(`/api/Request/ChangeStatus`, {
+        requestId: reqID,
+        newStatus: 3,
+      });
       toast.success(res.data.message, { rtl: true, autoClose: 5000 });
       setRequest({ ...request, status: "تم الرفض" });
     } catch (error) {
@@ -120,6 +131,8 @@ const PersonalInfoPortal = () => {
     const fetchData = async () => {
       try {
         const response = await api.get(`/api/Request/${id}`);
+        console.log(response);
+
         setData({
           name: response.data.data.employeeInformation.name,
           address: response.data.data.employeeInformation.address,
@@ -132,6 +145,7 @@ const PersonalInfoPortal = () => {
           DOB: response.data.data.employeeInformation.dob,
           age: response.data.data.employeeInformation.age,
           id: response.data.data.employeeInformation.id,
+          employeeType: response.data.data.employeeInformation.employeeType,
         });
         setOrgData(data);
         setFiles({
@@ -149,12 +163,12 @@ const PersonalInfoPortal = () => {
         }
         setErrPage(true);
       } finally {
-          setReloading(false);
+        setReloading(false);
         setLoader(false);
       }
     };
     if (user.role !== null) fetchData();
-  }, [id, user.token, navigate,reloading]);
+  }, [id, user.token, navigate, reloading]);
 
   const handleChange = (field, value) =>
     setData((prev) => ({ ...prev, [field]: value }));
@@ -189,13 +203,10 @@ const PersonalInfoPortal = () => {
   const closeImgModal = () => setShowImgModal(false);
   const saveNote = async () => {
     try {
-      const res = await api.put(
-        `/api/Request/AddNote`,
-        {
-          requestId: reqID,
-          note: noteText,
-        }
-      );
+      const res = await api.put(`/api/Request/AddNote`, {
+        requestId: reqID,
+        note: noteText,
+      });
       toast.success("تم حفظ الملاحظات", { rtl: true, autoClose: 5000 });
       setRequest({ ...request, notes: noteText });
     } catch (error) {
@@ -282,7 +293,7 @@ const PersonalInfoPortal = () => {
           {
             params: {
               Identifier: getIdentifier(type),
-            }
+            },
           }
         );
         toast.success("تم تحديث البيانات بنجاح", { rtl: true });
@@ -312,13 +323,10 @@ const PersonalInfoPortal = () => {
 
     try {
       // TODO: change url
-      const response = await api.put(
-        `/api/Request/UpdateRequestData`,
-        {
-          ...data,
-          gender: data.gender === "ذكر" ? 1 : 0,
-        }
-      );
+      const response = await api.put(`/api/Request/UpdateRequestData`, {
+        ...data,
+        gender: data.gender === "ذكر" ? 1 : 0,
+      });
       toast.success("تم تحديث البيانات بنجاح", { rtl: true });
       setIsEditing(false);
     } catch (error) {
@@ -336,7 +344,15 @@ const PersonalInfoPortal = () => {
     <>
       <ToastContainer position={"top-center"} />
       {loader && <LogoSpinner />}
-          {errPage && <NotLoaded reload={() => { setErrPage(false); setLoader(true); setReloading(true); }} />}
+      {errPage && (
+        <NotLoaded
+          reload={() => {
+            setErrPage(false);
+            setLoader(true);
+            setReloading(true);
+          }}
+        />
+      )}
       {!loader && !errPage && (
         <div
           dir="rtl"
@@ -507,15 +523,25 @@ const PersonalInfoPortal = () => {
                         </td>
                         <td className="text-center">
                           {isEditing ? (
-                            <input
+                            <select
                               className="form-control text-center"
                               value={data.degree}
                               onChange={(e) =>
                                 handleChange("degree", e.target.value)
                               }
-                            />
+                            >
+                              {degreeOptions.map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                  {opt.label}
+                                </option>
+                              ))}
+                            </select>
                           ) : (
-                            <span>{data.degree}</span>
+                            <span>
+                              {degreeOptions.find(
+                                (opt) => opt.value === data.degree
+                              )?.label || data.degree}
+                            </span>
                           )}
                         </td>
                       </tr>
@@ -577,6 +603,49 @@ const PersonalInfoPortal = () => {
                         </td>
                         <td className="text-center">
                           <span>{data.DOB}</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td
+                          className="text-center"
+                          style={{ backgroundColor: "#cdcdcd" }}
+                        >
+                          نوع الموظف
+                        </td>
+                        <td className="text-center">
+                          {isEditing ? (
+                            <select
+                              className="form-control text-center"
+                              value={data.employeeType}
+                              onChange={(e) =>
+                                handleChange("employeeType", e.target.value)
+                              }
+                            >
+                              {employeeTypeOptions.map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                  {opt.label}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <span>
+                              {employeeTypeOptions.find(
+                                (opt) => opt.value === data.employeeType
+                              )?.label || data.employeeType}
+                            </span>
+                          )}
+                        </td>
+
+                        <td
+                          className="text-center"
+                          style={{ backgroundColor: "#cdcdcd" }}
+                        >
+                          العمر
+                        </td>
+                        <td className="text-center">
+                          
+                            <span>{data.age}</span>
+                         
                         </td>
                       </tr>
                     </tbody>
@@ -899,119 +968,129 @@ const PersonalInfoPortal = () => {
               ))}
             </div>
 
-                      
             {/* Requests Section */}
             {!isManager && (
-                        <>
-                            <h2 className="mb-3">حالة الطلب</h2>
-                            <div className="row justify-content-center">
-                            <div className="col-12 col-lg-12">
-                                <div className="table-responsive shadow-lg rounded">
-                                <table className="table table-bordered text-center mb-0 w-100">
-                                    <thead className="bg-light">
-                                    <tr>
-                                        <th>الحالة</th>
-                                        <th>ملاحظات</th>
-                                        <th>تحكم</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr className="align-middle">
-                                        <td className={`${statusClass(request.status)} w-25`}>
-                                        {request.status}
-                                        </td>
-                                        <td
-                                        dir="rtl"
-                                        className="text-break w-50"
-                                        style={{ whiteSpace: "pre-wrap", maxWidth: "300px" }}
-                                        >
-                                        {request.notes || (
-                                            <span className="text-muted">لا توجد ملاحظات</span>
-                                        )}
-                                        </td>
-                                        <td className="w-25">
-                                        {isEmployee && (
-                                            <button
-                                            className="btn btn-outline-primary btn-main btn-sm mt-1"
-                                            onClick={() => navigate(`/faculties/${id}`)}
-                                            disabled={
-                                                request.status === "تحت المراجعة" ||
-                                                request.status === "تم الرفض"
-                                            }
-                                            style={{
-                                                backgroundColor: "#19355A",
-                                                cursor:
-                                                request.status === "تحت المراجعة" ||
-                                                request.status === "تم الرفض"
-                                                    ? "not-allowed"
-                                                    : "pointer",
-                                            }}
-                                            >
-                                            عرض الكليات
-                                            </button>
-                                        )}
-                                        {(isAdmin || isSuperAdmin) &&
-                                            (request.status === "تم الرفض" ||
-                                                request.status === "تحت المراجعة") && (
-                                                <> 
-                                                    <button
-                                                        style={{ backgroundColor: "#19355A" }}
-                                                        className="btn btn-outline-primary btn-main btn-sm mt-1 mx-1"
-                                                        onClick={() => openModal(request)}
-                                                    >
-                                                        اضف ملاحظة
-                                                    </button>
-                                                    {
-                                                        request.status === "تم الرفض" && (
-                                                            <button
-                                                                style={{ backgroundColor: "#AD8700" }}
-                                                                className="btn btn-outline-warning btn-main-s btn-sm mt-1 mx-1"
-                                                                onClick={() => navigate(`/faculties/${id}`)}
-                                                            >
-                                                                قبول مره اخري
-                                                            </button>
-                                                        )
-                                                    }
-                                                </>
-                                            )}
-                                        {(isAdmin || isSuperAdmin) && (
-                                            <>
-                                            {request.status === "تحت المراجعة" && (
-                                                <>
-                                                <button
-                                                    className="btn btn-outline-success btn-sm mx-2 mt-2"
-                                                    // onClick={approve}
-                                                    onClick={() => navigate(`/faculties/${id}`)}
-                                                >
-                                                    قبول
-                                                </button>
-                                                <button
-                                                    className="btn btn-outline-danger btn-sm mx-2 mt-2"
-                                                    onClick={reject}
-                                                >
-                                                    رفض
-                                                </button>
-                                                </>
-                                            )}
-                                            {request.status === "تم القبول" && (
-                                                <button
-                                                className="btn btn-outline-primary btn-sm mt-2"
-                                                onClick={() => navigate(`/faculties/${id}`)}
-                                                >
-                                                اضف كليات
-                                                </button>
-                                            )}
-                                            </>
-                                        )}
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                                </div>
-                            </div>
-                            </div>
-                        </>
-            )}    
+              <>
+                <h2 className="mb-3">حالة الطلب</h2>
+                <div className="row justify-content-center">
+                  <div className="col-12 col-lg-12">
+                    <div className="table-responsive shadow-lg rounded">
+                      <table className="table table-bordered text-center mb-0 w-100">
+                        <thead className="bg-light">
+                          <tr>
+                            <th>الحالة</th>
+                            <th>ملاحظات</th>
+                            <th>تحكم</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="align-middle">
+                            <td
+                              className={`${statusClass(request.status)} w-25`}
+                            >
+                              {request.status}
+                            </td>
+                            <td
+                              dir="rtl"
+                              className="text-break w-50"
+                              style={{
+                                whiteSpace: "pre-wrap",
+                                maxWidth: "300px",
+                              }}
+                            >
+                              {request.notes || (
+                                <span className="text-muted">
+                                  لا توجد ملاحظات
+                                </span>
+                              )}
+                            </td>
+                            <td className="w-25">
+                              {isEmployee && (
+                                <button
+                                  className="btn btn-outline-primary btn-main btn-sm mt-1"
+                                  onClick={() => navigate(`/faculties/${id}`)}
+                                  disabled={
+                                    request.status === "تحت المراجعة" ||
+                                    request.status === "تم الرفض"
+                                  }
+                                  style={{
+                                    backgroundColor: "#19355A",
+                                    cursor:
+                                      request.status === "تحت المراجعة" ||
+                                      request.status === "تم الرفض"
+                                        ? "not-allowed"
+                                        : "pointer",
+                                  }}
+                                >
+                                  عرض الكليات
+                                </button>
+                              )}
+                              {(isAdmin || isSuperAdmin) &&
+                                (request.status === "تم الرفض" ||
+                                  request.status === "تحت المراجعة") && (
+                                  <>
+                                    <button
+                                      style={{ backgroundColor: "#19355A" }}
+                                      className="btn btn-outline-primary btn-main btn-sm mt-1 mx-1"
+                                      onClick={() => openModal(request)}
+                                    >
+                                      اضف ملاحظة
+                                    </button>
+                                    {request.status === "تم الرفض" && (
+                                      <button
+                                        style={{ backgroundColor: "#AD8700" }}
+                                        className="btn btn-outline-warning btn-main-s btn-sm mt-1 mx-1"
+                                        onClick={() =>
+                                          navigate(`/faculties/${id}`)
+                                        }
+                                      >
+                                        قبول مره اخري
+                                      </button>
+                                    )}
+                                  </>
+                                )}
+                              {(isAdmin || isSuperAdmin) && (
+                                <>
+                                  {request.status === "تحت المراجعة" && (
+                                    <>
+                                      <button
+                                        className="btn btn-outline-success btn-sm mx-2 mt-2"
+                                        // onClick={approve}
+                                        onClick={() =>
+                                          navigate(`/faculties/${id}`)
+                                        }
+                                      >
+                                        قبول
+                                      </button>
+                                      <button
+                                        className="btn btn-outline-danger btn-sm mx-2 mt-2"
+                                        onClick={reject}
+                                      >
+                                        رفض
+                                      </button>
+                                    </>
+                                  )}
+                                  {request.status === "تم القبول" && (
+                                    <button
+                                      className="btn btn-outline-primary btn-sm mt-2"
+                                      onClick={() =>
+                                        navigate(`/faculties/${id}`)
+                                      }
+                                    >
+                                      اضف كليات
+                                    </button>
+                                  )}
+                                </>
+                              )}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Notes Modal */}
             <Modal
