@@ -197,7 +197,7 @@ const Employees = () => {
             {loading && <LogoSpinner />}
             {errPage && <NotLoaded reload={() => { setErrPage(false); setLoading(true); setReloading(true); }} />}
             {!loading && !errPage && (
-                <div dir='rtl' className='p-4 bg-light min-vh-100'>
+                <div dir='rtl' className='p-4 min-vh-100'>
                     <ToastContainer position='top-center'/>
                     <h2 style={{ color: "#19355A" }} className="mb-4">المستخدمين</h2>
 

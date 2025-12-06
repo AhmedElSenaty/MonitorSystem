@@ -1,325 +1,365 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashCan, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { faPenToSquare as faPenRegular } from '@fortawesome/free-regular-svg-icons';
-import { toast, ToastContainer } from 'react-toastify';
-import './Tables.css';
-import { useAuth } from '../../Context/AuthContext.jsx';
-import { useNavigate } from 'react-router-dom';
-import LogoSpinner from '../spinner/LogoSpinner.jsx';
-import { NotLoaded } from '../../App.jsx';
-import { api } from '../../data/api.js';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashCan, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPenToSquare as faPenRegular } from "@fortawesome/free-regular-svg-icons";
+import { toast, ToastContainer } from "react-toastify";
+import "./Tables.css";
+import { useAuth } from "../../Context/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
+import LogoSpinner from "../spinner/LogoSpinner.jsx";
+import { NotLoaded } from "../../App.jsx";
+import { api } from "../../data/api.js";
 
-
-
-
-// TODO : fix list names and add select faculty and make api requestes 
+// TODO : fix list names and add select faculty and make api requestes
 const Managers = () => {
-    const { user } = useAuth();
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
-    const [errPage, setErrPage] = useState(false);
-    const [admins, setAdmins] = useState([]);
-    const [showModal, setShowModal] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
-    const [selectedAdmin, setSelectedAdmin] = useState(null);
-    const [AdminID, setAdminID] = useState(0);
-    const [newAdminMail, setNewAdminMail] = useState('');
-    const [newAdminPass, setNewAdminPass] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [reloading, setReloading] = useState(true);
-    const [statusFilter, setStatusFilter] = useState('');
-    const [faculties, setFaculties] = useState([]);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [errPage, setErrPage] = useState(false);
+  const [admins, setAdmins] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedAdmin, setSelectedAdmin] = useState(null);
+  const [AdminID, setAdminID] = useState(0);
+  const [newAdminMail, setNewAdminMail] = useState("");
+  const [newAdminPass, setNewAdminPass] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [reloading, setReloading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [faculties, setFaculties] = useState([]);
 
-    useEffect(() => {
-        if (user.role === null || user.role.toLowerCase() !== 'superadmin'  ) {
-            navigate('/');
-            return;
-        }
-    }, [])
-    const [adminsPerPage, setAdminsPerPage] = useState(5);
+  useEffect(() => {
+    if (user.role === null || user.role.toLowerCase() !== "superadmin") {
+      navigate("/");
+      return;
+    }
+  }, []);
+  const [adminsPerPage, setAdminsPerPage] = useState(5);
 
+  useEffect(() => {
+    try {
+      const getFaculties = async () => {
+        const userFac = await api.get(`/api/Department/List`);
+        // return userFac.data?.data?.map(f => {f.name, f.id}) ?? [];
 
-    useEffect(() => {
+        const fac = userFac.data?.data ?? [];
+        // console.log(userFac.data?.data);
+        setFaculties(fac);
+        return fac;
+      };
+      // console.log(faculties)
+      getFaculties();
+    } catch (err) {
+      console.error(err);
+      setFaculties([
+        {
+          name: "لا يوجد",
+          id: 0,
+        },
+      ]);
+    }
+  }, [showModal]);
+
+  const fetchData = async () => {
+    // TODO: update url to get managers
+    try {
+      const res = await api.get(
+        `/api/Manager?PageIndex=${currentPage}&PageSize=${adminsPerPage}`
+      );
+      setAdmins(res.data.data.managers);
+      setTotalPages(
+        res.data.data.totalCount / adminsPerPage > 0
+          ? Math.ceil(res.data.data.totalCount / adminsPerPage)
+          : 1
+      );
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      if (error.response?.status == 401) {
+        toast.error(error.response.data.Data, { rtl: true });
+        navigate("/");
+        sessionStorage.removeItem("user");
+        return;
+      }
+      setErrPage(true);
+    } finally {
+      setReloading(false);
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, [currentPage, reloading, adminsPerPage]);
+
+  const handleEdit = (admin, id) => {
+    setSelectedAdmin(admin);
+    setAdminID(id);
+    if (admin.mail !== null) setNewAdminMail(admin.mail);
+    setNewAdminPass(admin.pass);
+    setIsEditing(true);
+    setShowModal(true);
+  };
+
+  // TODO: update url to delete manager
+  const handleDelete = async (adminId) => {
+    setAdminID(adminId);
+    try {
+      await api.delete(`/api/Admin/${adminId}`);
+      fetchData();
+      toast.success("تم الحذف بنجاح", { rtl: true });
+    } catch (error) {
+      toast.error("حدث خطأ أثناء الحذف", { rtl: true });
+      console.error("Error deleting:", error);
+      if (error.response?.status == 401) {
+        toast.error(error.response.data.Data, { rtl: true });
+        navigate("/");
+      }
+    }
+  };
+
+  const handleAddOrUpdateAdmin = async () => {
+    // console.log(statusFilter);
+    // if (!newAdminMail.trim()) return;
+    console.log(AdminID);
+    try {
+      if (isEditing && selectedAdmin && AdminID !== 0) {
+        // TODO: Update the url to add new manager
         try {
-            
-            const getFaculties = async () => {
-                const userFac = await api.get(`/api/Department/List`);
-                // return userFac.data?.data?.map(f => {f.name, f.id}) ?? [];
-        
-                const fac = userFac.data?.data ??[];
-                // console.log(userFac.data?.data);
-                setFaculties(fac)
-                return fac ;
-            };
-            // console.log(faculties)
-            getFaculties();
-        } catch (err) {
-            console.error(err);
-            setFaculties([{
-                name: 'لا يوجد',
-                id: 0
-            }])
-        }
-        
-    }, [showModal])
-
-
-    const fetchData = async () => {
-        // TODO: update url to get managers
-        try {
-            const res = await api.get(`/api/Manager?PageIndex=${currentPage}&PageSize=${adminsPerPage}`,
-            );
-            setAdmins(res.data.data.managers);
-            setTotalPages((res.data.data.totalCount / adminsPerPage) > 0 ? Math.ceil(res.data.data.totalCount / adminsPerPage) : 1);
+          await api.post(`/api/Account/admin-reset-password`, {
+            userId: AdminID,
+            password: newAdminPass,
+          });
+          toast.success("تم التحديث بنجاح", { rtl: true });
         } catch (error) {
-            console.error("Error fetching data:", error);
-            if (error.response?.status == 401) {
-                toast.error(error.response.data.Data, { rtl: true });
-                navigate('/');
-                sessionStorage.removeItem('user');
-                return;
-            }
-            setErrPage(true);
-        } finally {
-            setReloading(false);
-            setLoading(false);
+          error.response.data.errors.forEach((err) => {
+            toast.error(err, { rtl: true });
+          });
+          console.error("Error saving admin:", error);
         }
-    };
-    useEffect(() => {
-        fetchData();
-    }, [currentPage, reloading, adminsPerPage]);
-
-
-
-    const handleEdit = (admin, id) => {
-        setSelectedAdmin(admin);
-        setAdminID(id);
-        if (admin.mail !== null) setNewAdminMail(admin.mail);
-        setNewAdminPass(admin.pass);
-        setIsEditing(true);
-        setShowModal(true);
-    };
-
-    // TODO: update url to delete manager
-    const handleDelete = async (adminId) => {
-        setAdminID(adminId);
+      } else {
         try {
-            await api.delete(`/api/Admin/${adminId}`);
-            fetchData();
-            toast.success("تم الحذف بنجاح", { rtl: true });
+          const facID = faculties.filter((f) =>
+            f.name === statusFilter ? f.id : 0
+          )[0];
+          // console.log(facID);
+          // TODO: Update url to change manger password
+          await api.post(`/api/Account/RegisterManager`, {
+            username: newAdminMail,
+            password: newAdminPass,
+            departmentId: facID.id,
+          });
+
+          toast.success("تمت الإضافة بنجاح", { rtl: true });
         } catch (error) {
-            toast.error("حدث خطأ أثناء الحذف", { rtl: true });
-            console.error("Error deleting:", error);
-            if (error.response?.status == 401) {
-                toast.error(error.response.data.Data, { rtl: true });
-                navigate('/');
-            }
+          error.response.data.errors.forEach((err) => {
+            toast.error(err, { rtl: true });
+          });
+          console.error("Error saving admin:", error);
         }
-    };
+      }
 
-    const handleAddOrUpdateAdmin = async () => {
-        // console.log(statusFilter);
-        // if (!newAdminMail.trim()) return;
-        console.log(AdminID);
-        try {
-            if (isEditing && selectedAdmin && AdminID !== 0) {
-                // TODO: Update the url to add new manager
-                try {
+      setShowModal(false);
+      setNewAdminMail("");
+      setNewAdminPass("");
+      setIsEditing(false);
+      setSelectedAdmin(null);
+      fetchData();
+    } catch (error) {
+      toast.error("حدث خطأ أثناء الحفظ", { rtl: true });
+      console.error("Error saving admin:", error);
+    }
+  };
 
-                    await api.post(`/api/Account/admin-reset-password`, {
-                        userId: AdminID,
-                        password: newAdminPass,
-                    });
-                    toast.success("تم التحديث بنجاح", { rtl: true });
-                } catch (error) {
-                    error.response.data.errors.forEach(err => {
+  return (
+    <>
+      {loading && <LogoSpinner />}
+      {errPage && (
+        <NotLoaded
+          reload={() => {
+            setErrPage(false);
+            setLoading(true);
+            setReloading(true);
+          }}
+        />
+      )}
+      {!loading && !errPage && (
+        <div dir="rtl" className="p-4  min-vh-100">
+          <ToastContainer position="top-center" />
+          <h2 style={{ color: "#19355A" }} className="mb-4">
+            المديرين
+          </h2>
 
-                        toast.error(err, { rtl: true });
-                    })
-                    console.error("Error saving admin:", error);
-                }
-            } else {
-                try {
-                    const facID = faculties.filter(f => f.name === statusFilter ? f.id : 0)[0];
-                    // console.log(facID);
-                    // TODO: Update url to change manger password
-                    await api.post(`/api/Account/RegisterManager`, {
-                        username: newAdminMail,
-                        password: newAdminPass,
-                        departmentId: facID.id,
-                    });
+          <div className="mb-3 d-flex" style={{ justifySelf: "start" }}>
+            <button
+              className="btn btn-primary rounded-0"
+              onClick={() => {
+                setIsEditing(false);
+                setNewAdminMail("");
+                setNewAdminPass("");
+                setShowModal(true);
+              }}
+            >
+              <FontAwesomeIcon icon={faPlus} className="ms-2" />
+              اضف مدير
+            </button>
+            <div className="col-12 col-md-6 col-lg-3 mx-3">
+              <select
+                className="form-select"
+                value={adminsPerPage}
+                onChange={(e) => {
+                  setAdminsPerPage(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                <option value="5">اختار عدد الطلبات (5)</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="25">25</option>
+                <option value="30">30</option>
+                <option value="35">35</option>
+              </select>
+            </div>
+          </div>
 
-                    toast.success("تمت الإضافة بنجاح", { rtl: true });
-                } catch (error) {
-                    error.response.data.errors.forEach(err => {
+          <div className="table-responsive">
+            <table className="table table-hover text-end table-striped">
+              <thead className="table-secondary">
+                <tr>
+                  <th> الترتيب </th>
+                  <th className="w-25 text-break">اسم المستخدم</th>
+                  <th className="w-25 text-break">اسم الكلية</th>
+                  <th className="text-center">تحكم</th>
+                </tr>
+              </thead>
+              <tbody>
+                {admins.length > 0 &&
+                  admins.map((admin, index) => (
+                    <tr key={index + 1}>
+                      <td>{index + 1}</td>
+                      <td className="text-break">{admin.username}</td>
+                      <td className="text-break">{admin.colleageName}</td>
+                      <td
+                        className="text-center fs-5"
+                        style={{ alignContent: "center" }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faPenRegular}
+                          onClick={() => handleEdit(admin, admin.id)}
+                          style={{ cursor: "pointer" }}
+                          className="btn btn-outline-primary mx-1"
+                        />
+                        <FontAwesomeIcon
+                          icon={faTrashCan}
+                          onClick={() => handleDelete(admin.id)}
+                          style={{ cursor: "pointer" }}
+                          className="btn btn-outline-danger mx-1"
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                {admins.length === 0 && (
+                  <tr>
+                    <td colSpan="3" className="text-center">
+                      لا يوجد مشرفين
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
 
-                        toast.error(err, { rtl: true });
-                    })
-                    console.error("Error saving admin:", error);
-                }
-            }
+          {/* Pagination */}
+          <div className="d-flex justify-content-center mt-4">
+            <nav>
+              <ul className="pagination flex-wrap">
+                <li
+                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                >
+                  <button
+                    className={`page-link rounded-end-5  bg-warning ${
+                      currentPage === 1 ? "text-gray" : "text-dark"
+                    }`}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                  >
+                    السابق
+                  </button>
+                </li>
+                <li className="page-item">
+                  <span className="page-link text-dark bg-white">
+                    {` ${totalPages} / ${currentPage}  `}
+                  </span>
+                </li>
 
-            setShowModal(false);
-            setNewAdminMail('');
-            setNewAdminPass('');
-            setIsEditing(false);
-            setSelectedAdmin(null);
-            fetchData();
-        } catch (error) {
-            toast.error("حدث خطأ أثناء الحفظ", { rtl: true });
-            console.error("Error saving admin:", error);
-        }
-    };
+                <li
+                  className={`page-item ${
+                    currentPage === totalPages ? "disabled" : ""
+                  }`}
+                >
+                  <button
+                    className={`page-link rounded-start-5  bg-warning ${
+                      currentPage === totalPages ? "text-gray" : "text-dark"
+                    }`}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                  >
+                    التالي
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
 
-    return (
-        <>
-            {loading && <LogoSpinner />}
-            {errPage && <NotLoaded reload={() => { setErrPage(false); setLoading(true); setReloading(true); }} />}
-            {!loading && !errPage && (
-                <div dir='rtl' className='p-4 bg-light min-vh-100'>
-                    <ToastContainer position='top-center' />
-                    <h2 style={{ color: "#19355A" }} className="mb-4">المديرين</h2>
+          {/* Modal */}
+          {showModal && (
+            <div
+              className="modal d-block"
+              tabIndex="-1"
+              style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
+            >
+              <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <button
+                      type="button"
+                      className="btn-close ms-0"
+                      onClick={() => setShowModal(false)}
+                    ></button>
+                    <h5 className="modal-title">
+                      {isEditing ? "تعديل مستخدم" : "إضافة مستخدم جديد"}
+                    </h5>
+                  </div>
+                  <div className="modal-body">
+                    {!isEditing && (
+                      <>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={newAdminMail}
+                          onChange={(e) => setNewAdminMail(e.target.value)}
+                          placeholder="اسم المستخدم"
+                        />
+                        <div className="my-3">
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            placeholder="اسم الكليه او الرقم المسلسل الخاص بها"
+                            list="faclist"
+                          />
 
-                    <div className="mb-3 d-flex" style={{ justifySelf: "start" }}>
-                        <button className="btn btn-primary rounded-0" onClick={() => {
-                            setIsEditing(false);
-                            setNewAdminMail('');
-                            setNewAdminPass('');
-                            setShowModal(true);
-                        }}>
-                            <FontAwesomeIcon icon={faPlus} className='ms-2' />
-                            اضف مدير
-                        </button>
-                        <div className="col-12 col-md-6 col-lg-3 mx-3">
-                            <select
-                                className="form-select"
-                                value={adminsPerPage}
-                                onChange={(e) => {
-                                    setAdminsPerPage(e.target.value);
-                                    setCurrentPage(1);
-                                }}
-                            >
-
-                                <option value="5">اختار عدد الطلبات (5)</option>
-                                <option value="10">10</option>
-                                <option value="15">15</option>
-                                <option value="20">20</option>
-                                <option value="25">25</option>
-                                <option value="30">30</option>
-                                <option value="35">35</option>
-
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="table-responsive">
-                        <table className="table table-hover text-end table-striped">
-                            <thead className="table-secondary">
-                                <tr>
-                                    <th> الترتيب </th>
-                                    <th className='w-25 text-break'>اسم المستخدم</th>
-                                    <th className='w-25 text-break'>اسم الكلية</th>
-                                    <th className="text-center">تحكم</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {admins.length > 0 && admins.map((admin, index) => (
-                                    <tr key={index + 1}>
-                                        <td>{index + 1}</td>
-                                        <td className="text-break">{admin.username}</td>
-                                        <td className="text-break">{admin.colleageName}</td>
-                                        <td className="text-center fs-5" style={{ alignContent: "center" }}>
-                                            <FontAwesomeIcon
-                                                icon={faPenRegular}
-                                                onClick={() => handleEdit(admin, admin.id)}
-                                                style={{ cursor: 'pointer' }}
-                                                className='btn btn-outline-primary mx-1'
-                                            />
-                                            <FontAwesomeIcon
-                                                icon={faTrashCan}
-                                                onClick={() => handleDelete(admin.id)}
-                                                style={{ cursor: 'pointer' }}
-                                                className='btn btn-outline-danger mx-1'
-                                            />
-                                        </td>
-                                    </tr>
-                                ))}
-                                {
-                                    admins.length === 0 && (
-                                        <tr>
-                                            <td colSpan="3" className="text-center">
-                                                لا يوجد مشرفين
-                                            </td>
-                                        </tr>
-                                    )
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Pagination */}
-                    <div className="d-flex justify-content-center mt-4">
-                        <nav>
-                            <ul className="pagination flex-wrap">
-                                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                                    <button className={`page-link rounded-end-5  bg-warning ${currentPage === 1 ? 'text-gray' : 'text-dark'}`} onClick={() => setCurrentPage(currentPage - 1)}>السابق</button>
-                                </li>
-                                <li className="page-item" >
-                                    <span className="page-link text-dark bg-white" >
-                                        {` ${totalPages} / ${currentPage}  `}
-                                    </span>
-                                </li>
-
-                                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                                    <button className={`page-link rounded-start-5  bg-warning ${currentPage === totalPages ? 'text-gray' : 'text-dark'}`} onClick={() => setCurrentPage(currentPage + 1)}>التالي</button>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-
-                    {/* Modal */}
-                    {showModal && (
-                        <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.4)" }}>
-                            <div className="modal-dialog modal-dialog-centered">
-                                <div className="modal-content">
-                                    <div className="modal-header">
-                                        <button type="button" className="btn-close ms-0" onClick={() => setShowModal(false)}></button>
-                                        <h5 className="modal-title">{isEditing ? 'تعديل مستخدم' : 'إضافة مستخدم جديد'}</h5>
-                                    </div>
-                                    <div className="modal-body">
-                                        {!isEditing && (
-                                            <>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    value={newAdminMail}
-                                                    onChange={(e) => setNewAdminMail(e.target.value)}
-                                                    placeholder="اسم المستخدم"
-                                                />
-                                                <div className="my-3">
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    value={statusFilter}
-                                                    onChange={(e) => setStatusFilter(e.target.value)}
-                                                        placeholder="اسم الكليه او الرقم المسلسل الخاص بها"
-                                                        list='faclist'
-                                                />
-
-                                                    <datalist
-                                                        id='faclist'
-                                                    >
-                                                        {faculties.length > 0 &&  faculties?.map((f,i) => (
-                                                            <option key={i} value={f.name}>{f.name}</option>
-                                                            
-                                                        ))}
-                                                        {/* <option value="2">تم القبول</option>
+                          <datalist id="faclist">
+                            {faculties.length > 0 &&
+                              faculties?.map((f, i) => (
+                                <option key={i} value={f.name}>
+                                  {f.name}
+                                </option>
+                              ))}
+                            {/* <option value="2">تم القبول</option>
                                                         <option value="3">تم الرفض</option> */}
-                                                    </datalist>
-                                                    {/* <select
+                          </datalist>
+                          {/* <select
                                                         className="form-select"
                                                         value={statusFilter}
                                                         onChange={(e) => {
@@ -332,36 +372,41 @@ const Managers = () => {
                                                         <option value="2">تم القبول</option>
                                                         <option value="3">تم الرفض</option>
                                                     </select> */}
-                                                </div>
-                                            </>
-                                            
-                                        )}
-                                        <input
-                                            type="text"
-                                            className="form-control mt-3"
-                                            // value={newAdminPass}
-                                            onChange={(e) => setNewAdminPass(e.target.value)}
-                                            placeholder="كلمة المرور "
-                                        />
-
-                                        {/* Add faculty select list */}
-
-                                    </div>
-                                    <div className="modal-footer">
-                                        <button className="btn btn-secondary" onClick={() => setShowModal(false)}>إغلاق</button>
-                                        <button className="btn btn-primary" onClick={handleAddOrUpdateAdmin}>
-                                            {isEditing ? 'تحديث' : 'إضافة'}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
+                      </>
                     )}
+                    <input
+                      type="text"
+                      className="form-control mt-3"
+                      // value={newAdminPass}
+                      onChange={(e) => setNewAdminPass(e.target.value)}
+                      placeholder="كلمة المرور "
+                    />
 
+                    {/* Add faculty select list */}
+                  </div>
+                  <div className="modal-footer">
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => setShowModal(false)}
+                    >
+                      إغلاق
+                    </button>
+                    <button
+                      className="btn btn-primary"
+                      onClick={handleAddOrUpdateAdmin}
+                    >
+                      {isEditing ? "تحديث" : "إضافة"}
+                    </button>
+                  </div>
                 </div>
-            )}
-        </>
-    );
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </>
+  );
 };
 
 export default Managers;

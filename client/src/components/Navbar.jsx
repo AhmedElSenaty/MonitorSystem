@@ -2,167 +2,221 @@ import React, { useState, useEffect, useRef } from "react";
 import "./Navbar.css";
 import { useAuth } from "../Context/AuthContext";
 import { useNavigate, NavLink, useLocation } from "react-router-dom";
-import logo from '../assets/helwan-logo.png'
-
+import logo from "../assets/helwan-logo.png";
 
 const Navbar = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const burger = useRef(null);
-    const { logout, user } = useAuth();
-    const [role, setRole] = useState(null);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const burger = useRef(null);
+  const { logout, user } = useAuth();
+  const [role, setRole] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    // Sync local state when auth context changes
-    useEffect(() => {
-        if (user && user.isLoggedIn) {
-            setRole(user.role);
-            setIsLoggedIn(true);
-        } else {
-            setRole(null);
-            setIsLoggedIn(false);
-        }
-    }, [user]);
+  // Sync local state when auth context changes
+  useEffect(() => {
+    if (user && user.isLoggedIn) {
+      setRole(user.role);
+      setIsLoggedIn(true);
+    } else {
+      setRole(null);
+      setIsLoggedIn(false);
+    }
+  }, [user]);
 
-    const onLogout = () => {
-        logout();
-        navigate("/login");
-    };
+  const onLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
-    return (
-        <nav className="navbar navbar-expand-lg shadow" style={{ backgroundColor: "#19355A" }} dir="rtl">
-            <div className="container-fluid">
-                <div className="navbar-brand" >
-                    <img
-                        src={logo}
-                        alt="Logo"
-                        width="50"
-                        height="50"
-                        className="d-inline-block align-text-top cursor-pointer"
-                        onClick={() => navigate("/")}
-                    />
-                </div>
-                {isLoggedIn && (
-                    <button
-                        ref={burger}
-                        className="navbar-toggler"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#navbarScroll"
-                        aria-controls="navbarScroll"
-                        aria-expanded="false"
-                        aria-label="Toggle navigation"
-                        
-                    >
-                        <span className="navbar-toggler-icon"></span>
-                    </button>
-                )}
-                <div className="collapse navbar-collapse" id="navbarScroll">
-                    {role === "superadmin" && (
-                        <ul className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll gap-2" style={{ "--bs-scroll-height": "300px" }}>
-                            <li className="nav-item">
-                                <NavLink className={({ isActive }) => {
-                                    
-                                    return (isActive ? `nav-link my-bg-warning` : `nav-link`)
-                                }} to="/managers" style={{ color: "white" }}
-                                    onClick={() => {
-                                        if (window.getComputedStyle(burger.current).display !== 'none'){
-                                            burger.current.click();
-                                        }
-                                    }}
-                                >
-                                    قائمة المديرين
-                                </NavLink>
-                            </li>
-                            <li className="nav-item">
-                                <NavLink className={({ isActive }) => {
-                                    
-                                    return (isActive ? `nav-link my-bg-warning` : `nav-link`)
-                                }} to="/admins" style={{ color: "white" }}
-                                    onClick={() => {
-                                        if (window.getComputedStyle(burger.current).display !== 'none'){
-                                            burger.current.click();
-                                        }
-                                    }}
-                                >
-                                    قائمة المشرفين
-                                </NavLink>
-                            </li>
-                            <li className="nav-item">
-                                <NavLink className={({ isActive }) => {
-                                    
-                                    return (isActive ? `nav-link my-bg-warning` : `nav-link`)
-                                }} to="/employees" style={{ color: "white" }}
-                                    onClick={() => {
-                                        if (window.getComputedStyle(burger.current).display !== 'none') {
-                                            burger.current.click();
-                                        }
-                                    }}
-                                >
-                                    قائمة المستخدمين
-                                </NavLink>
-                            </li>
-                            <li className="nav-item">
-                                <NavLink className={({ isActive }) => {
-                                    
-                                    return (isActive ? `nav-link my-bg-warning` : `nav-link`)
-                                }} to="/faculties" style={{ color: "white" }}
-                                    onClick={() => {
-                                        if (window.getComputedStyle(burger.current).display !== 'none') {
-                                            burger.current.click();
-                                        }
-                                    }}
-                                >
-                                    قائمة الكليات
-                                </NavLink>
-                            </li>
-                            <li className="nav-item">
-                                <NavLink className={({ isActive }) => {
-                                    
-                                    return (isActive ? `nav-link my-bg-warning` : `nav-link`)
-                                }} to="/requests" style={{ color: "white" }}
-                                    onClick={() => {
-                                        if (window.getComputedStyle(burger.current).display !== 'none') {
-                                            burger.current.click();
-                                        }
-                                    }}
-                                >
-                                    قائمة الطلبات
-                                </NavLink>
-                            </li>
-                        </ul>
-                    )}
-                    {role === "admin" && (
-                        <ul className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll gap-2" style={{ "--bs-scroll-height": "100px" }}>
-                            <li className="nav-item">
-                                <NavLink className={({ isActive }) => {
-                                    
-                                    return (isActive ? `nav-link my-bg-warning` : `nav-link`)
-                                }} to="/requests" style={{ color: "white" }}
-                                    onClick={() => {
-                                        if (window.getComputedStyle(burger.current).display !== 'none') {
-                                            burger.current.click();
-                                        }
-                                    }}
-                                >
-                                    قائمة الطلبات
-                                </NavLink>
-                            </li>
-                            <li className="nav-item">
-                                <NavLink className={({ isActive }) => {
-                                    
-                                    return (isActive ? `nav-link my-bg-warning` : `nav-link`)
-                                }} to="/faculties" style={{ color: "white" }}
-                                    onClick={() => {
-                                        if (window.getComputedStyle(burger.current).display !== 'none') {
-                                            burger.current.click();
-                                        }
-                                    }}
-                                >
-                                    قائمة الكليات
-                                </NavLink>
-                            </li>
-                            {/* <li className="nav-item">
+  return (
+    <nav
+      className="navbar navbar-expand-lg shadow"
+      style={{ backgroundColor: "#19355A" }}
+      dir="rtl"
+    >
+      <div className="container-fluid">
+        <div className="navbar-brand">
+          <img
+            src={logo}
+            alt="Logo"
+            width="50"
+            height="50"
+            className="d-inline-block align-text-top cursor-pointer"
+            onClick={() => navigate("/")}
+          />
+        </div>
+        {isLoggedIn && (
+          <button
+            ref={burger}
+            className="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarScroll"
+            aria-controls="navbarScroll"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+        )}
+        <div className="collapse navbar-collapse" id="navbarScroll">
+          {role === "superadmin" && (
+            <ul
+              className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll gap-2"
+              style={{ "--bs-scroll-height": "300px" }}
+            >
+              <li className="nav-item">
+                <NavLink
+                  className={({ isActive }) => {
+                    return isActive ? `nav-link my-bg-warning` : `nav-link`;
+                  }}
+                  to="/logsPage"
+                  style={{ color: "white" }}
+                  onClick={() => {
+                    if (
+                      window.getComputedStyle(burger.current).display !== "none"
+                    ) {
+                      burger.current.click();
+                    }
+                  }}
+                >
+                  سجلات النظام
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  className={({ isActive }) => {
+                    return isActive ? `nav-link my-bg-warning` : `nav-link`;
+                  }}
+                  to="/managers"
+                  style={{ color: "white" }}
+                  onClick={() => {
+                    if (
+                      window.getComputedStyle(burger.current).display !== "none"
+                    ) {
+                      burger.current.click();
+                    }
+                  }}
+                >
+                  قائمة المديرين
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  className={({ isActive }) => {
+                    return isActive ? `nav-link my-bg-warning` : `nav-link`;
+                  }}
+                  to="/admins"
+                  style={{ color: "white" }}
+                  onClick={() => {
+                    if (
+                      window.getComputedStyle(burger.current).display !== "none"
+                    ) {
+                      burger.current.click();
+                    }
+                  }}
+                >
+                  قائمة المشرفين
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  className={({ isActive }) => {
+                    return isActive ? `nav-link my-bg-warning` : `nav-link`;
+                  }}
+                  to="/employees"
+                  style={{ color: "white" }}
+                  onClick={() => {
+                    if (
+                      window.getComputedStyle(burger.current).display !== "none"
+                    ) {
+                      burger.current.click();
+                    }
+                  }}
+                >
+                  قائمة المستخدمين
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  className={({ isActive }) => {
+                    return isActive ? `nav-link my-bg-warning` : `nav-link`;
+                  }}
+                  to="/faculties"
+                  style={{ color: "white" }}
+                  onClick={() => {
+                    if (
+                      window.getComputedStyle(burger.current).display !== "none"
+                    ) {
+                      burger.current.click();
+                    }
+                  }}
+                >
+                  قائمة الكليات
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  className={({ isActive }) => {
+                    return isActive ? `nav-link my-bg-warning` : `nav-link`;
+                  }}
+                  to="/requests"
+                  style={{ color: "white" }}
+                  onClick={() => {
+                    if (
+                      window.getComputedStyle(burger.current).display !== "none"
+                    ) {
+                      burger.current.click();
+                    }
+                  }}
+                >
+                  قائمة الطلبات
+                </NavLink>
+              </li>
+            </ul>
+          )}
+          {role === "admin" && (
+            <ul
+              className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll gap-2"
+              style={{ "--bs-scroll-height": "100px" }}
+            >
+              <li className="nav-item">
+                <NavLink
+                  className={({ isActive }) => {
+                    return isActive ? `nav-link my-bg-warning` : `nav-link`;
+                  }}
+                  to="/requests"
+                  style={{ color: "white" }}
+                  onClick={() => {
+                    if (
+                      window.getComputedStyle(burger.current).display !== "none"
+                    ) {
+                      burger.current.click();
+                    }
+                  }}
+                >
+                  قائمة الطلبات
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  className={({ isActive }) => {
+                    return isActive ? `nav-link my-bg-warning` : `nav-link`;
+                  }}
+                  to="/faculties"
+                  style={{ color: "white" }}
+                  onClick={() => {
+                    if (
+                      window.getComputedStyle(burger.current).display !== "none"
+                    ) {
+                      burger.current.click();
+                    }
+                  }}
+                >
+                  قائمة الكليات
+                </NavLink>
+              </li>
+              {/* <li className="nav-item">
                                 <NavLink className={({ isActive }) => {
 
                                     return (isActive ? `nav-link my-bg-warning` : `nav-link`)
@@ -170,60 +224,79 @@ const Navbar = () => {
                                     قائمة المستخدمين
                                 </NavLink>
                             </li> */}
-                        </ul>
-                    )}
-                    {role === "manager" && (
-                        <ul className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll gap-2" style={{ "--bs-scroll-height": "100px" }}>
-                            <li className="nav-item">
-                                <NavLink className={({ isActive }) => {
-                                    
-                                    return (isActive ? `nav-link my-bg-warning` : `nav-link`)
-                                }} to="/faculty/requestes" style={{ color: "white" }}
-                                    onClick={() => {
-                                        if (window.getComputedStyle(burger.current).display !== 'none') {
-                                            burger.current.click();
-                                        }
-                                    }}
-                                >
-                                    قائمة الطلبات
-                                </NavLink>
-                            </li>
-                        </ul>
-                    )}
-                    {isLoggedIn && (
-                        <div className={( role === "superadmin" || role === "admin" || role === "manager") ? "d-flex" : "d-flex me-auto my-2 my-lg-0"} role="logout">
-                            <button className="btn btn-outline-info me-5" type="button" onClick={onLogout}>
-                                تسجيل خروج
-                            </button>
-                        </div>
-                    )}
-                    {!isLoggedIn && (
-                        <div className={"d-flex me-auto my-2 my-lg-0"} >
-                            {(location.pathname.includes('register') || location.pathname === '/' )&& 
-                                (
-                                <button className="btn btn-outline-warning me-5" type="button" onClick={() => navigate("/login")}>
-                                    <span className="text-white">
-                                    تسجيل دخول
-                                    </span>
-                                </button>
-                                )}
-                            {
-                                (location.pathname.includes('/login') || location.pathname === '/') && 
-                                (
-                                <button className="btn btn-outline-warning me-5" type="button" onClick={() => navigate("/register")}>
-                                        <span className="text-white">
-                                            تسجيل طلب
-                                        </span>
-                                </button>
-                                )
-                            }
-                        </div>
-                    )}
-                </div>
+            </ul>
+          )}
+          {role === "manager" && (
+            <ul
+              className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll gap-2"
+              style={{ "--bs-scroll-height": "100px" }}
+            >
+              <li className="nav-item">
+                <NavLink
+                  className={({ isActive }) => {
+                    return isActive ? `nav-link my-bg-warning` : `nav-link`;
+                  }}
+                  to="/faculty/requestes"
+                  style={{ color: "white" }}
+                  onClick={() => {
+                    if (
+                      window.getComputedStyle(burger.current).display !== "none"
+                    ) {
+                      burger.current.click();
+                    }
+                  }}
+                >
+                  قائمة الطلبات
+                </NavLink>
+              </li>
+            </ul>
+          )}
+          {isLoggedIn && (
+            <div
+              className={
+                role === "superadmin" || role === "admin" || role === "manager"
+                  ? "d-flex"
+                  : "d-flex me-auto my-2 my-lg-0"
+              }
+              role="logout"
+            >
+              <button
+                className="btn btn-outline-info me-5"
+                type="button"
+                onClick={onLogout}
+              >
+                تسجيل خروج
+              </button>
             </div>
-        </nav>
-    );
+          )}
+          {!isLoggedIn && (
+            <div className={"d-flex me-auto my-2 my-lg-0"}>
+              {(location.pathname.includes("register") ||
+                location.pathname === "/") && (
+                <button
+                  className="btn btn-outline-warning me-5"
+                  type="button"
+                  onClick={() => navigate("/login")}
+                >
+                  <span className="text-white">تسجيل دخول</span>
+                </button>
+              )}
+              {(location.pathname.includes("/login") ||
+                location.pathname === "/") && (
+                <button
+                  className="btn btn-outline-warning me-5"
+                  type="button"
+                  onClick={() => navigate("/register")}
+                >
+                  <span className="text-white">تسجيل طلب</span>
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
 };
 
 export default Navbar;
-

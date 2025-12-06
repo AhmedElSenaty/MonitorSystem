@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -6,111 +6,110 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import "./Login.css"; // for custom styles
 import { decodeJWT } from "../../utils/decodeJWT";
-import { useAuth } from '../../Context/AuthContext'
+import { useAuth } from "../../Context/AuthContext";
 import { api } from "../../data/api";
 
 const Login = () => {
-    const navigate = useNavigate();
-    const [showPassword, setShowPassword] = useState(false);
-    const {setUser, user} = useAuth();
-        const [loader, setLoader] = useState(false);
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const { setUser, user } = useAuth();
+  const [loader, setLoader] = useState(false);
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm();
 
-    
-    useEffect(() => {
-        if(user.isLoggedIn){
-            switch (user.role.toLowerCase()) {
-                case "admin":
-                    navigate("/requests");
-                    break;
-                case "superadmin":
-                    navigate("/admins");
-                    break;
-                case "employee":
-                    navigate(`/profile/${user.id}`);
-                    break;
-            }
-        }
-    }, []);
+  useEffect(() => {
+    if (user.isLoggedIn) {
+      switch (user.role.toLowerCase()) {
+        case "admin":
+          navigate("/requests");
+          break;
+        case "superadmin":
+          navigate("/admins");
+          break;
+        case "employee":
+          navigate(`/profile/${user.id}`);
+          break;
+      }
+    }
+  }, []);
   //TODO: post method
-    const onSubmit = async (data) => {
-      setLoader(true);
+  const onSubmit = async (data) => {
+    setLoader(true);
     try {
       //change url
-        const res = await api.post(`/api/Account/Login`, {
-        
-          "email": data.email,
-          "password": data.password
-        
+      const res = await api.post(`/api/Account/Login`, {
+        email: data.email,
+        password: data.password,
       });
 
-      if (res.data  ) {
+      if (res.data) {
         toast.success("تم تسجيل الدخول بنجاح", { rtl: true });
-          // Proceed with navigation or state update
-          
-          const token = decodeJWT(res.data.data.token);
-          const userData = {
-              id: token.Id,
-              role: token.role.toLowerCase(),
-              token: res.data.data.token,
-              isLoggedIn: true
-          }
-          setUser(userData);
-          sessionStorage.setItem("user", JSON.stringify(userData));
-          switch (token.role.toLowerCase()) {
-              case "admin":
-                  navigate("/requests");
-                  break;
-              case "superadmin":
-                  navigate("/requests");
-                  break;
-              case "employee":
-                  navigate(`/profile/${token.Id}`);
-                  break;
-              case "manager":
-                  navigate(`/faculty/requestes`);
-                  break;
-          }
+        // Proceed with navigation or state update
+
+        const token = decodeJWT(res.data.data.token);
+        const userData = {
+          id: token.Id,
+          role: token.role.toLowerCase(),
+          token: res.data.data.token,
+          isLoggedIn: true,
+        };
+        setUser(userData);
+        sessionStorage.setItem("user", JSON.stringify(userData));
+        switch (token.role.toLowerCase()) {
+          case "admin":
+            navigate("/requests");
+            break;
+          case "superadmin":
+            navigate("/requests");
+            break;
+          case "employee":
+            navigate(`/profile/${token.Id}`);
+            break;
+          case "manager":
+            navigate(`/faculty/requestes`);
+            break;
+        }
       } else {
         toast.error("بيانات الدخول غير صحيحة", { rtl: true });
       }
     } catch (error) {
-        // toast.error("حدث خطأ أثناء محاولة الدخول", { rtl: true });
-        // Object.values(error.response.data.data.errors).forEach(msg => toast.error(msg, { rtl: true }));
-        // console.warn(error.response.data.data.errors);
-        setLoader(false);
+      // toast.error("حدث خطأ أثناء محاولة الدخول", { rtl: true });
+      // Object.values(error.response.data.data.errors).forEach(msg => toast.error(msg, { rtl: true }));
+      // console.warn(error.response.data.data.errors);
+      setLoader(false);
 
-        // If api got a response from the server with an error status:
-        if (error.response && error.response.data) {
-            const errs = error.response.data.data?.errors;
-            
-            if (errs) {
-                // iterate over API validation errors
-                Object.values(errs).forEach(msg => toast.error(msg, { rtl: true }));
-            } else if (error.response.data.message) {
-                // or a single error message
-                toast.error(error.response.data.message, { rtl: true });
-            } else {
-                toast.error('حدث خطأ في الاستجابة من الخادم', { rtl: true });
-            }
-        }
-        // If no response at all (network error, CORS, timeout, etc.)
-        else {
-            toast.error('تعذر الاتصال بالخادم. الرجاء التحقق من الإنترنت.', { rtl: true });
-        }
+      // If api got a response from the server with an error status:
+      if (error.response && error.response.data) {
+        const errs = error.response.data.data?.errors;
 
-        console.error('Login error:', error);
-    }finally{
-        setLoader(false);
+        if (errs) {
+          // iterate over API validation errors
+          Object.values(errs).forEach((msg) => toast.error(msg, { rtl: true }));
+        } else if (error.response.data.message) {
+          // or a single error message
+          toast.error(error.response.data.message, { rtl: true });
+        } else {
+          toast.error("حدث خطأ في الاستجابة من الخادم", { rtl: true });
+        }
+      }
+      // If no response at all (network error, CORS, timeout, etc.)
+      else {
+        toast.error("تعذر الاتصال بالخادم. الرجاء التحقق من الإنترنت.", {
+          rtl: true,
+        });
+      }
+
+      console.error("Login error:", error);
+    } finally {
+      setLoader(false);
     }
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100 bg-light ">
+    <div className="d-flex justify-content-center align-items-center page-height ">
       <div
         className="d-flex shadow rounded overflow-hidden login-container"
         style={{ maxWidth: 900, width: "100%", height: "70%" }}
@@ -123,7 +122,7 @@ const Login = () => {
 
         {/* Right Side: Form */}
         <div className="bg-white p-5 w-100" dir="rtl">
-                  <h4 className="mb-4 text-center fw-bold pb-5 pt-3">تسجيل الدخول</h4>
+          <h4 className="mb-4 text-center fw-bold pb-5 pt-3">تسجيل الدخول</h4>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-3">
               <input
@@ -137,13 +136,13 @@ const Login = () => {
             </div>
 
             <div className="mb-3">
-            <input
-                type={ showPassword ? "text" : "password"}
+              <input
+                type={showPassword ? "text" : "password"}
                 className="form-control"
                 placeholder="كلمة مرور"
-                              {...register("password", { required: "كلمة المرور مطلوبة" })}
-                              onMouseEnter={() => setShowPassword(true)}
-                              onMouseLeave={() => setShowPassword(false)}
+                {...register("password", { required: "كلمة المرور مطلوبة" })}
+                onMouseEnter={() => setShowPassword(true)}
+                onMouseLeave={() => setShowPassword(false)}
               />
               {errors.password && (
                 <small className="text-danger">{errors.password.message}</small>
@@ -180,6 +179,5 @@ const Login = () => {
     </div>
   );
 };
-
 
 export default Login;

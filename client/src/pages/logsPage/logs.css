@@ -1,0 +1,54 @@
+/* شكل الكارت الأساسي */
+.log-card {
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
+    padding: 1rem;
+    background-color: #fff;
+    transition: box-shadow 0.15s ease-in-out, transform 0.15s ease-in-out;
+    cursor: pointer;
+}
+
+.log-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+}
+
+/* ألوان حسب نوع الـ Log */
+.log-card-create {
+    background-color: #e7f1ff;
+    border-color: #b6d4fe;
+}
+
+.log-card-update {
+    background-color: #fff8e1;
+    border-color: #ffe08a;
+}
+
+.log-card-delete {
+    background-color: #ffe5e5;
+    border-color: #ffb3b3;
+}
+
+.log-card-error {
+    background-color: #ffe7ec;
+    border-color: #ffb8c6;
+}
+
+.log-card-icon {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+/* نص الرسالة */
+.log-card-message {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    white-space: pre-wrap;
+    font-family: inherit;
+    font-size: 0.9rem;
+    direction: rtl;
+    text-align: right;
+    color: #212529;
+}

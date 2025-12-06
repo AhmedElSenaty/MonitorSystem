@@ -1,0 +1,107 @@
+/* ====== 📱 Responsive Requests Table (Requests Only) ====== */
+@media (max-width: 767.98px) {
+
+    /* اخفي الهيدر */
+    .requests-table-wrapper table thead {
+        display: none;
+    }
+
+    /* تعطيل ألوان STRIPE و ACCENT و HOVER من Bootstrap */
+    .requests-table-wrapper .table-striped,
+    .requests-table-wrapper .table-hover {
+        --bs-table-striped-bg: transparent !important;
+        --bs-table-accent-bg: transparent !important;
+        --bs-table-hover-bg: transparent !important;
+        --bs-table-striped-color: inherit !important;
+        --bs-table-hover-color: inherit !important;
+    }
+
+    /* إلغاء hover على tr بالكامل */
+    .requests-table-wrapper .table-hover tbody tr:hover,
+    .requests-table-wrapper .table-hover tbody tr:hover>* {
+        background-color: transparent !important;
+        color: inherit !important;
+    }
+
+    /* إلغاء أي لون يتم تطبيقه على مستوى الخلايا أو الصف */
+    .requests-table-wrapper .table-striped tbody tr,
+    .requests-table-wrapper .table-striped tbody tr:nth-of-type(odd),
+    .requests-table-wrapper .table-striped tbody tr:nth-of-type(even),
+    .requests-table-wrapper .table-hover tbody tr,
+    .requests-table-wrapper .table-hover tbody tr>*,
+    .requests-table-wrapper .table-striped tbody tr>* {
+        background-color: #fff !important;
+    }
+
+    /* كل صف = كارت */
+    .requests-table-wrapper table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 0.75rem;
+        padding: 0.75rem 0.9rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    /* كل خلية */
+    .requests-table-wrapper table tbody td {
+        display: block;
+        border: none !important;
+        padding: 0.3rem 0;
+        font-size: 0.9rem;
+        text-align: right;
+    }
+
+    .requests-table-wrapper table tbody td::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 2px;
+    }
+
+    .requests-table-wrapper table tbody td[data-label="الكليات"] {
+        margin-bottom: 0.4rem;
+    }
+
+    /* بلوك الإجراءات */
+    .requests-table-wrapper table tbody td[data-label="الإجراءات"] {
+        margin-top: 0.5rem;
+    }
+
+    .requests-table-wrapper table tbody td[data-label="الإجراءات"] .btn {
+        width: 100%;
+        margin-bottom: 0.35rem;
+        border-radius: 999px;
+    }
+
+    .requests-table-wrapper table tbody td[data-label="الإجراءات"] .btn:last-child {
+        margin-bottom: 0;
+    }
+}
+
+/* كروت الإحصائيات */
+.status-card-success {
+    border-right: 4px solid #198754 !important;
+}
+
+.status-card-danger {
+    border-right: 4px solid #dc3545 !important;
+}
+
+.status-card-warning {
+    border-right: 4px solid #ffc107 !important;
+}
+
+/* عناوين الجدول */
+.requests-table-wrapper table thead th {
+    vertical-align: middle;
+    font-size: 0.9rem;
+}
+
+/* الاسم أوضح قليلاً */
+.requests-table-wrapper tbody td[data-label="الإسم"],
+.requests-table-wrapper tbody td:first-child {
+    font-weight: 600;
+}

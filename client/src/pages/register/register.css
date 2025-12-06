@@ -1,12 +1,119 @@
 .border-dashed {
   border-style: dashed !important;
 }
+
 .cursor-pointer {
   cursor: pointer;
 }
 
-.backBTN:hover{
-    background-color: #19355a !important;
-    color: white !important;
+.backBTN:hover {
+  background-color: #19355a !important;
+  color: white !important;
 }
 
+/* make the main card tall enough */
+.register-card {
+  min-height: 45vh;
+  /* or 600px if you prefer a fixed value */
+  display: flex;
+  flex-direction: column;
+}
+
+/* let the stepper area expand to fill the card */
+.register-card .bs-stepper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* keep step content tall so footer buttons sit at the bottom nicely */
+.register-card .bs-stepper-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* each step fills available space */
+.register-card .content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-check:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 8px rgba(25, 53, 90, 0.3);
+}
+
+/* full-screen overlay */
+.terms-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 2000;
+  /* above fixed footer */
+  animation: fadeIn 150ms ease-out;
+}
+
+/* centered card */
+.terms-card {
+  position: fixed;
+  z-index: 2001;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  width: min(720px, 92vw);
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  border-top: 6px solid #19355A;
+  /* color overridden inline */
+  animation: popIn 150ms ease-out;
+}
+
+/* header/footer/body */
+.terms-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .9rem 1rem;
+  background: #19355A;
+  color: #fff;
+}
+
+.terms-body {
+  padding: 1rem 1.2rem;
+  line-height: 1.8;
+}
+
+.terms-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: .5rem;
+  padding: .8rem 1rem 1rem;
+  background: #f7f7f9;
+  border-top: 1px solid #eee;
+}
+
+/* animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}

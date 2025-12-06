@@ -15,8 +15,10 @@ html {
     font-family: var(--font-cario), var(--font-noto);
     overflow-y: overlay;
     overflow-x: hidden;
-    background-color: #f5f5f5;
+    /* background-color: #f5f5f5; */
+    background-color: rgb(235, 239, 245) !important;
 }
+
 
 /* WebKit Browsers (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
@@ -78,6 +80,7 @@ input[type="time"]::-moz-calendar-picker-indicator {
     background-color: transparent !important;
     color: #19355a !important;
 }
+
 .btn-main-s:hover {
     background-color: #AD8700 !important;
     color: white !important;
@@ -86,4 +89,12 @@ input[type="time"]::-moz-calendar-picker-indicator {
 .btn-main-s {
     background-color: transparent !important;
     color: #AD8700 !important;
+}
+
+/* .nav-link {
+    color: var(--color-secondary) !important;
+} */
+
+.terms-headers {
+    color: var(--color-secondary) !important;
 }
